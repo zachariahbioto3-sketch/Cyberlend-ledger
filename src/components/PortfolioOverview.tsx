@@ -1,83 +1,77 @@
 ﻿import React from 'react';
+import { TrendingUp, Wallet, AlertCircle, CheckCircle2, Clock, ArrowUpRight } from 'lucide-react';
 import { Loan, PortfolioMetrics } from '../types';
-import { formatCurrency, formatDate } from '../utils/loanCalculations';
-import { AlertCircle, TrendingUp, DollarSign, Users } from 'lucide-react';
+import { formatCurrency } from '../utils/loanCalculations';
 
 interface PortfolioOverviewProps {
   metrics: PortfolioMetrics;
   loans: Loan[];
-  onSelectLoan: (loan: Loan) => void;
 }
 
-export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
-  metrics,
-  loans,
-  onSelectLoan,
-}) => {
-  const overdueLoans = loans.filter(
-    (l) => l.status === 'Overdue' || (l.nextDueDate && new Date(l.nextDueDate) < new Date())
-  );
+export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ metrics, loans }) => {
+  const overdueLoans = loans.filter((l) => l.status === 'Overdue');
+
+  const cards = [
+    {
+      label: 'Total Lent',
+      value: formatCurrency(metrics.totalPrincipalLent),
+      sub: `${metrics.totalLoansOriginated} loans`,
+      icon: <Wallet className="w-4 h-4" />,
+    },
+    {
+      label: 'Outstanding',
+      value: formatCurrency(metrics.totalOutstanding),
+      sub: `${metrics.activeLoansCount} active`,
+      icon: <Clock className="w-4 h-4" />,
+    },
+    {
+      label: 'Collected',
+      value: formatCurrency(metrics.totalCollected),
+      sub: `${metrics.completedLoansCount} completed`,
+      icon: <CheckCircle2 className="w-4 h-4" />,
+    },
+    {
+      label: 'Net Profit',
+      value: formatCurrency(metrics.totalProfit),
+      sub: 'from interest',
+      icon: <TrendingUp className="w-4 h-4" />,
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-600 font-medium">Total Loans Originated</span>
-            <Users className="w-5 h-5 text-blue-500" />
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {cards.map((card, i) => (
+          <div key={card.label} className={`rounded-2xl p-5 border transition-shadow hover:shadow-md ${i === 0 ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-100'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-[10px] font-semibold uppercase tracking-wider ${i === 0 ? 'text-gray-400' : 'text-gray-400'}`}>{card.label}</span>
+              <div className={`p-1.5 rounded-lg ${i === 0 ? 'bg-white/10' : 'bg-gray-100'}`}>
+                {card.icon}
+              </div>
+            </div>
+            <div className={`text-xl font-bold ${i === 0 ? 'text-white' : 'text-black'}`}>{card.value}</div>
+            <p className={`text-[11px] mt-1 ${i === 0 ? 'text-gray-400' : 'text-gray-400'}`}>{card.sub}</p>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{metrics.totalLoansOriginated}</p>
-          <p className="text-xs text-gray-500 mt-2">
-            {metrics.activeLoansCount} active • {metrics.completedLoansCount} completed
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-600 font-medium">Total Principal Lent</span>
-            <DollarSign className="w-5 h-5 text-green-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">{formatCurrency(metrics.totalPrincipalLent)}</p>
-          <p className="text-xs text-gray-500 mt-2">KES currency</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-600 font-medium">Interest Earned (20%)</span>
-            <TrendingUp className="w-5 h-5 text-purple-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">{formatCurrency(metrics.totalInterestEarned)}</p>
-          <p className="text-xs text-gray-500 mt-2">{formatCurrency(metrics.totalAmountPaid)} paid to date</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-600 font-medium">Amount Outstanding</span>
-            <AlertCircle className="w-5 h-5 text-orange-500" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">{formatCurrency(metrics.totalAmountOutstanding)}</p>
-          <p className="text-xs text-gray-500 mt-2">{metrics.overdueCount} loans overdue</p>
-        </div>
+        ))}
       </div>
 
       {overdueLoans.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-red-900">Overdue Payments</h3>
-              <p className="text-sm text-red-700 mt-1">{overdueLoans.length} loan(s) require immediate attention:</p>
-              <div className="mt-3 space-y-2">
-                {overdueLoans.slice(0, 3).map((loan) => (
-                  <button
-                    key={loan.id}
-                    onClick={() => onSelectLoan(loan)}
-                    className="w-full text-left p-2 bg-red-100 hover:bg-red-200 rounded-lg text-sm text-red-900 transition"
-                  >
-                    <span className="font-semibold">{loan.borrowerName}</span> ({loan.loanNumber}) - Due: {formatDate(loan.nextDueDate)} - {formatCurrency(loan.monthlyPayment)}
-                  </button>
-                ))}
-              </div>
+        <div className="bg-black text-white rounded-2xl p-4 flex items-start gap-3">
+          <div className="p-2 rounded-xl bg-white/10 shrink-0">
+            <AlertCircle className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold">
+              {overdueLoans.length} Overdue Loan{overdueLoans.length > 1 ? 's' : ''} — Collect Now
+            </h4>
+            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-300">
+              {overdueLoans.map((l) => (
+                <span key={l.id}>
+                  <span className="font-semibold text-white">{l.borrowerName}</span>
+                  {' · '}
+                  <span className="text-gray-300">{formatCurrency(l.monthlyPayment)} overdue</span>
+                </span>
+              ))}
             </div>
           </div>
         </div>
