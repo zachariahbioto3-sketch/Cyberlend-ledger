@@ -1,24 +1,57 @@
 ﻿@import "tailwindcss";
 
 @layer base {
+  * { box-sizing: border-box; }
+
   body {
-    background-color: #F8F8F8;
-    color: #111111;
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Space Grotesk', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input, select, textarea, button {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'Space Mono', monospace !important;
   }
 }
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.2s ease-in-out;
+    animation: fadeIn 0.3s ease-in-out;
   }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  .silver-gradient {
+    background: linear-gradient(135deg, #C0C0C0, #FFFFFF, #A0A0A0, #E8E8E8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-silver {
+    border-color: rgba(192, 192, 192, 0.2);
+  }
+
+  .bg-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glow-white {
+    box-shadow: 0 0 20px rgba(255,255,255,0.08), 0 0 40px rgba(255,255,255,0.04);
+  }
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #F0F0F0; }
-::-webkit-scrollbar-thumb { background: #CCCCCC; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #999999; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: #333333; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #555555; }

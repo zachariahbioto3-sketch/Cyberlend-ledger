@@ -3,15 +3,27 @@ import { useLoanStore } from './store/loanStore';
 import { sampleLoans } from './data/sampleLoans';
 import { Loan } from './types';
 import { Navbar, PortfolioOverview, LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal } from './components';
-import { Building2, LayoutDashboard, Users, TrendingUp, Settings, PlusCircle, Download, RotateCcw, Bell, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon } from 'lucide-react';
 import { formatCompactCurrency } from './utils/loanCalculations';
+
+export type Theme = 'dark' | 'light';
 
 function App() {
   const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics } = useLoanStore();
   const [newLoanOpen, setNewLoanOpen] = useState(false);
   const [paymentLoan, setPaymentLoan] = useState<Loan | null>(null);
   const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => {
+    return (localStorage.getItem('cyberlend_theme') as Theme) || 'dark';
+  });
+
+  const isDark = theme === 'dark';
+
+  const toggleTheme = () => {
+    const next = isDark ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('cyberlend_theme', next);
+  };
 
   useEffect(() => {
     if (loans.length === 0) setLoans(sampleLoans);
@@ -24,8 +36,8 @@ function App() {
 
   const handleExportCSV = () => {
     if (loans.length === 0) { alert('No loans to export'); return; }
-    const headers = ['Loan #','Borrower','Phone','Principal','Total Due','Monthly','Paid','Remaining','Status','Months Done','Months Left'];
-    const rows = loans.map((l) => [l.loanNumber,l.borrowerName,l.borrowerPhone,l.loanAmount,l.totalRepayable,l.monthlyPayment,l.amountPaid,l.remainingBalance,l.status,l.monthsCompleted,l.monthsRemaining]);
+    const headers = ['Loan #','Borrower','Phone','Principal','Total Due','Monthly','Paid','Remaining','Status'];
+    const rows = loans.map((l) => [l.loanNumber,l.borrowerName,l.borrowerPhone,l.loanAmount,l.totalRepayable,l.monthlyPayment,l.amountPaid,l.remainingBalance,l.status]);
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -37,151 +49,246 @@ function App() {
     if (confirm('Reset to sample data?')) setLoans(sampleLoans);
   };
 
+  // ── THEME TOKENS ──
+  const t = {
+    bg:           isDark ? '#000000'                         : '#F5F5F5',
+    bgCard:       isDark ? 'rgba(255,255,255,0.02)'          : 'rgba(0,0,0,0.03)',
+    bgCardHover:  isDark ? 'rgba(255,255,255,0.04)'          : 'rgba(0,0,0,0.06)',
+    bgSidebar:    isDark ? '#050505'                         : '#FFFFFF',
+    bgNav:        isDark ? 'rgba(0,0,0,0.90)'               : 'rgba(255,255,255,0.92)',
+    bgHero:       isDark ? 'linear-gradient(135deg,#0f0f0f,#1a1a1a)' : 'linear-gradient(135deg,#1a1a1a,#2d2d2d)',
+    bgInput:      isDark ? 'rgba(255,255,255,0.05)'          : 'rgba(0,0,0,0.04)',
+    bgModal:      isDark ? '#0A0A0A'                         : '#FFFFFF',
+    bgBtn:        isDark ? 'rgba(255,255,255,0.05)'          : 'rgba(0,0,0,0.05)',
+    bgActive:     isDark ? 'rgba(255,255,255,0.10)'          : 'rgba(0,0,0,0.08)',
+    border:       isDark ? 'rgba(255,255,255,0.07)'          : 'rgba(0,0,0,0.08)',
+    borderMid:    isDark ? 'rgba(255,255,255,0.12)'          : 'rgba(0,0,0,0.15)',
+    borderStrong: isDark ? 'rgba(255,255,255,0.20)'          : 'rgba(0,0,0,0.25)',
+    text:         isDark ? '#FFFFFF'                         : '#0A0A0A',
+    textMuted:    isDark ? 'rgba(255,255,255,0.30)'          : 'rgba(0,0,0,0.40)',
+    textFaint:    isDark ? 'rgba(255,255,255,0.15)'          : 'rgba(0,0,0,0.25)',
+    btnPrimary:   isDark ? '#FFFFFF'                         : '#000000',
+    btnPrimaryTx: isDark ? '#000000'                         : '#FFFFFF',
+    rowAlt:       isDark ? 'rgba(255,255,255,0.015)'         : 'rgba(0,0,0,0.02)',
+    rowHover:     isDark ? 'rgba(255,255,255,0.03)'          : 'rgba(0,0,0,0.04)',
+    progressBg:   isDark ? 'rgba(255,255,255,0.10)'          : 'rgba(0,0,0,0.10)',
+    progressFill: isDark ? '#FFFFFF'                         : '#000000',
+  };
+
+  const mono = "'Space Mono', monospace";
+
+  const statusStyle = (status: string) => {
+    const map: Record<string, { bg: string; color: string; border: string }> = {
+      Active:    { bg: t.bgActive,           color: t.text,            border: t.borderMid },
+      Overdue:   { bg: 'rgba(220,50,50,0.1)', color: '#f87171',         border: 'rgba(220,50,50,0.2)' },
+      Completed: { bg: t.bgCard,             color: t.textMuted,       border: t.border },
+      Defaulted: { bg: 'rgba(180,20,20,0.1)', color: '#fca5a5',         border: 'rgba(180,20,20,0.2)' },
+    };
+    return map[status] || map.Completed;
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen flex" style={{ background: t.bg, transition: 'background 0.3s' }}>
 
       {/* ── DESKTOP SIDEBAR ── */}
-      <aside className="hidden md:flex flex-col w-16 bg-white border-r border-gray-100 items-center py-5 gap-5 fixed h-full z-40 shadow-sm">
-        {/* Logo */}
-        <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center mb-2">
-          <Building2 className="w-4 h-4 text-white" />
+      <aside className="hidden md:flex flex-col w-16 items-center py-6 gap-4 fixed h-full z-40 border-r"
+        style={{ background: t.bgSidebar, borderColor: t.border, transition: 'background 0.3s' }}>
+        <div className="w-10 h-10 rounded-xl overflow-hidden border mb-3" style={{ borderColor: t.borderMid }}>
+          <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
         </div>
-
-        {/* Nav icons */}
         <nav className="flex flex-col gap-2 flex-1">
           {[
             { icon: <LayoutDashboard className="w-4 h-4" />, label: 'Dashboard', active: true },
             { icon: <Users className="w-4 h-4" />, label: 'Borrowers' },
             { icon: <TrendingUp className="w-4 h-4" />, label: 'Analytics' },
           ].map((item) => (
-            <button
-              key={item.label}
-              title={item.label}
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${item.active ? 'bg-black text-white' : 'text-gray-300 hover:text-black hover:bg-gray-100'}`}
-            >
+            <button key={item.label} title={item.label}
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+              style={{
+                background: item.active ? t.bgActive : 'transparent',
+                color: item.active ? t.text : t.textFaint,
+                border: `1px solid ${item.active ? t.borderMid : 'transparent'}`,
+              }}>
               {item.icon}
             </button>
           ))}
         </nav>
-
-        {/* Bottom icons */}
         <div className="flex flex-col gap-2">
-          <button onClick={handleExportCSV} title="Export CSV" className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-300 hover:text-black hover:bg-gray-100 transition-colors">
+          {/* Theme toggle */}
+          <button onClick={toggleTheme} title="Toggle theme"
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            style={{ color: t.textMuted, border: `1px solid ${t.border}`, background: t.bgBtn }}>
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button onClick={handleExportCSV} title="Export"
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            style={{ color: t.textFaint }}>
             <Download className="w-4 h-4" />
           </button>
-          <button onClick={handleResetData} title="Reset Data" className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-300 hover:text-black hover:bg-gray-100 transition-colors">
+          <button onClick={handleResetData} title="Reset"
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            style={{ color: t.textFaint }}>
             <RotateCcw className="w-4 h-4" />
           </button>
-          <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center">
-            <span className="text-white text-[10px] font-bold">CL</span>
-          </div>
         </div>
       </aside>
 
-      {/* ── MAIN AREA ── */}
-      <div className="flex-1 md:ml-16 flex flex-col min-h-screen">
+      {/* ── MAIN ── */}
+      <div className="flex-1 md:ml-16 flex flex-col">
 
-        {/* Desktop top navbar */}
-        <Navbar
-          metrics={metrics}
-          onOpenNewLoanModal={() => setNewLoanOpen(true)}
-          onExportCSV={handleExportCSV}
-          onResetData={handleResetData}
-        />
+        {/* Desktop navbar */}
+        <header className="hidden md:flex sticky top-0 z-30 h-14 items-center px-6 gap-4 border-b"
+          style={{ background: t.bgNav, backdropFilter: 'blur(20px)', borderColor: t.border, transition: 'background 0.3s' }}>
+          <div className="flex items-center gap-3 min-w-[220px]">
+            <div className="w-8 h-8 rounded-lg overflow-hidden border" style={{ borderColor: t.borderMid }}>
+              <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <span className="font-bold text-sm tracking-widest" style={{ fontFamily: mono, color: t.text }}>CYBERLEND</span>
+              <p className="text-[8px] tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BUILDING WEALTH TOGETHER</p>
+            </div>
+          </div>
 
-        {/* ── MOBILE HEADER (FinSight style) ── */}
-        <div className="md:hidden">
-          {/* Top bar */}
-          <div className="bg-white px-4 pt-6 pb-4 flex items-center justify-between">
+          <div className="hidden lg:flex items-center gap-5 text-xs ml-4">
+            {[
+              { label: 'LENT', value: formatCompactCurrency(metrics.totalPrincipalLent) },
+              { label: 'OUTSTANDING', value: formatCompactCurrency(metrics.totalOutstanding) },
+              { label: 'COLLECTED', value: formatCompactCurrency(metrics.totalCollected) },
+              { label: 'PROFIT', value: formatCompactCurrency(metrics.totalProfit) },
+            ].map((m, i) => (
+              <React.Fragment key={m.label}>
+                {i > 0 && <div className="w-px h-5" style={{ background: t.border }} />}
+                <div>
+                  <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{m.label}</p>
+                  <p className="font-bold text-xs" style={{ fontFamily: mono, color: t.text }}>{m.value}</p>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Theme toggle in navbar */}
+            <button onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
+              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
+              {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              <span style={{ fontFamily: mono }}>{isDark ? 'LIGHT' : 'DARK'}</span>
+            </button>
+            <button onClick={handleExportCSV}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
+              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
+              <Download className="w-3 h-3" /> Export
+            </button>
+            <button onClick={handleResetData}
+              className="p-1.5 rounded-lg transition-colors"
+              style={{ color: t.textFaint }}>
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={() => setNewLoanOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-lg"
+              style={{ fontFamily: mono, background: t.btnPrimary, color: t.btnPrimaryTx }}>
+              <PlusCircle className="w-3.5 h-3.5" /> NEW LOAN
+            </button>
+          </div>
+        </header>
+
+        {/* ── MOBILE ── */}
+        <div className="md:hidden min-h-screen" style={{ background: t.bg }}>
+          <div className="px-5 pt-8 pb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden border" style={{ borderColor: t.borderMid }}>
+                <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>Portfolio</p>
+                <p className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>CYBERLEND</p>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                <span className="text-white text-[10px] font-bold">CL</span>
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-400">Good day,</p>
-                <p className="text-xs font-bold text-black">Cyberlend</p>
-              </div>
-            </div>
-            <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">
-              <Bell className="w-4 h-4 text-gray-400" />
-            </button>
-          </div>
-
-          {/* Dark balance card (FinSight style) */}
-          <div className="mx-4 rounded-2xl bg-black text-white p-5 mb-4">
-            <p className="text-[11px] text-gray-400 mb-1">Total Outstanding</p>
-            <p className="text-3xl font-bold mb-4">{formatCompactCurrency(metrics.totalOutstanding)}</p>
-            <div className="flex justify-between text-[11px]">
-              <div>
-                <p className="text-gray-400">Total Lent</p>
-                <p className="font-semibold">{formatCompactCurrency(metrics.totalPrincipalLent)}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Collected</p>
-                <p className="font-semibold">{formatCompactCurrency(metrics.totalCollected)}</p>
-              </div>
-              <div>
-                <p className="text-gray-400">Profit</p>
-                <p className="font-semibold">{formatCompactCurrency(metrics.totalProfit)}</p>
-              </div>
+              <button onClick={toggleTheme}
+                className="w-8 h-8 rounded-full border flex items-center justify-center transition-all"
+                style={{ borderColor: t.border, background: t.bgBtn, color: t.textMuted }}>
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+              <button className="w-8 h-8 rounded-full border flex items-center justify-center"
+                style={{ borderColor: t.border, background: t.bgBtn }}>
+                <Bell className="w-4 h-4" style={{ color: t.textMuted }} />
+              </button>
             </div>
           </div>
 
-          {/* Quick actions row */}
-          <div className="px-4 flex gap-3 mb-4">
-            <button onClick={() => setNewLoanOpen(true)} className="flex-1 flex flex-col items-center gap-1.5 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                <PlusCircle className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-[10px] font-semibold text-black">New Loan</span>
-            </button>
-            <button onClick={handleExportCSV} className="flex-1 flex flex-col items-center gap-1.5 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                <Download className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-[10px] font-semibold text-black">Export</span>
-            </button>
-            <button onClick={handleResetData} className="flex-1 flex flex-col items-center gap-1.5 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                <RotateCcw className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-[10px] font-semibold text-black">Reset</span>
-            </button>
+          {/* Hero card — always dark regardless of theme (like a credit card) */}
+          <div className="mx-4 rounded-3xl p-6 mb-5 border relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg,#0f0f0f,#1f1f1f)', borderColor: 'rgba(255,255,255,0.12)' }}>
+            <div className="absolute -bottom-6 -right-6 w-36 h-36 opacity-10">
+              <img src="/logo.png" alt="" className="w-full h-full object-contain" />
+            </div>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1" style={{ fontFamily: mono }}>TOTAL OUTSTANDING</p>
+            <p className="text-4xl font-bold text-white mb-5" style={{ fontFamily: mono }}>
+              {formatCompactCurrency(metrics.totalOutstanding)}
+            </p>
+            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-white/10">
+              {[
+                { label: 'LENT', value: formatCompactCurrency(metrics.totalPrincipalLent) },
+                { label: 'COLLECTED', value: formatCompactCurrency(metrics.totalCollected) },
+                { label: 'PROFIT', value: formatCompactCurrency(metrics.totalProfit) },
+              ].map((s) => (
+                <div key={s.label}>
+                  <p className="text-[9px] text-white/25 uppercase tracking-widest mb-0.5" style={{ fontFamily: mono }}>{s.label}</p>
+                  <p className="text-sm font-bold text-white" style={{ fontFamily: mono }}>{s.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Mobile transaction list */}
-          <div className="px-4 mb-4">
+          {/* Quick actions */}
+          <div className="px-4 grid grid-cols-3 gap-3 mb-5">
+            {[
+              { label: 'NEW LOAN', icon: <PlusCircle className="w-5 h-5" />, action: () => setNewLoanOpen(true) },
+              { label: 'EXPORT', icon: <Download className="w-5 h-5" />, action: handleExportCSV },
+              { label: 'RESET', icon: <RotateCcw className="w-5 h-5" />, action: handleResetData },
+            ].map((btn) => (
+              <button key={btn.label} onClick={btn.action}
+                className="flex flex-col items-center gap-2 py-4 rounded-2xl border transition-all active:scale-95"
+                style={{ background: t.bgCard, borderColor: t.border }}>
+                <div style={{ color: t.textMuted }}>{btn.icon}</div>
+                <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{btn.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Loan list */}
+          <div className="px-4 pb-24">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-black">Loans</h2>
-              <span className="text-[11px] text-gray-400">{loans.length} total</span>
+              <h2 className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>LOANS</h2>
+              <span className="text-[10px]" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS</span>
             </div>
             <div className="space-y-2">
-              {loans.slice(0, 10).map((loan) => {
-                const statusColor: Record<string, string> = {
-                  Active: 'bg-black text-white',
-                  Overdue: 'bg-red-100 text-red-600',
-                  Completed: 'bg-gray-100 text-gray-500',
-                  Defaulted: 'bg-red-200 text-red-900',
-                };
+              {loans.map((loan) => {
+                const ss = statusStyle(loan.status);
                 return (
-                  <div
-                    key={loan.id}
-                    onClick={() => setDetailLoan(loan)}
-                    className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center justify-between active:bg-gray-50 cursor-pointer"
-                  >
+                  <div key={loan.id} onClick={() => setDetailLoan(loan)}
+                    className="rounded-2xl p-4 border flex items-center justify-between cursor-pointer transition-all active:scale-99"
+                    style={{ background: t.bgCard, borderColor: t.border }}>
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center shrink-0">
-                        <span className="text-white text-xs font-bold">{loan.borrowerName.charAt(0)}</span>
+                      <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0"
+                        style={{ background: t.bgActive, borderColor: t.borderMid }}>
+                        <span className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
+                          {loan.borrowerName.charAt(0)}
+                        </span>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-black">{loan.borrowerName}</p>
-                        <p className="text-[10px] text-gray-400">{loan.category} · {loan.monthsRemaining} mo left</p>
+                        <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {loan.monthsRemaining} mo left</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-black">{formatCompactCurrency(loan.remainingBalance)}</p>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold ${statusColor[loan.status]}`}>
-                        {loan.status}
+                      <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
+                        {formatCompactCurrency(loan.remainingBalance)}
+                      </p>
+                      <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5"
+                        style={{ fontFamily: mono, background: ss.bg, color: ss.color, borderColor: ss.border }}>
+                        {loan.status.toUpperCase()}
                       </span>
                     </div>
                   </div>
@@ -189,46 +296,99 @@ function App() {
               })}
             </div>
           </div>
+
+          {/* Mobile bottom nav */}
+          <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-around px-4 py-4 z-30 border-t"
+            style={{ background: t.bgNav, backdropFilter: 'blur(20px)', borderColor: t.border }}>
+            {[
+              { icon: <LayoutDashboard className="w-5 h-5" />, active: true },
+              { icon: <TrendingUp className="w-5 h-5" /> },
+              { icon: <PlusCircle className="w-5 h-5" />, action: () => setNewLoanOpen(true) },
+              { icon: <Users className="w-5 h-5" /> },
+            ].map((item, i) => (
+              <button key={i} onClick={item.action}
+                style={{ color: item.active ? t.text : t.textFaint }}>
+                {item.icon}
+              </button>
+            ))}
+          </nav>
         </div>
 
-        {/* ── DESKTOP MAIN CONTENT ── */}
-        <main className="hidden md:block flex-1 p-6 space-y-6">
-          <PortfolioOverview metrics={metrics} loans={loans} />
-          <LoanLedgerTable
-            loans={loans}
-            onSelectLoan={setDetailLoan}
-            onRecordPayment={setPaymentLoan}
-            onDeleteLoan={deleteLoan}
-            onOpenNewLoan={() => setNewLoanOpen(true)}
-          />
-        </main>
-
-        {/* ── MOBILE BOTTOM NAV (FinSight style) ── */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around px-4 py-3 z-30 shadow-lg">
-          <button className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-              <LayoutDashboard className="w-4 h-4 text-white" />
+        {/* ── DESKTOP CONTENT ── */}
+        <main className="hidden md:block flex-1 p-6 space-y-6 relative"
+          style={{
+            backgroundImage: 'url(/logo.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right -80px top -80px',
+            backgroundSize: '400px',
+          }}>
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: isDark ? 'rgba(0,0,0,0.88)' : 'rgba(245,245,245,0.92)' }} />
+          <div className="relative z-10 space-y-6">
+            <div>
+              <h1 className="text-lg font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h1>
+              <p className="text-[11px] mt-0.5 tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BUILDING WEALTH TOGETHER</p>
             </div>
-          </button>
-          <button className="flex flex-col items-center gap-1">
-            <TrendingUp className="w-5 h-5 text-gray-300" />
-          </button>
-          <button onClick={() => setNewLoanOpen(true)} className="flex flex-col items-center gap-1">
-            <PlusCircle className="w-5 h-5 text-gray-300" />
-          </button>
-          <button className="flex flex-col items-center gap-1">
-            <Users className="w-5 h-5 text-gray-300" />
-          </button>
-        </nav>
 
-        {/* Bottom padding for mobile nav */}
-        <div className="md:hidden h-20" />
+            {/* Metric cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { label: 'TOTAL LENT', value: formatCompactCurrency(metrics.totalPrincipalLent), sub: `${metrics.totalLoansOriginated} loans` },
+                { label: 'OUTSTANDING', value: formatCompactCurrency(metrics.totalOutstanding), sub: `${metrics.activeLoansCount} active` },
+                { label: 'COLLECTED', value: formatCompactCurrency(metrics.totalCollected), sub: `${metrics.completedLoansCount} completed` },
+                { label: 'NET PROFIT', value: formatCompactCurrency(metrics.totalProfit), sub: 'from interest' },
+              ].map((card, i) => (
+                <div key={card.label}
+                  className="rounded-2xl p-5 border transition-all"
+                  style={{
+                    background: i === 0 ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)') : t.bgCard,
+                    borderColor: i === 0 ? t.borderMid : t.border,
+                  }}>
+                  <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>{card.label}</p>
+                  <p className="text-xl font-bold" style={{ fontFamily: mono, color: t.text }}>{card.value}</p>
+                  <p className="text-[10px] mt-1" style={{ color: t.textFaint }}>{card.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Overdue alert */}
+            {loans.filter(l => l.status === 'Overdue').length > 0 && (
+              <div className="rounded-2xl p-4 border flex items-start gap-3"
+                style={{ background: 'rgba(220,50,50,0.05)', borderColor: 'rgba(220,50,50,0.15)' }}>
+                <div className="p-2 rounded-xl shrink-0" style={{ background: t.bgBtn }}>
+                  <Bell className="w-4 h-4 text-red-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
+                    {loans.filter(l => l.status === 'Overdue').length} OVERDUE — COLLECT NOW
+                  </h4>
+                  <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
+                    {loans.filter(l => l.status === 'Overdue').map((l) => (
+                      <span key={l.id}>
+                        <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
+                        {' · '}{formatCompactCurrency(l.monthlyPayment)} overdue
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <LoanLedgerTable
+              loans={loans}
+              onSelectLoan={setDetailLoan}
+              onRecordPayment={setPaymentLoan}
+              onDeleteLoan={deleteLoan}
+              onOpenNewLoan={() => setNewLoanOpen(true)}
+              theme={t}
+            />
+          </div>
+        </main>
       </div>
 
-      {/* Modals */}
-      <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} />
-      <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} />
-      <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} />
+      <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} theme={t} />
+      <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
+      <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} theme={t} />
     </div>
   );
 }

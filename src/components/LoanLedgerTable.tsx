@@ -1,7 +1,9 @@
 ﻿import React, { useState, useMemo } from 'react';
 import { Loan } from '../types';
 import { formatCurrency, formatDate } from '../utils/loanCalculations';
-import { ChevronRight, Plus, Trash2, Search, SlidersHorizontal } from 'lucide-react';
+import { ChevronRight, Plus, Trash2, Search } from 'lucide-react';
+
+interface ThemeTokens { bg: string; bgCard: string; bgCardHover: string; bgActive: string; bgBtn: string; border: string; borderMid: string; borderStrong: string; text: string; textMuted: string; textFaint: string; btnPrimary: string; btnPrimaryTx: string; rowAlt: string; rowHover: string; progressBg: string; progressFill: string; [key: string]: string; }
 
 interface LoanLedgerTableProps {
   loans: Loan[];
@@ -9,159 +11,152 @@ interface LoanLedgerTableProps {
   onRecordPayment: (loan: Loan) => void;
   onDeleteLoan: (loanId: string) => void;
   onOpenNewLoan: () => void;
+  theme: ThemeTokens;
 }
 
-export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({
-  loans, onSelectLoan, onRecordPayment, onDeleteLoan, onOpenNewLoan,
-}) => {
+export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelectLoan, onRecordPayment, onDeleteLoan, onOpenNewLoan, theme: t }) => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const mono = "'Space Mono', monospace";
 
-  const filtered = useMemo(() => {
-    return loans.filter((l) => {
-      const q = search.toLowerCase();
-      const matchSearch = l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q);
-      const matchStatus = statusFilter === 'ALL' || l.status === statusFilter;
-      return matchSearch && matchStatus;
-    });
-  }, [loans, search, statusFilter]);
+  const filtered = useMemo(() => loans.filter((l) => {
+    const q = search.toLowerCase();
+    return (l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q))
+      && (statusFilter === 'ALL' || l.status === statusFilter);
+  }), [loans, search, statusFilter]);
 
-  const statusBadge = (status: string) => {
-    const map: Record<string, string> = {
-      Active: 'bg-black text-white',
-      Overdue: 'bg-red-100 text-red-700',
-      Completed: 'bg-gray-100 text-gray-500',
-      Defaulted: 'bg-red-200 text-red-900',
+  const statusStyle = (status: string) => {
+    const map: Record<string, { bg: string; color: string; border: string }> = {
+      Active:    { bg: t.bgActive,            color: t.text,      border: t.borderMid },
+      Overdue:   { bg: 'rgba(220,50,50,0.1)', color: '#f87171',   border: 'rgba(220,50,50,0.2)' },
+      Completed: { bg: t.bgCard,              color: t.textMuted, border: t.border },
+      Defaulted: { bg: 'rgba(180,20,20,0.1)', color: '#fca5a5',   border: 'rgba(180,20,20,0.2)' },
     };
-    return map[status] || 'bg-gray-100 text-gray-600';
+    return map[status] || map.Completed;
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      {/* Table Header */}
-      <div className="p-5 border-b border-gray-100">
+    <div className="rounded-2xl border overflow-hidden" style={{ background: t.bgCard, borderColor: t.border }}>
+      <div className="p-5 border-b" style={{ borderColor: t.border }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-black">Loan Ledger</h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">{loans.length} total records</p>
+            <h2 className="text-sm font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: t.text }}>MASTER LEDGER</h2>
+            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-black transition-colors w-44"
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3" style={{ color: t.textFaint }} />
+              <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 pr-3 py-1.5 text-xs rounded-lg border focus:outline-none w-40 transition-colors"
+                style={{ background: t.bgBtn, borderColor: t.border, color: t.text }} />
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-black text-gray-600"
-            >
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-1.5 text-xs rounded-lg border focus:outline-none transition-colors"
+              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
               <option value="ALL">All</option>
               <option value="Active">Active</option>
               <option value="Overdue">Overdue</option>
               <option value="Completed">Completed</option>
               <option value="Defaulted">Defaulted</option>
             </select>
-            <button
-              onClick={onOpenNewLoan}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-black hover:bg-gray-900 text-white shadow-sm transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New Loan
+            <button onClick={onOpenNewLoan}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+              style={{ fontFamily: mono, background: t.btnPrimary, color: t.btnPrimaryTx }}>
+              <Plus className="w-3.5 h-3.5" /> NEW
             </button>
           </div>
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-gray-100">
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">#</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Borrower</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Category</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Lent</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Total Due</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Monthly</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Remaining</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Progress</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-              <th className="px-5 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Next Due</th>
-              <th className="px-5 py-3 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+            <tr className="border-b" style={{ borderColor: t.border }}>
+              {['#','BORROWER','CAT','LENT','TOTAL DUE','MONTHLY','REMAINING','PROGRESS','STATUS','NEXT DUE',''].map((h) => (
+                <th key={h} className="px-4 py-3 text-[9px] font-bold uppercase tracking-widest whitespace-nowrap"
+                  style={{ fontFamily: mono, color: t.textFaint }}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={11} className="text-center py-16 text-gray-400 text-sm">
-                  No loans found.{' '}
-                  <button onClick={onOpenNewLoan} className="text-black font-semibold underline">Add one</button>
-                </td>
-              </tr>
-            ) : (
-              filtered.map((loan, idx) => {
-                const pct = Math.round((loan.amountPaid / loan.totalRepayable) * 100);
-                return (
-                  <tr key={loan.id} className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${idx % 2 === 0 ? '' : 'bg-gray-50/50'}`}>
-                    <td className="px-5 py-3.5 font-mono text-gray-400 text-[10px]">{String(idx + 1).padStart(2, '0')}</td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center shrink-0">
-                          <span className="text-white text-[10px] font-bold">{loan.borrowerName.charAt(0)}</span>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-black">{loan.borrowerName}</p>
-                          <p className="text-[10px] text-gray-400">{loan.borrowerPhone}</p>
-                        </div>
+              <tr><td colSpan={11} className="text-center py-16 text-xs" style={{ fontFamily: mono, color: t.textFaint }}>
+                NO RECORDS. <button onClick={onOpenNewLoan} style={{ color: t.text, textDecoration: 'underline' }}>ADD ONE</button>
+              </td></tr>
+            ) : filtered.map((loan, idx) => {
+              const pct = Math.round((loan.amountPaid / loan.totalRepayable) * 100);
+              const ss = statusStyle(loan.status);
+              return (
+                <tr key={loan.id} className="border-b transition-colors"
+                  style={{ borderColor: t.border, background: idx % 2 !== 0 ? t.rowAlt : 'transparent' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = t.rowHover)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = idx % 2 !== 0 ? t.rowAlt : 'transparent')}>
+                  <td className="px-4 py-3.5 text-[10px]" style={{ fontFamily: mono, color: t.textFaint }}>{String(idx + 1).padStart(2, '0')}</td>
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-full border flex items-center justify-center shrink-0"
+                        style={{ background: t.bgActive, borderColor: t.borderMid }}>
+                        <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>{loan.borrowerName.charAt(0)}</span>
                       </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500">{loan.category}</td>
-                    <td className="px-5 py-3.5 font-semibold text-black">{formatCurrency(loan.loanAmount)}</td>
-                    <td className="px-5 py-3.5 font-semibold text-gray-600">{formatCurrency(loan.totalRepayable)}</td>
-                    <td className="px-5 py-3.5 font-semibold text-black">{formatCurrency(loan.monthlyPayment)}</td>
-                    <td className="px-5 py-3.5">
-                      <span className="font-bold text-black">{formatCurrency(loan.remainingBalance)}</span>
-                      <p className="text-[10px] text-gray-400">{loan.monthsRemaining} mo left</p>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-black rounded-full" style={{ width: `${pct}%` }} />
-                        </div>
-                        <span className="text-[10px] text-gray-400">{pct}%</span>
+                      <div>
+                        <p className="font-semibold" style={{ color: t.text }}>{loan.borrowerName}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerPhone}</p>
                       </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${statusBadge(loan.status)}`}>
-                        {loan.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500">{formatDate(loan.nextDueDate)}</td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex justify-end gap-1">
-                        {loan.status !== 'Completed' && (
-                          <button onClick={() => onRecordPayment(loan)} className="p-1.5 hover:bg-black hover:text-white text-gray-400 rounded-lg transition-colors" title="Record payment">
-                            <Plus className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                        <button onClick={() => onSelectLoan(loan)} className="p-1.5 hover:bg-gray-100 text-gray-400 rounded-lg transition-colors" title="View details">
-                          <ChevronRight className="w-3.5 h-3.5" />
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5" style={{ color: t.textMuted }}>{loan.category}</td>
+                  <td className="px-4 py-3.5 font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.loanAmount)}</td>
+                  <td className="px-4 py-3.5" style={{ fontFamily: mono, color: t.textMuted }}>{formatCurrency(loan.totalRepayable)}</td>
+                  <td className="px-4 py-3.5 font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.monthlyPayment)}</td>
+                  <td className="px-4 py-3.5">
+                    <span className="font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.remainingBalance)}</span>
+                    <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.monthsRemaining} mo left</p>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: t.progressBg }}>
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: t.progressFill }} />
+                      </div>
+                      <span className="text-[9px]" style={{ fontFamily: mono, color: t.textFaint }}>{pct}%</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold border"
+                      style={{ fontFamily: mono, background: ss.bg, color: ss.color, borderColor: ss.border }}>
+                      {loan.status.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 text-[10px]" style={{ color: t.textMuted }}>{formatDate(loan.nextDueDate)}</td>
+                  <td className="px-4 py-3.5 text-right">
+                    <div className="flex justify-end gap-1">
+                      {loan.status !== 'Completed' && (
+                        <button onClick={() => onRecordPayment(loan)}
+                          className="p-1.5 rounded-lg transition-colors"
+                          style={{ color: t.textFaint }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = t.bgActive; (e.currentTarget as HTMLElement).style.color = t.text; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = t.textFaint; }}>
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => { if (confirm(`Delete ${loan.borrowerName}'s loan?`)) onDeleteLoan(loan.id); }} className="p-1.5 hover:bg-red-50 text-gray-300 hover:text-red-500 rounded-lg transition-colors" title="Delete">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
+                      )}
+                      <button onClick={() => onSelectLoan(loan)}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: t.textFaint }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = t.bgActive; (e.currentTarget as HTMLElement).style.color = t.text; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = t.textFaint; }}>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => { if (confirm(`Delete ${loan.borrowerName}?`)) onDeleteLoan(loan.id); }}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: t.textFaint }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(220,50,50,0.1)'; (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = t.textFaint; }}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
