@@ -1,8 +1,10 @@
-﻿export type LoanCategory = 'Personal' | 'Business' | 'Emergency' | 'Other';
+﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Other";
 
-export type LoanStatus = 'Active' | 'Overdue' | 'Completed' | 'Defaulted';
+export type LoanStatus = "Active" | "Overdue" | "Completed" | "Defaulted";
 
-export type PaymentMethod = 'M-Pesa' | 'Bank Transfer';
+export type PaymentMethod = "M-Pesa" | "Bank Transfer";
+
+export type PaymentType = "Interest" | "Principal";
 
 export interface RepaymentTransaction {
   id: string;
@@ -11,7 +13,8 @@ export interface RepaymentTransaction {
   amount: number;
   paymentMethod: PaymentMethod;
   referenceNumber: string;
-  status: 'Completed' | 'Pending' | 'Failed';
+  status: "Completed" | "Pending" | "Failed";
+  paymentType: PaymentType;
   notes?: string;
 }
 
@@ -22,6 +25,7 @@ export interface Loan {
   borrowerPhone: string;
   borrowerEmail?: string;
   loanAmount: number;
+  monthlyInterest: number;
   totalRepayable: number;
   monthlyPayment: number;
   term: number;
@@ -30,6 +34,7 @@ export interface Loan {
   originationDate: string;
   maturityDate: string;
   nextDueDate: string;
+  interestCollected: number;
   amountPaid: number;
   remainingBalance: number;
   monthsCompleted: number;

@@ -1,8 +1,13 @@
-﻿import { create } from 'zustand';
-import { Loan, RepaymentTransaction, PortfolioMetrics } from '../types';
-import { calculateCyberlendLoan, calculatePortfolioMetrics, updateLoanAfterPayment } from '../utils/loanCalculations';
+﻿import { create } from "zustand";
+import { Loan, RepaymentTransaction, PortfolioMetrics } from "../types";
+import {
+  calculateCyberlendLoan,
+  calculatePortfolioMetrics,
+  updateLoanAfterInterest,
+  closeLoanWithPrincipal,
+} from "../utils/loanCalculations";
 
-const STORAGE_KEY = 'cyberlend_loans';
+const STORAGE_KEY = "cyberlend_loans";
 
 function loadLoans(): Loan[] {
   try {
@@ -20,7 +25,8 @@ interface LoanState {
   metrics: PortfolioMetrics;
   addLoan: (data: any) => void;
   deleteLoan: (id: string) => void;
-  recordPayment: (loanId: string, transaction: Omit<RepaymentTransaction, 'id'>) => void;
+  recordPayment: (loanId: string, transaction: Omit<RepaymentTransaction, "id">) => void;
+  closeLoan: (loanId: string, transaction: Omit<RepaymentTransaction, "id">) => void;
   setLoans: (loans: Loan[]) => void;
 }
 
@@ -33,33 +39,38 @@ export const useLoanStore = create<LoanState>((set) => ({
   addLoan: (loanData) =>
     set((state) => {
       const loanNumber = `CL-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const { totalRepayable, monthlyPayment } = calculateCyberlendLoan(loanData.loanAmount, loanData.term);
+      const { monthlyInterest, totalRepayable, monthlyPayment } = calculateCyberlendLoan(
+        loanData.loanAmount,
+        loanData.term
+      );
 
-      const [year, month, day] = loanData.originationDate.split('-').map(Number);
-      const maturityDate = new Date(year, month - 1 + loanData.term, day).toISOString().split('T')[0];
-      const nextDueDate = new Date(year, month, day).toISOString().split('T')[0];
+      const [year, month, day] = loanData.originationDate.split("-").map(Number);
+      const maturityDate = new Date(year, month - 1 + loanData.term, day).toISOString().split("T")[0];
+      const nextDueDate  = new Date(year, month, day).toISOString().split("T")[0];
 
       const newLoan: Loan = {
         id: `loan-${Date.now()}`,
         loanNumber,
-        borrowerName: loanData.borrowerName,
-        borrowerPhone: loanData.borrowerPhone,
-        borrowerEmail: loanData.borrowerEmail || '',
-        loanAmount: loanData.loanAmount,
+        borrowerName:    loanData.borrowerName,
+        borrowerPhone:   loanData.borrowerPhone,
+        borrowerEmail:   loanData.borrowerEmail || "",
+        loanAmount:      loanData.loanAmount,
+        monthlyInterest,
         totalRepayable,
         monthlyPayment,
-        term: loanData.term,
-        category: loanData.category,
-        status: 'Active',
+        term:            loanData.term,
+        category:        loanData.category,
+        status:          "Active",
         originationDate: loanData.originationDate,
         maturityDate,
         nextDueDate,
-        amountPaid: 0,
-        remainingBalance: totalRepayable,
-        monthsCompleted: 0,
-        monthsRemaining: loanData.term,
-        transactions: [],
-        notes: loanData.notes || '',
+        interestCollected: 0,
+        amountPaid:        0,
+        remainingBalance:  loanData.loanAmount, // principal stays constant
+        monthsCompleted:   0,
+        monthsRemaining:   loanData.term,
+        transactions:      [],
+        notes:             loanData.notes || "",
       };
 
       const updated = [...state.loans, newLoan];
@@ -74,15 +85,43 @@ export const useLoanStore = create<LoanState>((set) => ({
       return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
     }),
 
+  // Records a monthly interest payment
   recordPayment: (loanId, txData) =>
     set((state) => {
       const idx = state.loans.findIndex((l) => l.id === loanId);
       if (idx === -1) return state;
 
       const loan = state.loans[idx];
-      const updatedLoan = updateLoanAfterPayment(loan, txData.amount);
-      const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData };
-      updatedLoan.transactions.push(tx);
+      const updatedLoan = updateLoanAfterInterest(loan);
+      const tx: RepaymentTransaction = {
+        id: `TX-${Date.now()}`,
+        ...txData,
+        paymentType: "Interest",
+        amount: loan.monthlyInterest,
+      };
+      updatedLoan.transactions = [...updatedLoan.transactions, tx];
+
+      const updated = [...state.loans];
+      updated[idx] = updatedLoan;
+      saveLoans(updated);
+      return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
+    }),
+
+  // Records principal return — closes the loan
+  closeLoan: (loanId, txData) =>
+    set((state) => {
+      const idx = state.loans.findIndex((l) => l.id === loanId);
+      if (idx === -1) return state;
+
+      const loan = state.loans[idx];
+      const updatedLoan = closeLoanWithPrincipal(loan);
+      const tx: RepaymentTransaction = {
+        id: `TX-${Date.now()}`,
+        ...txData,
+        paymentType: "Principal",
+        amount: loan.loanAmount,
+      };
+      updatedLoan.transactions = [...updatedLoan.transactions, tx];
 
       const updated = [...state.loans];
       updated[idx] = updatedLoan;

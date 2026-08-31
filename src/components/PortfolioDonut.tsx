@@ -2,76 +2,97 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { PortfolioMetrics } from "../types";
 
+interface ThemeTokens {
+  bg: string; bgCard: string; bgModal: string; bgActive: string; bgBtn: string;
+  border: string; borderMid: string; text: string; textMuted: string; textFaint: string;
+}
+
 interface Props {
   metrics: PortfolioMetrics;
+  theme: ThemeTokens;
   compact?: boolean;
 }
 
-const COLORS = {
-  Active: "#000000",
-  Overdue: "#ef4444",
-  Completed: "#9ca3af",
-  Defaulted: "#7f1d1d",
-};
+export const PortfolioDonut: React.FC<Props> = ({ metrics, theme: t, compact = false }) => {
+  const mono = "'Space Mono', monospace";
+  const isDark = t.text !== "#0f1117" && t.text !== "#0A0A0A";
 
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const { name, value } = payload[0];
-    return (
-      <div className="bg-white border border-gray-100 rounded-xl px-3 py-2 shadow-sm text-xs">
-        <p className="font-semibold text-black">{name}</p>
-        <p className="text-gray-500">{value} loan{value !== 1 ? "s" : ""}</p>
-      </div>
-    );
-  }
-  return null;
-};
+  const COLORS: Record<string, string> = {
+    Active:    "#5b7cfa",
+    Overdue:   "#ef4444",
+    Completed: isDark ? "rgba(255,255,255,0.25)" : "#9ca3af",
+    Defaulted: "#7f1d1d",
+  };
 
-export const PortfolioDonut: React.FC<Props> = ({ metrics, compact = false }) => {
   const data = [
-    { name: "Active", value: metrics.activeLoansCount },
-    { name: "Overdue", value: metrics.overdueCount },
+    { name: "Active",    value: metrics.activeLoansCount },
+    { name: "Overdue",   value: metrics.overdueCount },
     { name: "Completed", value: metrics.completedLoansCount },
     { name: "Defaulted", value: metrics.defaultedCount },
   ].filter((d) => d.value > 0);
 
-  const total = metrics.totalLoansOriginated;
-  const chartHeight = compact ? 160 : 200;
-  const innerRadius = compact ? 45 : 60;
-  const outerRadius = compact ? 65 : 85;
+  const chartH   = compact ? 160 : 200;
+  const innerR   = compact ? 48  : 62;
+  const outerR   = compact ? 68  : 88;
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    const { name, value } = payload[0];
+    return (
+      <div style={{
+        background: t.bgModal, border: `1px solid ${t.borderMid}`,
+        borderRadius: 12, padding: "8px 12px", fontFamily: mono,
+      }}>
+        <p style={{ fontSize: 10, fontWeight: 700, color: t.text, textTransform: "uppercase", letterSpacing: 2 }}>{name}</p>
+        <p style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{value} loan{value !== 1 ? "s" : ""}</p>
+      </div>
+    );
+  };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-4">Portfolio Health</p>
-      <div className="relative" style={{ height: chartHeight }}>
+    <div style={{
+      background: t.bgCard,
+      border: `1px solid ${t.border}`,
+      borderRadius: 20,
+      padding: 20,
+    }}>
+      <p style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, letterSpacing: 3, color: t.textFaint, textTransform: "uppercase", marginBottom: 16 }}>
+        PORTFOLIO HEALTH
+      </p>
+
+      <div style={{ position: "relative", height: chartH }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={innerRadius}
-              outerRadius={outerRadius}
-              paddingAngle={3}
-              dataKey="value"
-            >
+            <Pie data={data} cx="50%" cy="50%" innerRadius={innerR} outerRadius={outerR} paddingAngle={3} dataKey="value">
               {data.map((entry) => (
-                <Cell key={entry.name} fill={COLORS[entry.name as keyof typeof COLORS]} />
+                <Cell key={entry.name} fill={COLORS[entry.name]} />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <p className={`font-bold text-black ${compact ? "text-xl" : "text-2xl"}`}>{total}</p>
-          <p className="text-[10px] text-gray-400">total loans</p>
+
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none",
+        }}>
+          <p style={{ fontFamily: mono, fontSize: compact ? 22 : 28, fontWeight: 700, color: t.text, lineHeight: 1 }}>
+            {metrics.totalLoansOriginated}
+          </p>
+          <p style={{ fontFamily: mono, fontSize: 8, color: t.textFaint, letterSpacing: 2, marginTop: 4, textTransform: "uppercase" }}>
+            TOTAL
+          </p>
         </div>
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginTop: 14 }}>
         {data.map((d) => (
-          <div key={d.name} className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ background: COLORS[d.name as keyof typeof COLORS] }} />
-            <span className="text-[11px] text-gray-500">{d.name} <span className="font-semibold text-black">{d.value}</span></span>
+          <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS[d.name], flexShrink: 0 }} />
+            <span style={{ fontFamily: mono, fontSize: 9, color: t.textFaint, textTransform: "uppercase", letterSpacing: 1 }}>
+              {d.name} <strong style={{ color: t.text }}>{d.value}</strong>
+            </span>
           </div>
         ))}
       </div>
