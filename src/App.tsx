@@ -2,12 +2,12 @@
 import { useLoanStore } from "./store/loanStore";
 import { sampleLoans } from "./data/sampleLoans";
 import { Loan } from "./types";
-import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal } from "./components";
+import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal } from "./components";
 import { PortfolioDonut } from "./components/PortfolioDonut";
 import { MonthlyCollections } from "./components/MonthlyCollections";
 import { RepaymentProgress } from "./components/RepaymentProgress";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
-import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
@@ -18,6 +18,7 @@ function App() {
   const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
   const [detailLoan,  setDetailLoan]    = useState<Loan | null>(null);
   const [mobileTab,   setMobileTab]     = useState<"loans" | "analytics">("loans");
+  const [pdfOpen,     setPdfOpen]       = useState(false);
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("cyberlend_theme") as Theme) || "dark");
 
   const isDark = theme === "dark";
@@ -185,6 +186,11 @@ function App() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
               style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
               <Download className="w-3 h-3" /> Export
+            </button>
+            <button onClick={() => setPdfOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
+              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
+              <FileText className="w-3 h-3" /> PDF
             </button>
             <button onClick={handleResetData} className="p-1.5 rounded-lg" style={{ color: t.textFaint }}>
               <RotateCcw className="w-3.5 h-3.5" />
@@ -427,6 +433,7 @@ function App() {
         <div className="md:hidden h-20" />
       </div>
 
+      <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
       <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} theme={t} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
       <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} theme={t} />
@@ -435,3 +442,5 @@ function App() {
 }
 
 export default App;
+
+
