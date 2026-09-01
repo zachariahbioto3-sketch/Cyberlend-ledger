@@ -6,6 +6,7 @@ import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, Pdf
 import { PortfolioDonut } from "./components/PortfolioDonut";
 import { MonthlyCollections } from "./components/MonthlyCollections";
 import { RepaymentProgress } from "./components/RepaymentProgress";
+import { ClientsPage } from "./components/ClientsPage";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
 import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
@@ -17,8 +18,12 @@ function App() {
   const [newLoanOpen, setNewLoanOpen]   = useState(false);
   const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
   const [detailLoan,  setDetailLoan]    = useState<Loan | null>(null);
-  const [mobileTab,   setMobileTab]     = useState<"loans" | "analytics">("loans");
+  const [mobileTab,   setMobileTab]     = useState<"loans" | "analytics" | "clients">("loans");
   const [pdfOpen,     setPdfOpen]       = useState(false);
+  const handleUpdateLoan = (id: string, updates: Partial<any>) => {
+    const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
+    setLoans(updated);
+  };
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("cyberlend_theme") as Theme) || "dark");
 
   const isDark = theme === "dark";
@@ -118,6 +123,7 @@ function App() {
             { icon: <LayoutDashboard className="w-4 h-4" />, label: "Dashboard", active: true },
             { icon: <Users className="w-4 h-4" />, label: "Borrowers" },
             { icon: <TrendingUp className="w-4 h-4" />, label: "Analytics" },
+            { icon: <Users className="w-4 h-4" />, label: "Clients", active: false },
           ].map((item) => (
             <button key={item.label} title={item.label}
               className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
@@ -304,6 +310,13 @@ function App() {
             </div>
           )}
 
+          {/* CLIENTS TAB */}
+          {mobileTab === "clients" && (
+            <div className="pb-24">
+              <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} />
+            </div>
+          )}
+
           {/* ANALYTICS TAB */}
           {mobileTab === "analytics" && (
             <div className="px-4 pb-24 space-y-3">
@@ -389,6 +402,7 @@ function App() {
             </div>
 
             {/* LEDGER */}
+            <div className="hidden">{/* clients desktop */}</div>
             <LoanLedgerTable
               loans={loans}
               onSelectLoan={setDetailLoan}
@@ -406,6 +420,7 @@ function App() {
           {[
             { tab: "loans",     icon: <LayoutDashboard className="w-4 h-4" />, label: "LOANS" },
             { tab: "analytics", icon: <TrendingUp className="w-4 h-4" />,      label: "ANALYTICS" },
+            { tab: "clients",   icon: <Users className="w-4 h-4" />,            label: "CLIENTS" },
           ].map((item) => (
             <button key={item.tab} onClick={() => setMobileTab(item.tab as any)} className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
@@ -422,12 +437,7 @@ function App() {
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>NEW</span>
           </button>
-          <button className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: t.bgBtn }}>
-              <Users className="w-4 h-4" style={{ color: t.textFaint }} />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>TEAM</span>
-          </button>
+          
         </nav>
 
         <div className="md:hidden h-20" />
@@ -442,5 +452,9 @@ function App() {
 }
 
 export default App;
+
+
+
+
 
 

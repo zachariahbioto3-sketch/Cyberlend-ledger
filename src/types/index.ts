@@ -6,6 +6,8 @@ export type PaymentMethod = "M-Pesa" | "Bank Transfer";
 
 export type PaymentType = "Interest" | "Principal";
 
+export type ClientFlag = "VIP" | "Blacklisted" | "Defaulter" | "New" | "Regular";
+
 export interface RepaymentTransaction {
   id: string;
   loanId: string;
@@ -24,6 +26,13 @@ export interface Loan {
   borrowerName: string;
   borrowerPhone: string;
   borrowerEmail?: string;
+  borrowerAddress?: string;
+  borrowerIdNumber?: string;
+  borrowerPhoto?: string;
+  clientFlags?: ClientFlag[];
+  clientNotes?: string;
+  referralSource?: string;
+  dateJoined?: string;
   loanAmount: number;
   monthlyInterest: number;
   totalRepayable: number;
@@ -54,4 +63,17 @@ export interface PortfolioMetrics {
   completedLoansCount: number;
   overdueCount: number;
   defaultedCount: number;
+}
+
+export interface BorrowerProfile {
+  borrowerName: string;
+  borrowerPhone: string;
+  borrowerEmail: string;
+  borrowerAddress: string;
+  borrowerIdNumber: string;
+  borrowerPhoto: string;
+  clientFlags: ClientFlag[];
+  clientNotes: string;
+  referralSource: string;
+  dateJoined: string;
 }
