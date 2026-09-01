@@ -60,7 +60,7 @@ export const PortfolioDonut: React.FC<Props> = ({ metrics, theme: t, compact = f
         PORTFOLIO HEALTH
       </p>
 
-      <div style={{ position: "relative", height: chartH }}>
+      <div style={{ position: "relative", height: chartH, minHeight: chartH, width: "100%", minWidth: 0 }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie data={data} cx="50%" cy="50%" innerRadius={innerR} outerRadius={outerR} paddingAngle={3} dataKey="value">
@@ -99,3 +99,4 @@ export const PortfolioDonut: React.FC<Props> = ({ metrics, theme: t, compact = f
     </div>
   );
 };
+

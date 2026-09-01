@@ -84,7 +84,7 @@ export const RepaymentProgress: React.FC<Props> = ({ loans, theme: t, compact = 
         )}
       </div>
 
-      <div style={{ height: chartHeight }}>
+      <div style={{ height: chartHeight, minHeight: chartHeight, width: "100%", minWidth: 0 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart layout="vertical" data={data} barCategoryGap="25%">
             <XAxis
@@ -126,3 +126,4 @@ export const RepaymentProgress: React.FC<Props> = ({ loans, theme: t, compact = 
     </div>
   );
 };
+
