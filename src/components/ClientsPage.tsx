@@ -2,10 +2,11 @@
 import {
   Users, Search, Star, AlertTriangle, UserX,
   Mail, MapPin, CreditCard, TrendingUp, FileText,
-  ChevronRight, X, Edit3, Save, Flag, Plus, ArrowLeft
+  ChevronRight, X, Edit3, Save, Flag, Plus, ArrowLeft,
+  DollarSign, Activity, CheckCircle, Clock, ShieldAlert, BarChart2
 } from "lucide-react";
 import { Loan, ClientFlag } from "../types";
-import { formatCompactCurrency } from "../utils/loanCalculations";
+import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
 
 interface ClientsPageProps {
   loans: Loan[];
@@ -39,6 +40,304 @@ function groupByBorrower(loans: Loan[]): Record<string, Loan[]> {
     return acc;
   }, {} as Record<string, Loan[]>);
 }
+
+// ── PORTFOLIO SUMMARY PANEL ──────────────────────────────────────────────────
+interface PortfolioSummaryPanelProps { loans: Loan[]; theme: any; grouped: Record<string, Loan[]>; }
+
+const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, theme: t, grouped }) => {
+  const mono    = "'Space Mono', monospace";
+  const metrics = calculatePortfolioMetrics(loans);
+  const totalClients = Object.keys(grouped).length;
+
+  const topBorrowers = useMemo(() => {
+    return Object.entries(grouped)
+      .map(([, clientLoans]) => {
+        const latest     = clientLoans[0];
+        const totalLent  = clientLoans.reduce((s, l) => s + l.loanAmount, 0);
+        const hasOverdue = clientLoans.some((l) => l.status === "Overdue");
+        return { name: latest.borrowerName, phone: latest.borrowerPhone, totalLent, hasOverdue, flags: latest.clientFlags || [] };
+      })
+      .sort((a, b) => b.totalLent - a.totalLent)
+      .slice(0, 5);
+  }, [grouped]);
+
+  const flagSummary = useMemo(() => {
+    return (Object.keys(FLAG_META) as ClientFlag[]).map((f) => ({
+      flag: f,
+      count: loans.filter((l) => (l.clientFlags || []).includes(f)).length,
+    })).filter((x) => x.count > 0);
+  }, [loans]);
+
+  // ── FINANCIAL HEALTH METRICS ──
+  const collectionRate = useMemo(() => {
+    const totalExpected = loans.reduce((s, l) => s + (l.monthlyInterest * l.monthsCompleted), 0);
+    if (totalExpected === 0) return 0;
+    return Math.min(100, Math.round((metrics.totalCollected / totalExpected) * 100));
+  }, [loans, metrics]);
+
+  const monthlyCollections = useMemo(() => {
+    const map: Record<string, { collected: number; outstanding: number }> = {};
+    loans.forEach((loan) => {
+      loan.transactions
+        .filter((tx) => tx.status === "Completed" && tx.paymentType === "Interest")
+        .forEach((tx) => {
+          const month = tx.date.slice(0, 7); // "YYYY-MM"
+          if (!map[month]) map[month] = { collected: 0, outstanding: 0 };
+          map[month].collected += tx.amount;
+        });
+      if (loan.status !== "Completed") {
+        const month = loan.nextDueDate?.slice(0, 7) || new Date().toISOString().slice(0, 7);
+        if (!map[month]) map[month] = { collected: 0, outstanding: 0 };
+        map[month].outstanding += loan.monthlyInterest;
+      }
+    });
+    return Object.entries(map)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-6)
+      .map(([month, data]) => ({ month: month.slice(5), ...data }));
+  }, [loans]);
+
+  const agingBuckets = useMemo(() => {
+    const today = new Date();
+    const buckets = [
+      { label: "1–30 days",  count: 0, amount: 0 },
+      { label: "31–60 days", count: 0, amount: 0 },
+      { label: "60+ days",   count: 0, amount: 0 },
+    ];
+    loans
+      .filter((l) => l.status === "Overdue")
+      .forEach((l) => {
+        const due  = new Date(l.nextDueDate);
+        const days = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+        if (days <= 30)       { buckets[0].count++; buckets[0].amount += l.loanAmount; }
+        else if (days <= 60)  { buckets[1].count++; buckets[1].amount += l.loanAmount; }
+        else                  { buckets[2].count++; buckets[2].amount += l.loanAmount; }
+      });
+    return buckets;
+  }, [loans]);
+
+  const maxBar = Math.max(...monthlyCollections.map((m) => Math.max(m.collected, m.outstanding)), 1);
+
+  const portfolioStats = [
+    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#5b7cfa" },
+    { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "#4ade80" },
+    { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "#f59e0b" },
+    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "#5b7cfa" },
+    { label: "OVERDUE",         value: String(metrics.overdueCount),                      icon: <Clock className="w-4 h-4" />,       color: metrics.overdueCount > 0 ? "#f87171" : "#4ade80" },
+    { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "#4ade80" },
+  ];
+
+  return (
+    <div className="hidden md:flex flex-1 overflow-y-auto" style={{ background: t.bgCard }}>
+
+      {/* Left column — Portfolio Overview */}
+      <div className="flex flex-col px-6 py-6 gap-5 flex-1 border-r" style={{ borderColor: t.border }}>
+        <div>
+          <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
+          <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>SELECT A CLIENT ON THE LEFT TO VIEW THEIR PROFILE</p>
+        </div>
+
+        {/* Stats grid */}
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
+          {portfolioStats.map((s) => (
+            <div key={s.label} className="rounded-2xl border p-4 flex flex-col gap-2" style={{ background: t.bg, borderColor: t.border }}>
+              <div className="flex items-center justify-between">
+                <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
+                <span style={{ color: s.color }}>{s.icon}</span>
+              </div>
+              <p className="text-lg font-bold" style={{ fontFamily: mono, color: s.color }}>{s.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Flag breakdown */}
+        {flagSummary.length > 0 && (
+          <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CLIENT SEGMENTS</p>
+            <div className="flex gap-2 flex-wrap">
+              {flagSummary.map(({ flag, count }) => (
+                <div key={flag}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-[10px] font-bold"
+                  style={{ fontFamily: mono, background: FLAG_META[flag].bg, borderColor: FLAG_META[flag].border, color: FLAG_META[flag].color }}>
+                  {FLAG_META[flag].icon}
+                  {flag} <span className="opacity-70">({count})</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Top borrowers */}
+        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>TOP BORROWERS BY EXPOSURE</p>
+          <div className="space-y-2">
+            {topBorrowers.map((b, i) => (
+              <div key={b.phone} className="flex items-center gap-3 p-3 rounded-xl border"
+                style={{ background: t.bgActive, borderColor: t.border }}>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 border"
+                  style={{
+                    background:  b.hasOverdue ? "rgba(248,113,113,0.15)" : "rgba(91,124,250,0.12)",
+                    borderColor: b.hasOverdue ? "rgba(248,113,113,0.4)"  : "rgba(91,124,250,0.3)",
+                  }}>
+                  <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: b.hasOverdue ? "#f87171" : "#5b7cfa" }}>{i + 1}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold truncate" style={{ color: t.text }}>{b.name}</p>
+                  <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{b.phone}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#5b7cfa" }}>{formatCompactCurrency(b.totalLent)}</p>
+                  {b.hasOverdue && <p className="text-[9px]" style={{ color: "#f87171", fontFamily: mono }}>OVERDUE</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right column — Financial Health */}
+      <div className="flex flex-col px-6 py-6 gap-5 w-[340px] xl:w-[380px] shrink-0">
+        <div>
+          <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
+          <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>COLLECTION METRICS & RISK ANALYSIS</p>
+        </div>
+
+        {/* Collection rate */}
+        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
+            <BarChart2 className="w-3.5 h-3.5" style={{ color: "#5b7cfa" }} />
+          </div>
+          <div className="flex items-end gap-3 mb-3">
+            <p className="text-3xl font-bold" style={{ fontFamily: mono, color: collectionRate >= 80 ? "#4ade80" : collectionRate >= 50 ? "#f59e0b" : "#f87171" }}>
+              {collectionRate}%
+            </p>
+            <p className="text-[10px] mb-1" style={{ color: t.textFaint, fontFamily: mono }}>
+              {formatCompactCurrency(metrics.totalCollected)} of expected collected
+            </p>
+          </div>
+          {/* Progress bar */}
+          <div className="h-2 rounded-full overflow-hidden" style={{ background: t.bgActive }}>
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${collectionRate}%`,
+                background: collectionRate >= 80 ? "#4ade80" : collectionRate >= 50 ? "#f59e0b" : "#f87171",
+              }}
+            />
+          </div>
+          <div className="flex justify-between mt-1.5">
+            <span className="text-[9px]" style={{ color: t.textFaint, fontFamily: mono }}>0%</span>
+            <span className="text-[9px]" style={{ color: t.textFaint, fontFamily: mono }}>TARGET: 100%</span>
+          </div>
+        </div>
+
+        {/* Outstanding vs Collected bar chart */}
+        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>
+              MONTHLY COLLECTIONS
+            </p>
+            <div className="flex gap-3 text-[9px]" style={{ fontFamily: mono }}>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#5b7cfa" }} />COLLECTED</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#f87171" }} />DUE</span>
+            </div>
+          </div>
+          {monthlyCollections.length === 0 ? (
+            <p className="text-xs text-center py-4" style={{ color: t.textFaint, fontFamily: mono }}>NO TRANSACTION DATA YET</p>
+          ) : (
+            <div className="flex items-end gap-2 h-28">
+              {monthlyCollections.map((m) => (
+                <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="flex items-end gap-0.5 w-full justify-center" style={{ height: "80px" }}>
+                    {/* Collected bar */}
+                    <div
+                      className="rounded-t-sm flex-1 max-w-[14px] transition-all"
+                      style={{
+                        height: `${Math.max(4, (m.collected / maxBar) * 80)}px`,
+                        background: "#5b7cfa",
+                        opacity: 0.85,
+                      }}
+                    />
+                    {/* Outstanding/due bar */}
+                    <div
+                      className="rounded-t-sm flex-1 max-w-[14px] transition-all"
+                      style={{
+                        height: `${Math.max(4, (m.outstanding / maxBar) * 80)}px`,
+                        background: "#f87171",
+                        opacity: 0.7,
+                      }}
+                    />
+                  </div>
+                  <p className="text-[8px]" style={{ color: t.textFaint, fontFamily: mono }}>{m.month}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Aging debt breakdown */}
+        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>AGING DEBT</p>
+            <ShieldAlert className="w-3.5 h-3.5" style={{ color: metrics.overdueCount > 0 ? "#f87171" : t.textFaint }} />
+          </div>
+          {metrics.overdueCount === 0 ? (
+            <div className="flex flex-col items-center py-3 gap-1.5">
+              <CheckCircle className="w-6 h-6" style={{ color: "#4ade80" }} />
+              <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#4ade80" }}>ALL CLEAR</p>
+              <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>NO OVERDUE LOANS</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {agingBuckets.map((bucket, i) => {
+                const colors = ["#f59e0b", "#f87171", "#dc2626"];
+                return (
+                  <div key={bucket.label} className="flex items-center justify-between p-2.5 rounded-xl border"
+                    style={{ background: t.bgActive, borderColor: t.border }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-6 rounded-full" style={{ background: colors[i] }} />
+                      <div>
+                        <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>{bucket.label}</p>
+                        <p className="text-[9px]" style={{ color: t.textFaint, fontFamily: mono }}>{bucket.count} LOAN{bucket.count !== 1 ? "S" : ""}</p>
+                      </div>
+                    </div>
+                    <p className="text-xs font-bold" style={{ fontFamily: mono, color: colors[i] }}>
+                      {bucket.amount > 0 ? formatCompactCurrency(bucket.amount) : "—"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Outstanding vs Lent summary */}
+        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CAPITAL EXPOSURE</p>
+          <div className="space-y-3">
+            {[
+              { label: "TOTAL LENT",       value: metrics.totalPrincipalLent, color: "#5b7cfa", pct: 100 },
+              { label: "OUTSTANDING",      value: metrics.totalOutstanding,   color: "#f59e0b", pct: metrics.totalPrincipalLent ? Math.round((metrics.totalOutstanding / metrics.totalPrincipalLent) * 100) : 0 },
+              { label: "RECOVERED",        value: metrics.totalPrincipalLent - metrics.totalOutstanding, color: "#4ade80", pct: metrics.totalPrincipalLent ? Math.round(((metrics.totalPrincipalLent - metrics.totalOutstanding) / metrics.totalPrincipalLent) * 100) : 0 },
+            ].map((row) => (
+              <div key={row.label}>
+                <div className="flex justify-between mb-1">
+                  <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{row.label}</p>
+                  <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: row.color }}>{formatCompactCurrency(row.value)}</p>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: t.bgActive }}>
+                  <div className="h-full rounded-full" style={{ width: `${row.pct}%`, background: row.color, opacity: 0.8 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+// ────────────────────────────────────────────────────────────────────────────
 
 export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpdateLoan }) => {
   const [search, setSearch]           = useState("");
@@ -112,26 +411,23 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     return counts;
   }, [grouped, loans]);
 
-  // On mobile: show detail panel as full-screen overlay when a client is selected
-  // On desktop: show side-by-side split layout
   const isMobileDetail = selectedKey !== null;
 
   return (
     <div className="flex h-full min-h-screen relative" style={{ background: t.bg }}>
 
       {/* ── LEFT — CLIENT LIST ── */}
-      {/* Hidden on mobile when detail is open; visible otherwise */}
       <div
         className={`flex flex-col border-r ${isMobileDetail ? "hidden md:flex" : "flex"}`}
         style={{
-          width: selectedKey ? "38%" : "100%",
-          minWidth: selectedKey ? "260px" : undefined,
+          width: "340px",
+          minWidth: "260px",
+          maxWidth: "340px",
           borderColor: t.border,
-          transition: "width 0.3s",
           background: t.bg,
+          flexShrink: 0,
         }}>
 
-        {/* Header */}
         <div className="px-4 md:px-6 pt-5 pb-4 border-b" style={{ borderColor: t.border }}>
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -145,7 +441,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             </div>
           </div>
 
-          {/* Search */}
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl border mb-3"
             style={{ background: t.bgInput, borderColor: t.borderMid }}>
             <Search className="w-3.5 h-3.5 shrink-0" style={{ color: t.textFaint }} />
@@ -163,7 +458,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             )}
           </div>
 
-          {/* Flag filters — horizontally scrollable on mobile */}
           <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {(["All", ...Object.keys(FLAG_META)] as (ClientFlag | "All")[]).map((f) => (
               <button
@@ -184,7 +478,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
           </div>
         </div>
 
-        {/* Client list */}
         <div className="flex-1 overflow-y-auto">
           {clients.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 gap-2">
@@ -193,8 +486,8 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             </div>
           ) : (
             clients.map((c) => {
-              const flags    = c.latest.clientFlags || [];
-              const isActive = selectedKey === c.key;
+              const flags      = c.latest.clientFlags || [];
+              const isActive   = selectedKey === c.key;
               const hasOverdue = c.loans.some((l) => l.status === "Overdue");
               return (
                 <button
@@ -209,7 +502,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.background = t.bgCard; }}
                   onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}>
 
-                  {/* Avatar */}
                   <div className="w-10 h-10 rounded-full border flex items-center justify-center shrink-0"
                     style={{
                       background:  hasOverdue ? "rgba(248,113,113,0.15)" : t.bgActive,
@@ -242,45 +534,31 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
         </div>
       </div>
 
-      {/* ── RIGHT — CLIENT DETAIL ── */}
-      {/* On mobile: full-screen overlay. On desktop: flex-1 side panel */}
+      {/* ── RIGHT — PORTFOLIO SUMMARY + FINANCIAL HEALTH (no client selected) ── */}
+      {!selected && <PortfolioSummaryPanel loans={loans} theme={t} grouped={grouped} />}
+
+      {/* ── RIGHT — CLIENT DETAIL (client selected) ── */}
       {selected && selectedLatest && selectedStats && (
         <div
           className="flex flex-col overflow-hidden md:flex-1"
-          style={{
-            background: t.bgCard,
-            // Mobile: absolute full-screen overlay
-            position: "absolute" as const,
-            inset: 0,
-            zIndex: 20,
-            // Override to relative on md+ via inline won't work, so we use a wrapper trick below
-          }}>
-
-          {/* We need md:relative md:inset-auto — use a style tag trick via className */}
-          {/* Instead, wrap in a div that is absolute on mobile, relative on desktop */}
+          style={{ background: t.bgCard, position: "absolute" as const, inset: 0, zIndex: 20 }}>
           <div className="flex flex-col h-full w-full" style={{ background: t.bgCard }}>
 
-            {/* Detail header */}
             <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b shrink-0 gap-3"
               style={{ borderColor: t.border }}>
-
-              {/* Left: back arrow (mobile) + avatar + name */}
               <div className="flex items-center gap-3 min-w-0">
-                {/* Back button — mobile only */}
                 <button
                   onClick={() => { setSelectedKey(null); setEditMode(false); }}
                   className="flex md:hidden items-center justify-center w-8 h-8 rounded-xl border shrink-0"
                   style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
                   <ArrowLeft className="w-4 h-4" />
                 </button>
-
                 <div className="w-10 h-10 md:w-14 md:h-14 rounded-2xl border flex items-center justify-center shrink-0"
                   style={{ background: t.bgActive, borderColor: t.borderMid }}>
                   <span className="text-base md:text-xl font-bold" style={{ fontFamily: mono, color: t.text }}>
                     {selectedLatest.borrowerName.charAt(0).toUpperCase()}
                   </span>
                 </div>
-
                 <div className="min-w-0">
                   <h3 className="text-sm md:text-base font-bold truncate" style={{ fontFamily: mono, color: t.text }}>
                     {selectedLatest.borrowerName}
@@ -300,11 +578,9 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 </div>
               </div>
 
-              {/* Right: action buttons */}
               <div className="flex items-center gap-2 shrink-0">
                 {!editMode ? (
-                  <button
-                    onClick={handleEdit}
+                  <button onClick={handleEdit}
                     className="flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-xl border text-xs font-bold transition-all"
                     style={{ fontFamily: mono, background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
                     <Edit3 className="w-3.5 h-3.5" />
@@ -312,15 +588,13 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   </button>
                 ) : (
                   <>
-                    <button
-                      onClick={() => setEditMode(false)}
+                    <button onClick={() => setEditMode(false)}
                       className="px-3 md:px-4 py-2 rounded-xl border text-xs font-bold"
                       style={{ fontFamily: mono, background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
                       <span className="hidden sm:inline">CANCEL</span>
                       <X className="w-3.5 h-3.5 sm:hidden" />
                     </button>
-                    <button
-                      onClick={handleSave}
+                    <button onClick={handleSave}
                       className="flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-xl text-xs font-bold"
                       style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
                       <Save className="w-3.5 h-3.5" />
@@ -328,7 +602,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                     </button>
                   </>
                 )}
-                {/* Close button — desktop only (mobile uses back arrow) */}
                 <button
                   onClick={() => { setSelectedKey(null); setEditMode(false); }}
                   className="hidden md:flex items-center justify-center p-2 rounded-xl border shrink-0"
@@ -338,10 +611,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               </div>
             </div>
 
-            {/* Detail body */}
             <div className="flex-1 overflow-y-auto px-4 md:px-6 py-5 space-y-4">
-
-              {/* Stats row */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
                   { label: "TOTAL LENT",    value: formatCompactCurrency(selectedStats.totalLent) },
@@ -357,7 +627,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 ))}
               </div>
 
-              {/* Contact info / edit */}
               <div className="rounded-2xl border p-4 md:p-5" style={{ background: t.bg, borderColor: t.border }}>
                 <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ fontFamily: mono, color: t.textFaint }}>
                   CONTACT & PROFILE
@@ -365,10 +634,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 {editMode ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
-                      { label: "Email",           key: "borrowerEmail",    icon: <Mail className="w-3.5 h-3.5" /> },
-                      { label: "Address",          key: "borrowerAddress",  icon: <MapPin className="w-3.5 h-3.5" /> },
-                      { label: "ID Number",        key: "borrowerIdNumber", icon: <CreditCard className="w-3.5 h-3.5" /> },
-                      { label: "Referral Source",  key: "referralSource",   icon: <TrendingUp className="w-3.5 h-3.5" /> },
+                      { label: "Email",          key: "borrowerEmail",    icon: <Mail className="w-3.5 h-3.5" /> },
+                      { label: "Address",         key: "borrowerAddress",  icon: <MapPin className="w-3.5 h-3.5" /> },
+                      { label: "ID Number",       key: "borrowerIdNumber", icon: <CreditCard className="w-3.5 h-3.5" /> },
+                      { label: "Referral Source", key: "referralSource",   icon: <TrendingUp className="w-3.5 h-3.5" /> },
                     ].map((field) => (
                       <div key={field.key}>
                         <label className="block text-[10px] font-bold uppercase tracking-wider mb-1"
@@ -393,7 +662,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                         style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }}
                       />
                     </div>
-                    {/* Flags */}
                     <div className="sm:col-span-2">
                       <label className="block text-[10px] font-bold uppercase tracking-wider mb-2"
                         style={{ fontFamily: mono, color: t.textMuted }}>
@@ -450,7 +718,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 )}
               </div>
 
-              {/* Loan history */}
               <div className="rounded-2xl border p-4 md:p-5" style={{ background: t.bg, borderColor: t.border }}>
                 <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>
                   LOAN HISTORY ({selected.length})
@@ -481,7 +748,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   ))}
                 </div>
               </div>
-
             </div>
           </div>
         </div>
