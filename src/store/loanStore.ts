@@ -1,4 +1,4 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 import { Loan, RepaymentTransaction, PortfolioMetrics } from "../types";
 import {
   calculateCyberlendLoan,
@@ -21,6 +21,8 @@ function saveLoans(loans: Loan[]) {
 }
 
 interface LoanState {
+  selectedClient: import("../types").Loan | null;
+  setSelectedClient: (client: import("../types").Loan | null) => void;
   loans: Loan[];
   metrics: PortfolioMetrics;
   addLoan: (data: any) => void;
@@ -107,7 +109,7 @@ export const useLoanStore = create<LoanState>((set) => ({
       return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
     }),
 
-  // Records principal return — closes the loan
+  // Records principal return � closes the loan
   closeLoan: (loanId, txData) =>
     set((state) => {
       const idx = state.loans.findIndex((l) => l.id === loanId);
@@ -129,9 +131,13 @@ export const useLoanStore = create<LoanState>((set) => ({
       return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
     }),
 
+  selectedClient: null,
+  setSelectedClient: (client) => set(() => ({ selectedClient: client })),
+
   setLoans: (loans) =>
     set(() => {
       saveLoans(loans);
       return { loans, metrics: calculatePortfolioMetrics(loans) };
     }),
 }));
+

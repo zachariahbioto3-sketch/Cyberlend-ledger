@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Users, Search, Star, AlertTriangle, UserX,
   Mail, MapPin, CreditCard, TrendingUp, FileText,
@@ -6,6 +6,7 @@ import {
   DollarSign, Activity, CheckCircle, Clock, ShieldAlert, BarChart2
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useLoanStore } from '../store/loanStore';
 import { Loan, ClientFlag } from "../types";
 import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
 
@@ -42,7 +43,7 @@ function groupByBorrower(loans: Loan[]): Record<string, Loan[]> {
   }, {} as Record<string, Loan[]>);
 }
 
-// ── PORTFOLIO SUMMARY PANEL ──────────────────────────────────────────────────
+// -- PORTFOLIO SUMMARY PANEL --------------------------------------------------
 interface PortfolioSummaryPanelProps { loans: Loan[]; theme: any; grouped: Record<string, Loan[]>; }
 
 const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, theme: t, grouped }) => {
@@ -69,7 +70,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
     })).filter((x) => x.count > 0);
   }, [loans]);
 
-  // ── FINANCIAL HEALTH METRICS ──
+  // -- FINANCIAL HEALTH METRICS --
   const collectionRate = useMemo(() => {
     const totalExpected = loans.reduce((s, l) => s + (l.monthlyInterest * l.monthsCompleted), 0);
     if (totalExpected === 0) return 0;
@@ -101,8 +102,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   const agingBuckets = useMemo(() => {
     const today = new Date();
     const buckets = [
-      { label: "1–30 days",  count: 0, amount: 0 },
-      { label: "31–60 days", count: 0, amount: 0 },
+      { label: "1�30 days",  count: 0, amount: 0 },
+      { label: "31�60 days", count: 0, amount: 0 },
       { label: "60+ days",   count: 0, amount: 0 },
     ];
     loans
@@ -131,7 +132,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   return (
     <div className="hidden md:flex flex-1 overflow-y-auto" style={{ background: t.bgCard }}>
 
-      {/* Left column — Portfolio Overview */}
+      {/* Left column � Portfolio Overview */}
       <div className="flex flex-col px-6 py-6 gap-5 flex-1 border-r" style={{ borderColor: t.border }}>
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
@@ -196,7 +197,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         </div>
       </div>
 
-      {/* Right column — Financial Health */}
+      {/* Right column � Financial Health */}
       <div className="flex flex-col px-6 py-6 gap-5 w-[340px] xl:w-[380px] shrink-0">
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
@@ -294,7 +295,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
                       </div>
                     </div>
                     <p className="text-xs font-bold" style={{ fontFamily: mono, color: colors[i] }}>
-                      {bucket.amount > 0 ? formatCompactCurrency(bucket.amount) : "—"}
+                      {bucket.amount > 0 ? formatCompactCurrency(bucket.amount) : "�"}
                     </p>
                   </div>
                 );
@@ -328,9 +329,10 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
     </div>
   );
 };
-// ────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------------------
 
 export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpdateLoan }) => {
+  const { setSelectedClient } = useLoanStore();
   const [search, setSearch]           = useState("");
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [editMode, setEditMode]       = useState(false);
@@ -407,7 +409,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
   return (
     <div className="flex h-full min-h-screen relative" style={{ background: t.bg }}>
 
-      {/* ── LEFT — CLIENT LIST ── */}
+      {/* -- LEFT � CLIENT LIST -- */}
       <div
         className={`flex flex-col border-r ${isMobileDetail ? "hidden md:flex" : "flex"}`}
         style={{
@@ -483,7 +485,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               return (
                 <button
                   key={c.key}
-                  onClick={() => { setSelectedKey(c.key); setEditMode(false); }}
+                  onClick={() => { setSelectedKey(c.key); setEditMode(false); setSelectedClient(c.latest); }}
                   className="w-full flex items-center gap-3 px-4 md:px-5 py-4 border-b text-left transition-all cursor-pointer"
                   style={{
                     background:  isActive ? t.bgActive : "transparent",
@@ -510,7 +512,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                       {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#dc2626" }} />}
                     </div>
                     <p className="text-[10px] truncate" style={{ color: t.textFaint, fontFamily: mono }}>
-                      {c.latest.borrowerPhone} · {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
+                      {c.latest.borrowerPhone} � {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
                     </p>
                     <p className="text-[10px]" style={{ color: "#5b7cfa", fontFamily: mono }}>
                       {formatCompactCurrency(c.stats.totalLent)} lent
@@ -525,10 +527,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
         </div>
       </div>
 
-      {/* ── RIGHT — PORTFOLIO SUMMARY + FINANCIAL HEALTH (no client selected) ── */}
+      {/* -- RIGHT � PORTFOLIO SUMMARY + FINANCIAL HEALTH (no client selected) -- */}
       {!selected && <PortfolioSummaryPanel loans={loans} theme={t} grouped={grouped} />}
 
-      {/* ── RIGHT — CLIENT DETAIL (client selected) ── */}
+      {/* -- RIGHT � CLIENT DETAIL (client selected) -- */}
       {selected && selectedLatest && selectedStats && (
         <div
           className="flex flex-col overflow-hidden md:flex-1"
@@ -594,8 +596,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   </>
                 )}
                 <button
-                  onClick={() => { setSelectedKey(null); setEditMode(false); }}
-                  className="hidden md:flex items-center justify-center p-2 rounded-xl border shrink-0"
+                  onClick={() => { setSelectedKey(null); setEditMode(false); setSelectedClient(null); }} className="hidden md:flex items-center justify-center p-2 rounded-xl border shrink-0"
                   style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
                   <X className="w-4 h-4" />
                 </button>
@@ -681,10 +682,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
-                      { label: "Email",    value: selectedLatest.borrowerEmail    || "—", icon: <Mail className="w-3.5 h-3.5" /> },
-                      { label: "Address",  value: selectedLatest.borrowerAddress  || "—", icon: <MapPin className="w-3.5 h-3.5" /> },
-                      { label: "ID No.",   value: selectedLatest.borrowerIdNumber || "—", icon: <CreditCard className="w-3.5 h-3.5" /> },
-                      { label: "Referral", value: selectedLatest.referralSource   || "—", icon: <TrendingUp className="w-3.5 h-3.5" /> },
+                      { label: "Email",    value: selectedLatest.borrowerEmail    || "�", icon: <Mail className="w-3.5 h-3.5" /> },
+                      { label: "Address",  value: selectedLatest.borrowerAddress  || "�", icon: <MapPin className="w-3.5 h-3.5" /> },
+                      { label: "ID No.",   value: selectedLatest.borrowerIdNumber || "�", icon: <CreditCard className="w-3.5 h-3.5" /> },
+                      { label: "Referral", value: selectedLatest.referralSource   || "�", icon: <TrendingUp className="w-3.5 h-3.5" /> },
                     ].map((f) => (
                       <div key={f.label} className="flex items-start gap-2 p-3 rounded-xl border"
                         style={{ background: t.bgActive, borderColor: t.border }}>
@@ -719,7 +720,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                       style={{ background: t.bgActive, borderColor: t.border }}>
                       <div>
                         <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{l.loanNumber}</p>
-                        <p className="text-[10px]" style={{ color: t.textFaint }}>{l.category} · {l.originationDate}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{l.category} � {l.originationDate}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
@@ -746,6 +747,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
 
 
 

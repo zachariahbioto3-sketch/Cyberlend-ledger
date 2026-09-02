@@ -1,4 +1,4 @@
-ï»¿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
 import { sampleLoans } from "./data/sampleLoans";
 import { Loan } from "./types";
@@ -8,13 +8,14 @@ import { MonthlyCollections } from "./components/MonthlyCollections";
 import { RepaymentProgress } from "./components/RepaymentProgress";
 import { ClientsPage } from "./components/ClientsPage";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
+import { TrackerBar } from './components/TrackerBar';
 import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
 function App() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics } = useLoanStore();
+  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient } = useLoanStore();
   const [newLoanOpen, setNewLoanOpen]   = useState(false);
   const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
   const [detailLoan,  setDetailLoan]    = useState<Loan | null>(null);
@@ -289,7 +290,7 @@ function App() {
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} Â· {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -346,7 +347,26 @@ function App() {
                 <h1 className="text-lg font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h1>
                 <p className="text-[11px] mt-0.5 tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BUILDING WEALTH TOGETHER</p>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {selectedClient && (
+                <TrackerBar
+                  metrics={metrics}
+                  theme={t}
+                  selectedClient={selectedClient}
+                  onClose={() => setSelectedClient(null)}
+                />
+              )}
+
+              <div
+                className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+                style={{
+                  transform:  selectedClient ? "translateY(-8px)" : "translateY(0)",
+                  opacity:    selectedClient ? 0 : 1,
+                  maxHeight:  selectedClient ? "0px" : "300px",
+                  overflow:   "hidden",
+                  transition: "transform 0.3s ease, opacity 0.25s ease, max-height 0.35s ease",
+                  pointerEvents: selectedClient ? "none" : "auto",
+                }}
+              >
                 {[
                   { label: "TOTAL LENT",  value: formatCompactCurrency(metrics.totalPrincipalLent), sub: metrics.totalLoansOriginated + " loans" },
                   { label: "OUTSTANDING", value: formatCompactCurrency(metrics.totalOutstanding),   sub: metrics.activeLoansCount + " active" },
@@ -372,26 +392,35 @@ function App() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE â€” COLLECT NOW
+                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE — COLLECT NOW
                     </h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" Â· "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" · "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>
                   </div>
                 </div>
               )}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <PortfolioDonut metrics={metrics} theme={t} />
-                <MonthlyCollections loans={loans} theme={t} />
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <RepaymentProgress loans={loans} theme={t} />
-                <FinancialStackedBar loans={loans} theme={t} />
+              <div
+                style={{
+                  maxHeight: selectedClient ? "0px" : "800px",
+                  opacity:   selectedClient ? 0 : 1,
+                  overflow:  "hidden",
+                  transition: "max-height 0.35s ease-in-out, opacity 0.25s ease-in-out",
+                }}
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                  <PortfolioDonut metrics={metrics} theme={t} />
+                  <MonthlyCollections loans={loans} theme={t} />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <RepaymentProgress loans={loans} theme={t} />
+                  <FinancialStackedBar loans={loans} theme={t} />
+                </div>
               </div>
               <LoanLedgerTable
                 loans={loans}
@@ -442,3 +471,6 @@ function App() {
 }
 
 export default App;
+
+
+
