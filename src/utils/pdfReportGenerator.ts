@@ -9,7 +9,7 @@ interface PdfReportOptions {
   reportTitle: string;
   includePaidOff: boolean;
 }
-
+//function for generating pdf report
 export function generatePortfolioSummaryPdf(
   loans: Loan[],
   metrics: PortfolioMetrics,

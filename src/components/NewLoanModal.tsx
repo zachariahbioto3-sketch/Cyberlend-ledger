@@ -43,8 +43,8 @@ export const NewLoanModal: React.FC<NewLoanModalProps> = ({ isOpen, onClose, onA
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(20px)' }}>
 
-      <div className="w-full sm:min-w-[65vw] max-w-[90vw] max-h-[90vh] flex flex-col rounded-2xl border overflow-hidden shadow-2xl transition-all"
-        style={{ background: t.bgModal, borderColor: t.borderMid }}>
+      <div className="w-full flex flex-col rounded-2xl border overflow-hidden shadow-2xl transition-all" style="width:88vw;height:82vh;max-width:88vw;max-height:82vh"
+        style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", height: "82vh" }}>
 
         {/* Modal Header */}
         <div className="p-5 border-b flex items-center justify-between shrink-0" style={{ borderColor: t.border }}>
@@ -165,3 +165,5 @@ export const NewLoanModal: React.FC<NewLoanModalProps> = ({ isOpen, onClose, onA
     </div>
   );
 };
+
+

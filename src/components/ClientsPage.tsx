@@ -5,6 +5,7 @@ import {
   ChevronRight, X, Edit3, Save, Flag, Plus, ArrowLeft,
   DollarSign, Activity, CheckCircle, Clock, ShieldAlert, BarChart2
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Loan, ClientFlag } from "../types";
 import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
 
@@ -116,7 +117,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
     return buckets;
   }, [loans]);
 
-  const maxBar = Math.max(...monthlyCollections.map((m) => Math.max(m.collected, m.outstanding)), 1);
+
 
   const portfolioStats = [
     { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#5b7cfa" },
@@ -140,7 +141,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         {/* Stats grid */}
         <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
           {portfolioStats.map((s) => (
-            <div key={s.label} className="rounded-2xl border p-4 flex flex-col gap-2" style={{ background: t.bg, borderColor: t.border }}>
+            <div key={s.label} className="rounded-2xl border p-5 flex flex-col gap-2" style={{ background: t.bgCard, borderColor: t.border }}>
               <div className="flex items-center justify-between">
                 <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
                 <span style={{ color: s.color }}>{s.icon}</span>
@@ -152,7 +153,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
 
         {/* Flag breakdown */}
         {flagSummary.length > 0 && (
-          <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+          <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
             <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CLIENT SEGMENTS</p>
             <div className="flex gap-2 flex-wrap">
               {flagSummary.map(({ flag, count }) => (
@@ -168,7 +169,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         )}
 
         {/* Top borrowers */}
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+        <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
           <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>TOP BORROWERS BY EXPOSURE</p>
           <div className="space-y-2">
             {topBorrowers.map((b, i) => (
@@ -203,7 +204,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         </div>
 
         {/* Collection rate */}
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+        <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
             <BarChart2 className="w-3.5 h-3.5" style={{ color: "#5b7cfa" }} />
@@ -233,7 +234,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         </div>
 
         {/* Outstanding vs Collected bar chart */}
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+        <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>
               MONTHLY COLLECTIONS
@@ -246,38 +247,28 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
           {monthlyCollections.length === 0 ? (
             <p className="text-xs text-center py-4" style={{ color: t.textFaint, fontFamily: mono }}>NO TRANSACTION DATA YET</p>
           ) : (
-            <div className="flex items-end gap-2 h-28">
-              {monthlyCollections.map((m) => (
-                <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="flex items-end gap-0.5 w-full justify-center" style={{ height: "80px" }}>
-                    {/* Collected bar */}
-                    <div
-                      className="rounded-t-sm flex-1 max-w-[14px] transition-all"
-                      style={{
-                        height: `${Math.max(4, (m.collected / maxBar) * 80)}px`,
-                        background: "#5b7cfa",
-                        opacity: 0.85,
-                      }}
-                    />
-                    {/* Outstanding/due bar */}
-                    <div
-                      className="rounded-t-sm flex-1 max-w-[14px] transition-all"
-                      style={{
-                        height: `${Math.max(4, (m.outstanding / maxBar) * 80)}px`,
-                        background: "#f87171",
-                        opacity: 0.7,
-                      }}
-                    />
-                  </div>
-                  <p className="text-[8px]" style={{ color: t.textFaint, fontFamily: mono }}>{m.month}</p>
-                </div>
-              ))}
+            <div style={{ height: 120, width: "100%" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyCollections} barGap={3} barCategoryGap="30%">
+                  <XAxis dataKey="month" tick={{ fontSize: 9, fill: t.textFaint, fontFamily: mono }} axisLine={false} tickLine={false} />
+                  <YAxis hide />
+                  <Tooltip
+                    cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                    contentStyle={{ background: t.bgCard, border: `1px solid ${t.borderMid}`, borderRadius: 10, fontFamily: mono, fontSize: 10 }}
+                    labelStyle={{ color: t.text, fontWeight: 700 }}
+                    itemStyle={{ color: t.textMuted }}
+                    formatter={(v: number) => [`KES ${v.toLocaleString()}`, undefined]}
+                  />
+                  <Bar dataKey="collected"   name="Collected" fill="#3b82f6" radius={[3,3,0,0]} />
+                  <Bar dataKey="outstanding" name="Due"       fill="#ef4444" opacity={0.6} radius={[3,3,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           )}
         </div>
 
         {/* Aging debt breakdown */}
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+        <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>AGING DEBT</p>
             <ShieldAlert className="w-3.5 h-3.5" style={{ color: metrics.overdueCount > 0 ? "#f87171" : t.textFaint }} />
@@ -313,7 +304,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         </div>
 
         {/* Outstanding vs Lent summary */}
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
+        <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
           <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CAPITAL EXPOSURE</p>
           <div className="space-y-3">
             {[
@@ -619,7 +610,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   { label: "REPAY RATE",    value: `${selectedStats.repayRate}%` },
                   { label: "TRANSACTIONS",  value: String(selectedStats.totalTx) },
                 ].map((s) => (
-                  <div key={s.label} className="rounded-xl p-3 md:p-4 border"
+                  <div key={s.label} className="rounded-2xl p-5 border"
                     style={{ background: t.bgActive, borderColor: t.border }}>
                     <p className="text-[9px] uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
                     <p className="text-sm font-bold" style={{ fontFamily: mono, color: "#5b7cfa" }}>{s.value}</p>
@@ -755,3 +746,14 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+

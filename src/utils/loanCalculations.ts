@@ -1,7 +1,7 @@
 ﻿import { Loan, PortfolioMetrics } from "../types";
-
+// global variables//
 const INTEREST_RATE = 0.20;
-
+//functions for our loan calculator//
 export function calculateCyberlendLoan(principal: number, term: number = 5) {
   const monthlyInterest  = Math.round(principal * INTEREST_RATE);
   const totalRepayable   = Math.round((monthlyInterest * term) + principal);
