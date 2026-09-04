@@ -32,7 +32,7 @@ export function generatePortfolioSummaryPdf(
     ? loans
     : loans.filter((l) => l.status !== "Completed");
 
-  // ── PAGE 1 BACKGROUND ──────────────────────────────────────────────
+  // â”€â”€ PAGE 1 BACKGROUND â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   doc.setFillColor(...DARK);
   doc.rect(0, 0, W, H, "F");
 
@@ -64,7 +64,7 @@ export function generatePortfolioSummaryPdf(
   doc.setTextColor(...BLUE);
   doc.text("CYBERLEND LEDGER", W - 12, 11, { align: "right" });
 
-  // ── KPI CARDS ──────────────────────────────────────────────────────
+  // â”€â”€ KPI CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const kpis = [
     { label: "TOTAL LENT",    value: formatCompactCurrency(metrics.totalPrincipalLent) },
     { label: "OUTSTANDING",   value: formatCompactCurrency(metrics.totalOutstanding) },
@@ -103,7 +103,7 @@ export function generatePortfolioSummaryPdf(
     doc.text(kpi.value, x + 3, y + 13);
   });
 
-  // ── LOAN TABLE ─────────────────────────────────────────────────────
+  // â”€â”€ LOAN TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const tableY = cardY + 2 * (cardH + 2) + 6;
 
   doc.setFontSize(7);
@@ -171,7 +171,7 @@ export function generatePortfolioSummaryPdf(
     },
   });
 
-  // ── PAGE 2 — TRANSACTIONS ──────────────────────────────────────────
+  // â”€â”€ PAGE 2 â€” TRANSACTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   doc.addPage();
   doc.setFillColor(...DARK);
   doc.rect(0, 0, W, H, "F");
@@ -248,7 +248,7 @@ export function generatePortfolioSummaryPdf(
     doc.rect(0, H - 8, W, 8, "F");
     doc.setFontSize(6);
     doc.setTextColor(...MUTED);
-    doc.text("CYBERLEND LEDGER — CONFIDENTIAL", 12, H - 3);
+    doc.text("CYBERLEND LEDGER â€” CONFIDENTIAL", 12, H - 3);
     doc.text(`Page ${p} of ${totalPages}`, W - 12, H - 3, { align: "right" });
   }
 

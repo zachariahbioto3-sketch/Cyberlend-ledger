@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import React from "react";
 import { Loan, PortfolioMetrics } from "../types";
 import { formatCompactCurrency } from "../utils/loanCalculations";
@@ -56,7 +57,7 @@ export const TrackerBar: React.FC<TrackerBarProps> = ({ metrics, theme: t, selec
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all hover:opacity-80"
           style={{ fontFamily: mono, background: t.bgBtn, borderColor: t.border, color: t.textMuted }}
         >
-          ? CLOSE PROFILE
+          CLOSE PROFILE
         </button>
       </div>
       <style>{`

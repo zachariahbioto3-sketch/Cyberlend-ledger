@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+ï»¿import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
 import { sampleLoans } from "./data/sampleLoans";
 import { Loan } from "./types";
@@ -9,6 +9,7 @@ import { RepaymentProgress } from "./components/RepaymentProgress";
 import { ClientsPage } from "./components/ClientsPage";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
 import { TrackerBar } from './components/TrackerBar';
+import { ClientProfilePanel } from './components/ClientProfilePanel';
 import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
@@ -290,7 +291,7 @@ function App() {
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} Â· {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -355,6 +356,19 @@ function App() {
                   onClose={() => setSelectedClient(null)}
                 />
               )}
+              {selectedClient && (
+                <div
+                  className="px-6 py-4 overflow-y-auto"
+                  style={{ animation: "profileSlideIn 0.35s cubic-bezier(0.16,1,0.3,1)" }}
+                >
+                  <ClientProfilePanel
+                    client={selectedClient}
+                    metrics={metrics}
+                    theme={t}
+                    allLoans={loans}
+                  />
+                </div>
+              )}
 
               <div
                 className="grid grid-cols-2 lg:grid-cols-4 gap-3"
@@ -392,13 +406,13 @@ function App() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE — COLLECT NOW
+                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE â€” COLLECT NOW
                     </h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" · "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" Â· "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>
@@ -471,6 +485,8 @@ function App() {
 }
 
 export default App;
+
+
 
 
 

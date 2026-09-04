@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { Loan, RepaymentTransaction, PortfolioMetrics } from "../types";
 import {
   calculateCyberlendLoan,
@@ -109,7 +109,7 @@ export const useLoanStore = create<LoanState>((set) => ({
       return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
     }),
 
-  // Records principal return � closes the loan
+  // Records principal return — closes the loan
   closeLoan: (loanId, txData) =>
     set((state) => {
       const idx = state.loans.findIndex((l) => l.id === loanId);

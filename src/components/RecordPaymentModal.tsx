@@ -43,7 +43,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
             </div>
             <div>
               <h3 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>RECORD PAYMENT</h3>
-              <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerName} · {loan.loanNumber}</p>
+              <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerName} Â· {loan.loanNumber}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg" style={{ color: t.textFaint }}><X className="w-4 h-4" /></button>
@@ -112,7 +112,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
           <div className="p-3 rounded-2xl border flex justify-between items-center" style={{ background: t.bgActive, borderColor: t.borderMid }}>
             <span className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BALANCE AFTER:</span>
             <span className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-              {formatCurrency(newBalance)} {newBalance === 0 ? '✓ CLEARED' : ''}
+              {formatCurrency(newBalance)} {newBalance === 0 ? 'âœ“ CLEARED' : ''}
             </span>
           </div>
 

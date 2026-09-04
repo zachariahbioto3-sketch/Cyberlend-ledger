@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+ï»¿import React, { useState, useMemo } from "react";
 import {
   Users, Search, Star, AlertTriangle, UserX,
   Mail, MapPin, CreditCard, TrendingUp, FileText,
@@ -102,8 +102,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   const agingBuckets = useMemo(() => {
     const today = new Date();
     const buckets = [
-      { label: "1–30 days",  count: 0, amount: 0 },
-      { label: "31–60 days", count: 0, amount: 0 },
+      { label: "1â€“30 days",  count: 0, amount: 0 },
+      { label: "31â€“60 days", count: 0, amount: 0 },
       { label: "60+ days",   count: 0, amount: 0 },
     ];
     loans
@@ -132,7 +132,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   return (
     <div className="hidden md:flex flex-1 overflow-y-auto" style={{ background: t.bgCard }}>
 
-      {/* Left column — Portfolio Overview */}
+      {/* Left column â€” Portfolio Overview */}
       <div className="flex flex-col px-6 py-6 gap-5 flex-1 border-r" style={{ borderColor: t.border }}>
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
@@ -197,7 +197,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         </div>
       </div>
 
-      {/* Right column — Financial Health */}
+      {/* Right column â€” Financial Health */}
       <div className="flex flex-col px-6 py-6 gap-5 w-[340px] xl:w-[380px] shrink-0">
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
@@ -295,7 +295,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
                       </div>
                     </div>
                     <p className="text-xs font-bold" style={{ fontFamily: mono, color: colors[i] }}>
-                      {bucket.amount > 0 ? formatCompactCurrency(bucket.amount) : "—"}
+                      {bucket.amount > 0 ? formatCompactCurrency(bucket.amount) : "â€”"}
                     </p>
                   </div>
                 );
@@ -409,7 +409,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
   return (
     <div className="flex h-full min-h-screen relative" style={{ background: t.bg }}>
 
-      {/* -- LEFT — CLIENT LIST -- */}
+      {/* -- LEFT â€” CLIENT LIST -- */}
       <div
         className={`flex flex-col border-r ${isMobileDetail ? "hidden md:flex" : "flex"}`}
         style={{
@@ -512,7 +512,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                       {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#dc2626" }} />}
                     </div>
                     <p className="text-[10px] truncate" style={{ color: t.textFaint, fontFamily: mono }}>
-                      {c.latest.borrowerPhone} · {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
+                      {c.latest.borrowerPhone} Â· {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
                     </p>
                     <p className="text-[10px]" style={{ color: "#5b7cfa", fontFamily: mono }}>
                       {formatCompactCurrency(c.stats.totalLent)} lent
@@ -527,10 +527,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
         </div>
       </div>
 
-      {/* -- RIGHT — PORTFOLIO SUMMARY + FINANCIAL HEALTH (no client selected) -- */}
+      {/* -- RIGHT â€” PORTFOLIO SUMMARY + FINANCIAL HEALTH (no client selected) -- */}
       {!selected && <PortfolioSummaryPanel loans={loans} theme={t} grouped={grouped} />}
 
-      {/* -- RIGHT — CLIENT DETAIL (client selected) -- */}
+      {/* -- RIGHT â€” CLIENT DETAIL (client selected) -- */}
       {selected && selectedLatest && selectedStats && (
         <div
           className="flex flex-col overflow-hidden md:flex-1"
@@ -682,10 +682,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
-                      { label: "Email",    value: selectedLatest.borrowerEmail    || "—", icon: <Mail className="w-3.5 h-3.5" /> },
-                      { label: "Address",  value: selectedLatest.borrowerAddress  || "—", icon: <MapPin className="w-3.5 h-3.5" /> },
-                      { label: "ID No.",   value: selectedLatest.borrowerIdNumber || "—", icon: <CreditCard className="w-3.5 h-3.5" /> },
-                      { label: "Referral", value: selectedLatest.referralSource   || "—", icon: <TrendingUp className="w-3.5 h-3.5" /> },
+                      { label: "Email",    value: selectedLatest.borrowerEmail    || "â€”", icon: <Mail className="w-3.5 h-3.5" /> },
+                      { label: "Address",  value: selectedLatest.borrowerAddress  || "â€”", icon: <MapPin className="w-3.5 h-3.5" /> },
+                      { label: "ID No.",   value: selectedLatest.borrowerIdNumber || "â€”", icon: <CreditCard className="w-3.5 h-3.5" /> },
+                      { label: "Referral", value: selectedLatest.referralSource   || "â€”", icon: <TrendingUp className="w-3.5 h-3.5" /> },
                     ].map((f) => (
                       <div key={f.label} className="flex items-start gap-2 p-3 rounded-xl border"
                         style={{ background: t.bgActive, borderColor: t.border }}>
@@ -720,7 +720,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                       style={{ background: t.bgActive, borderColor: t.border }}>
                       <div>
                         <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{l.loanNumber}</p>
-                        <p className="text-[10px]" style={{ color: t.textFaint }}>{l.category} · {l.originationDate}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{l.category} Â· {l.originationDate}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>

@@ -5,3 +5,5 @@ export { LoanDetailModal } from "./LoanDetailModal";
 export { PdfExportModal } from "./PdfExportModal";
 
 export { TrackerBar } from './TrackerBar';
+
+export { ClientProfilePanel } from './ClientProfilePanel';
