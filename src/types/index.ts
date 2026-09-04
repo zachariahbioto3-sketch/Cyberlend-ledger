@@ -116,3 +116,11 @@ export interface WishlistEntry {
   notes?: string;
   status: "Pending" | "Approved" | "Rejected";
 }
+
+
+export interface Goals {
+  targetPortfolioSize: number;
+  targetClientCount:   number;
+  targetMonthlyReturn: number;
+  targetReturnRate:    number;
+}

@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { X, CreditCard, Calendar, Phone, FileText } from 'lucide-react';
+import React from 'react';
+import { X, CreditCard, Calendar, Phone, FileText, Edit3 } from "lucide-react";
 import { Loan } from '../types';
 import { formatCurrency, formatDate } from '../utils/loanCalculations';
 
@@ -8,6 +8,8 @@ interface ThemeTokens { [key: string]: string; }
 interface LoanDetailModalProps {
   loan: Loan | null;
   onClose: () => void;
+  onEditClient?: (loan: Loan) => void;
+  onEditClient?: (loan: Loan) => void;
   onRecordPayment: (loan: Loan) => void;
   theme: ThemeTokens;
 }
@@ -36,7 +38,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
         <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: t.border }}>
           <div>
             <h3 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>{loan.borrowerName.toUpperCase()}</h3>
-            <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.loanNumber} Â· {loan.category}</p>
+            <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.loanNumber} · {loan.category}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[9px] px-2 py-0.5 rounded-full font-bold border" style={{ fontFamily: mono, background: ss.bg, color: ss.color, borderColor: ss.border }}>
@@ -64,7 +66,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
           <div>
             <div className="flex justify-between text-[9px] mb-1" style={{ fontFamily: mono, color: t.textFaint }}>
               <span>REPAYMENT PROGRESS</span>
-              <span>{pct}% Â· {loan.monthsCompleted}/{loan.term} MONTHS</span>
+              <span>{pct}% · {loan.monthsCompleted}/{loan.term} MONTHS</span>
             </div>
             <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: t.progressBg }}>
               <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: t.progressFill }} />
@@ -100,7 +102,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
                       </div>
                       <div>
                         <p className="font-bold text-xs" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(tx.amount)}</p>
-                        <p className="text-[10px]" style={{ color: t.textFaint }}>{tx.paymentMethod} Â· {tx.referenceNumber}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{tx.paymentMethod} · {tx.referenceNumber}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -118,7 +120,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg"
               style={{ fontFamily: mono, background: t.btnPrimary, color: t.btnPrimaryTx }}>
               <CreditCard className="w-3.5 h-3.5" />
-              RECORD PAYMENT â€” {loan.borrowerName.toUpperCase()}
+              RECORD PAYMENT — {loan.borrowerName.toUpperCase()}
             </button>
           )}
         </div>

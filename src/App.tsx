@@ -1,4 +1,4 @@
-ï»¿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
 import { useState as useModalState } from "react";
 import { sampleLoans } from "./data/sampleLoans";
@@ -9,7 +9,10 @@ import { MonthlyCollections } from "./components/MonthlyCollections";
 import { RepaymentProgress } from "./components/RepaymentProgress";
 import { ClientsPage } from "./components/ClientsPage";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
-import { GrowthCharts } from "./components/GrowthCharts";
+import { GrowthCharts }   from "./components/GrowthCharts";
+import { GoalsModal }      from "./components/GoalsModal";
+import { ClientEditModal } from "./components/ClientEditModal";
+import { GoalTracker }   from "./components/GoalTracker";
 import { TrackerBar } from './components/TrackerBar';
 import { ClientProfilePanel } from './components/ClientProfilePanel';
 import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock } from "lucide-react";
@@ -18,8 +21,10 @@ import { formatCompactCurrency } from "./utils/loanCalculations";
 export type Theme = "dark" | "light";
 
 function App() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, totalCapital, setTotalCapital } = useLoanStore();
+  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
   const [capitalModalOpen, setCapitalModalOpen] = useState(false);
+  const [goalsModalOpen,   setGoalsModalOpen]   = useState(false);
+  const [clientEditTarget, setClientEditTarget] = useState<Loan | null>(null);
   const [capitalInput, setCapitalInput] = useState<string>("");
   const [newLoanOpen, setNewLoanOpen]   = useState(false);
   const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
@@ -296,7 +301,7 @@ function App() {
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} Â· {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -315,7 +320,7 @@ function App() {
 
           {mobileTab === "clients" && (
             <div className="pb-24">
-              <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} />
+              <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} />
             </div>
           )}
 
@@ -340,7 +345,7 @@ function App() {
 
         {desktopTab === "clients" && (
           <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
-            <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} />
+            <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} />
           </div>
         )}
 
@@ -381,13 +386,13 @@ function App() {
                   />
                 </div>
               )}
-
-                            {/* THREE NEW CAPITAL CARDS */}
+              <GoalTracker goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
+              {/* THREE NEW CAPITAL CARDS */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3" style={{ marginBottom: "0" }}>
                 {[
                   { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
                   { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
-                  { label: "RETURNS â€” PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
+                  { label: "RETURNS — PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
                 ].map((card) => (
                   <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#1a1d27" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
                     <div className="flex items-start justify-between">
@@ -438,13 +443,13 @@ function App() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE â€” COLLECT NOW
+                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE — COLLECT NOW
                     </h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" Â· "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" · "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>
@@ -546,6 +551,8 @@ function App() {
         </div>
       )}
 
+      <ClientEditModal isOpen={clientEditTarget !== null} onClose={() => setClientEditTarget(null)} loan={clientEditTarget} onSave={handleSaveClientEdit} theme={t} />
+      <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
       <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} theme={t} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />

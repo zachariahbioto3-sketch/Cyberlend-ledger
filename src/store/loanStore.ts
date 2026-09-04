@@ -1,5 +1,5 @@
-﻿import { create } from "zustand";
-import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry } from "../types";
+import { create } from "zustand";
+import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry, Goals } from "../types";
 import {
   calculateCyberlendLoan,
   calculatePortfolioMetrics,
@@ -9,6 +9,11 @@ import {
 
 const STORAGE_KEY  = "cyberlend_loans";
 const WAITLIST_KEY = "cyberlend_waitlist";
+const GOALS_KEY    = "cyberlend_goals";
+
+const DEFAULT_GOALS: Goals = { targetPortfolioSize: 500000, targetClientCount: 20, targetMonthlyReturn: 50000, targetReturnRate: 10 };
+function loadGoals(): Goals { try { const r = localStorage.getItem(GOALS_KEY); return r ? { ...DEFAULT_GOALS, ...JSON.parse(r) } : DEFAULT_GOALS; } catch { return DEFAULT_GOALS; } }
+function saveGoals(g: Goals) { localStorage.setItem(GOALS_KEY, JSON.stringify(g)); }
 
 function loadLoans(): Loan[] {
   try { const r = localStorage.getItem(STORAGE_KEY);  return r ? JSON.parse(r) : []; } catch { return []; }
@@ -25,6 +30,8 @@ interface LoanState {
   waitlist: WishlistEntry[];
   selectedClient: Loan | null;
   totalCapital: number;
+  goals: Goals;
+  setGoals: (goals: Goals) => void;
   setSelectedClient:    (c: Loan | null) => void;
   setLoans:             (loans: Loan[]) => void;
   addLoan:              (data: any) => void;
@@ -52,6 +59,9 @@ export const useLoanStore = create<LoanState>((set) => ({
   waitlist:       initialWaitlist,
   selectedClient: null,
   totalCapital:   loadCapital(),
+  goals:          loadGoals(),
+
+  setGoals: (goals) => set(() => { saveGoals(goals); return { goals }; }),
 
   setSelectedClient: (client) => set(() => ({ selectedClient: client })),
 

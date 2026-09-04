@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Loan } from "../types";
 import { formatCurrency, formatDate } from "../utils/loanCalculations";
 import { ChevronRight, Plus, Trash2, Search } from "lucide-react";
@@ -11,10 +11,11 @@ interface LoanLedgerTableProps {
   onRecordPayment: (loan: Loan) => void;
   onDeleteLoan: (loanId: string) => void;
   onOpenNewLoan: () => void;
+  onEditClient?: (loan: Loan) => void;
   theme: ThemeTokens;
 }
 
-export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelectLoan, onRecordPayment, onDeleteLoan, onOpenNewLoan, theme: t }) => {
+export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelectLoan, onRecordPayment, onDeleteLoan, onOpenNewLoan, onEditClient, theme: t }) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const mono = "'Space Mono', monospace";

@@ -1,16 +1,17 @@
 import React from "react";
 import { Loan, PortfolioMetrics } from "../types";
 import { formatCompactCurrency } from "../utils/loanCalculations";
-import { Phone, Mail, Calendar, TrendingUp, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { Phone, Mail, Calendar, TrendingUp, CheckCircle, AlertCircle, Clock, Edit3 } from "lucide-react";
 
 interface ClientProfilePanelProps {
   client: Loan;
   metrics: PortfolioMetrics;
   theme: any;
   allLoans: Loan[];
+  onEditClient?: (loan: Loan) => void;
 }
 
-export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, theme: t, allLoans }) => {
+export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, theme: t, allLoans, onEditClient }) => {
   const mono = "'Space Mono', monospace";
 
   const clientLoans = allLoans.filter(l => l.borrowerName === client.borrowerName).sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime());
