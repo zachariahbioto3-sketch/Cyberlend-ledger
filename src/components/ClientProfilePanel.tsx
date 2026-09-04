@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Loan, PortfolioMetrics } from "../types";
 import { formatCompactCurrency } from "../utils/loanCalculations";
 import { Phone, Mail, Calendar, TrendingUp, CheckCircle, AlertCircle, Clock } from "lucide-react";
@@ -13,7 +13,7 @@ interface ClientProfilePanelProps {
 export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, theme: t, allLoans }) => {
   const mono = "'Space Mono', monospace";
 
-  const clientLoans = allLoans.filter(l => l.borrowerName === client.borrowerName);
+  const clientLoans = allLoans.filter(l => l.borrowerName === client.borrowerName).sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime());
   const totalBorrowed = clientLoans.reduce((s, l) => s + l.loanAmount, 0);
   const totalPaid     = clientLoans.reduce((s, l) => s + l.amountPaid, 0);
   const totalOwed     = clientLoans.reduce((s, l) => s + l.remainingBalance, 0);

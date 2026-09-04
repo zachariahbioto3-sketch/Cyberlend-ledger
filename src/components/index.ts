@@ -4,3 +4,5 @@ export { RecordPaymentModal } from "./RecordPaymentModal";
 export { LoanDetailModal }    from "./LoanDetailModal";
 export { PdfExportModal }     from "./PdfExportModal";
 export { WaitlistPage }       from "./WaitlistPage";
+
+export { GrowthCharts } from "./GrowthCharts";

@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
+import { useState as useModalState } from "react";
 import { sampleLoans } from "./data/sampleLoans";
 import { Loan } from "./types";
 import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal, WaitlistPage } from "./components";
@@ -8,15 +9,18 @@ import { MonthlyCollections } from "./components/MonthlyCollections";
 import { RepaymentProgress } from "./components/RepaymentProgress";
 import { ClientsPage } from "./components/ClientsPage";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
+import { GrowthCharts } from "./components/GrowthCharts";
 import { TrackerBar } from './components/TrackerBar';
 import { ClientProfilePanel } from './components/ClientProfilePanel';
-import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText } from "lucide-react";
+import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
 function App() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist } = useLoanStore();
+  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, totalCapital, setTotalCapital } = useLoanStore();
+  const [capitalModalOpen, setCapitalModalOpen] = useState(false);
+  const [capitalInput, setCapitalInput] = useState<string>("");
   const [newLoanOpen, setNewLoanOpen]   = useState(false);
   const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
   const [detailLoan,  setDetailLoan]    = useState<Loan | null>(null);
@@ -123,7 +127,8 @@ function App() {
         <nav className="flex flex-col gap-2 flex-1">
           {[
             { icon: <LayoutDashboard className="w-4 h-4" />, label: "Dashboard", tab: "dashboard" as const },
-            { icon: <Users className="w-4 h-4" />, label: "Clients",  tab: "clients"   as const },`n            { icon: <Clock className="w-4 h-4" />,  label: "Waitlist", tab: "waitlist"  as const },
+            { icon: <Users className="w-4 h-4" />, label: "Clients",  tab: "clients"   as const },
+            { icon: <Clock className="w-4 h-4" />,  label: "Waitlist", tab: "waitlist"  as const },
           ].map((item) => (
             <button key={item.label} title={item.label}
               onClick={() => setDesktopTab(item.tab)}
@@ -278,7 +283,7 @@ function App() {
                 <span className="text-[10px]" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS</span>
               </div>
               <div className="space-y-2">
-                {loans.map((loan) => {
+                {[...loans].sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()).map((loan) => {
                   const ss = statusStyle(loan.status);
                   return (
                     <div key={loan.id} onClick={() => setDetailLoan(loan)}
@@ -321,12 +326,19 @@ function App() {
               <MonthlyCollections loans={loans} theme={t} compact />
               <RepaymentProgress loans={loans} theme={t} compact />
               <FinancialStackedBar loans={loans} theme={t} compact />
+              <GrowthCharts loans={loans} theme={t} />
             </div>
           )}
         </div>
 
         {/* DESKTOP CLIENTS VIEW */}
-        {desktopTab === "waitlist" && (`n            <div className="flex-1 overflow-hidden">`n              <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setNewLoanOpen(true); }} />`n            </div>`n          )}`n          {desktopTab === "waitlist" && (`n            <div className="flex-1 overflow-hidden">`n              <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setNewLoanOpen(true); }} />`n            </div>`n          )}`n          {desktopTab === "clients" && (
+        {desktopTab === "waitlist" && (
+          <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
+            <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setNewLoanOpen(true); }} />
+          </div>
+        )}
+
+        {desktopTab === "clients" && (
           <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
             <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} />
           </div>
@@ -370,7 +382,27 @@ function App() {
                 </div>
               )}
 
-              <div
+                            {/* THREE NEW CAPITAL CARDS */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3" style={{ marginBottom: "0" }}>
+                {[
+                  { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
+                  { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
+                  { label: "RETURNS — PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
+                ].map((card) => (
+                  <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#1a1d27" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
+                    <div className="flex items-start justify-between">
+                      <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>{card.label}</p>
+                      {card.hasAction && (
+                        <button onClick={() => { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); }} className="text-[9px] font-bold px-2 py-0.5 rounded-lg border" style={{ fontFamily: mono, borderColor: card.borderColor, color: card.color }}>SET</button>
+                      )}
+                    </div>
+                    <p className="text-xl font-bold" style={{ fontFamily: mono, color: card.color }}>{card.value}</p>
+                    <p className="text-[10px] mt-1" style={{ color: t.textFaint }}>{card.sub}</p>
+                  </div>
+                ))}
+              </div>
+
+<div
                 className="grid grid-cols-2 lg:grid-cols-4 gap-3"
                 style={{
                   transform:  selectedClient ? "translateY(-8px)" : "translateY(0)",
@@ -436,6 +468,8 @@ function App() {
                   <FinancialStackedBar loans={loans} theme={t} />
                 </div>
               </div>
+              <GrowthCharts loans={loans} theme={t} />
+
               <LoanLedgerTable
                 loans={loans}
                 onSelectLoan={setDetailLoan}
@@ -475,6 +509,42 @@ function App() {
 
         <div className="md:hidden h-20" />
       </div>
+
+      {capitalModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}>
+          <div className="rounded-2xl p-6 border w-full max-w-sm"
+            style={{ background: t.bgModal, borderColor: t.borderMid }}>
+            <p className="text-sm font-bold tracking-widest mb-1" style={{ fontFamily: mono, color: t.text }}>SET TOTAL CAPITAL</p>
+            <p className="text-[10px] mb-4" style={{ color: t.textFaint, fontFamily: mono }}>
+              This is the total pool of money available to the lending business.
+            </p>
+            <input
+              type="number"
+              value={capitalInput}
+              onChange={(e) => setCapitalInput(e.target.value)}
+              placeholder="e.g. 500000"
+              className="w-full px-4 py-3 rounded-xl border text-sm mb-4 outline-none"
+              style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }}
+            />
+            <div className="flex gap-3">
+              <button onClick={() => setCapitalModalOpen(false)}
+                className="flex-1 py-2.5 rounded-xl border text-xs font-bold"
+                style={{ fontFamily: mono, borderColor: t.border, color: t.textMuted, background: t.bgBtn }}>
+                CANCEL
+              </button>
+              <button onClick={() => {
+                  const val = parseFloat(capitalInput);
+                  if (!isNaN(val) && val > 0) { setTotalCapital(val); setCapitalModalOpen(false); }
+                }}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold"
+                style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+                SAVE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
       <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} theme={t} />

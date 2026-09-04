@@ -80,6 +80,9 @@ export interface PortfolioMetrics {
   completedLoansCount: number;
   overdueCount: number;
   defaultedCount: number;
+  availableCapital: number;
+  lendableAmount: number;
+  returnsFromPreviousLoans: number;
 }
 
 export interface BorrowerProfile {

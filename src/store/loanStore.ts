@@ -24,6 +24,7 @@ interface LoanState {
   metrics:  PortfolioMetrics;
   waitlist: WishlistEntry[];
   selectedClient: Loan | null;
+  totalCapital: number;
   setSelectedClient:    (c: Loan | null) => void;
   setLoans:             (loans: Loan[]) => void;
   addLoan:              (data: any) => void;
@@ -34,16 +35,23 @@ interface LoanState {
   addToWaitlist:        (entry: Omit<WishlistEntry, "id" | "dateRegistered" | "status">) => void;
   removeFromWaitlist:   (id: string) => void;
   updateWaitlistStatus: (id: string, status: WishlistEntry["status"]) => void;
+  setTotalCapital:      (amount: number) => void;
 }
 
 const initialLoans    = loadLoans();
 const initialWaitlist = loadWaitlist();
+
+function loadCapital(): number {
+  try { const v = localStorage.getItem("cyberlend_capital"); return v ? parseFloat(v) : 0; }
+  catch { return 0; }
+}
 
 export const useLoanStore = create<LoanState>((set) => ({
   loans:          initialLoans,
   metrics:        calculatePortfolioMetrics(initialLoans),
   waitlist:       initialWaitlist,
   selectedClient: null,
+  totalCapital:   loadCapital(),
 
   setSelectedClient: (client) => set(() => ({ selectedClient: client })),
 
@@ -161,5 +169,10 @@ export const useLoanStore = create<LoanState>((set) => ({
     const updated = state.waitlist.map((e) => e.id === id ? { ...e, status } : e);
     saveWaitlist(updated);
     return { waitlist: updated };
+  }),
+
+  setTotalCapital: (amount) => set((state) => {
+    localStorage.setItem("cyberlend_capital", String(amount));
+    return { totalCapital: amount, metrics: calculatePortfolioMetrics(state.loans) };
   }),
 }));
