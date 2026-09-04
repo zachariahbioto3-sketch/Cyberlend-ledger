@@ -23,19 +23,26 @@ export type Theme = "dark" | "light";
 function App() {
   const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
   const [capitalModalOpen, setCapitalModalOpen] = useState(false);
-  const [goalsModalOpen,   setGoalsModalOpen]   = useState(false);
+  const [goalsModalOpen, setGoalsModalOpen] = useState(false);
   const [clientEditTarget, setClientEditTarget] = useState<Loan | null>(null);
   const [capitalInput, setCapitalInput] = useState<string>("");
-  const [newLoanOpen, setNewLoanOpen]   = useState(false);
-  const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
-  const [detailLoan,  setDetailLoan]    = useState<Loan | null>(null);
-  const [mobileTab,   setMobileTab]     = useState<"loans" | "analytics" | "clients" | "waitlist">("loans");
-  const [desktopTab,  setDesktopTab]    = useState<"dashboard" | "clients" | "waitlist">("dashboard");
-  const [pdfOpen,     setPdfOpen]       = useState(false);
+  const [newLoanOpen, setNewLoanOpen] = useState(false);
+  const [paymentLoan, setPaymentLoan] = useState<Loan | null>(null);
+  const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
+  const [mobileTab, setMobileTab] = useState<"loans" | "analytics" | "clients" | "waitlist">("loans");
+  const [desktopTab, setDesktopTab] = useState<"dashboard" | "clients" | "waitlist">("dashboard");
+  const [pdfOpen, setPdfOpen] = useState(false);
   const handleUpdateLoan = (id: string, updates: Partial<any>) => {
     const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
     setLoans(updated);
+   };
+
+  const handleSaveClientEdit = (id: string, updates: Partial<Loan>) => {
+    const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
+    setLoans(updated);
+    setClientEditTarget(null);
   };
+
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("cyberlend_theme") as Theme) || "dark");
 
   const isDark = theme === "dark";
@@ -562,8 +569,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
