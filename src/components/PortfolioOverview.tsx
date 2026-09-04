@@ -20,7 +20,7 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ metrics, l
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {cards.map((card) => (
           <div key={card.label}
             className="rounded-2xl p-5 border transition-all hover:border-white/20 group"

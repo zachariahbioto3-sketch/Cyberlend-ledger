@@ -116,7 +116,7 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-2xl p-5 border" style={cardStyle}>
           <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>NEW CLIENT FORMATION</p>
           <ResponsiveContainer width="100%" height={160}>

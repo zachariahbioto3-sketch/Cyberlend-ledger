@@ -15,6 +15,13 @@ interface LoanDetailModalProps {
 }
 
 export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose, onRecordPayment, theme: t }) => {
+  
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   if (!loan) return null;
 
   const mono = "'Space Mono', monospace";

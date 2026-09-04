@@ -14,6 +14,13 @@ interface RecordPaymentModalProps {
 }
 
 export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, loan, onClose, onSavePayment, theme: t }) => {
+  
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   if (!isOpen || !loan) return null;
 
   const mono = "'Space Mono', monospace";

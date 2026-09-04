@@ -10,3 +10,5 @@ export { GoalsModal }  from "./GoalsModal";
 export { GoalTracker } from "./GoalTracker";
 
 export { ClientEditModal } from "./ClientEditModal";
+
+export { GoalDrawer } from "./GoalDrawer";

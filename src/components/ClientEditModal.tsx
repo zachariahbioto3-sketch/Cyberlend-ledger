@@ -35,6 +35,13 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
     }
   }, [isOpen, loan]);
 
+  
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   if (!isOpen || !loan) return null;
 
   const set = (k: keyof Loan, v: any) => setForm((p) => ({ ...p, [k]: v }));

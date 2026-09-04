@@ -308,7 +308,7 @@ function App() {
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} ï¿½ {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -328,6 +328,12 @@ function App() {
           {mobileTab === "clients" && (
             <div className="pb-24">
               <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} />
+            </div>
+          )}
+
+          {mobileTab === "waitlist" && (
+            <div className="pb-24">
+              <WaitlistPage theme={t} onPromoteToLoan={() => setNewLoanOpen(true)} />
             </div>
           )}
 
@@ -395,11 +401,11 @@ function App() {
               )}
               <GoalTracker goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
               {/* THREE NEW CAPITAL CARDS */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3" style={{ marginBottom: "0" }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" style={{ marginBottom: "0" }}>
                 {[
                   { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
                   { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
-                  { label: "RETURNS — PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
+                  { label: "RETURNS ï¿½ PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
                 ].map((card) => (
                   <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#1a1d27" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
                     <div className="flex items-start justify-between">
@@ -415,7 +421,7 @@ function App() {
               </div>
 
 <div
-                className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+                className="grid grid-cols-2 md:grid-cols-4 gap-3"
                 style={{
                   transform:  selectedClient ? "translateY(-8px)" : "translateY(0)",
                   opacity:    selectedClient ? 0 : 1,
@@ -450,13 +456,13 @@ function App() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE — COLLECT NOW
+                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE ï¿½ COLLECT NOW
                     </h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" · "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" ï¿½ "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>
@@ -471,11 +477,11 @@ function App() {
                   transition: "max-height 0.35s ease-in-out, opacity 0.25s ease-in-out",
                 }}
               >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <PortfolioDonut metrics={metrics} theme={t} />
                   <MonthlyCollections loans={loans} theme={t} />
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <RepaymentProgress loans={loans} theme={t} />
                   <FinancialStackedBar loans={loans} theme={t} />
                 </div>
@@ -501,6 +507,7 @@ function App() {
             { tab: "loans",     icon: <LayoutDashboard className="w-4 h-4" />, label: "LOANS" },
             { tab: "analytics", icon: <TrendingUp className="w-4 h-4" />,      label: "ANALYTICS" },
             { tab: "clients",   icon: <Users className="w-4 h-4" />,           label: "CLIENTS" },
+            { tab: "waitlist",  icon: <Clock className="w-4 h-4" />,           label: "WAITLIST" },
           ].map((item) => (
             <button key={item.tab} onClick={() => setMobileTab(item.tab as any)} className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"

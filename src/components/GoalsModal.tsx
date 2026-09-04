@@ -16,6 +16,13 @@ export const GoalsModal: React.FC<GoalsModalProps> = ({ isOpen, onClose, goals, 
 
   useEffect(() => { if (isOpen) setForm(goals); }, [isOpen, goals]);
 
+  
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   if (!isOpen) return null;
 
   const set = (k: keyof Goals, v: number) => setForm((p) => ({ ...p, [k]: v }));

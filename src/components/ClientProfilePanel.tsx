@@ -108,7 +108,21 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, 
             LOAN HISTORY ({clientLoans.length})
           </p>
         </div>
-        {clientLoans.map((loan, i) => {
+        {(() => {
+          const nodes = [];
+          let lastYear = '';
+          clientLoans.forEach((loan, i) => {
+            const year = (loan.originationDate || '').slice(0, 4);
+            if (clientLoans.length >= 3 && year && year !== lastYear) {
+              nodes.push(
+                React.createElement('div', { key: 'yr-' + year, className: 'flex items-center gap-2 px-5 py-1.5', style: { borderBottom: `1px solid ${t.border}` } },
+                  React.createElement('div', { className: 'flex-1 h-px', style: { background: t.border } }),
+                  React.createElement('span', { className: 'text-[9px] font-bold tracking-widest', style: { fontFamily: mono, color: t.textFaint } }, year),
+                  React.createElement('div', { className: 'flex-1 h-px', style: { background: t.border } })
+                )
+              );
+              lastYear = year;
+            }
           const pct = loan.totalRepayable > 0 ? Math.round((loan.amountPaid / loan.totalRepayable) * 100) : 0;
           return (
             <div
@@ -148,7 +162,9 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, 
               <p className="text-[9px] mt-1" style={{ color: t.textFaint }}>{pct}% repaid</p>
             </div>
           );
-        })}
+          });
+          return nodes;
+        })()}
       </div>
     </div>
   );

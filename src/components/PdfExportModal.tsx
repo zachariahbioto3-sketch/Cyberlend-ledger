@@ -26,6 +26,13 @@ export const PdfExportModal: React.FC<PdfExportModalProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
 
+  
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   if (!isOpen) return null;
 
   const handleGeneratePdf = () => {

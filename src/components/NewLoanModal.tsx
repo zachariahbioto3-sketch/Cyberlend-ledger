@@ -21,9 +21,17 @@ interface NewLoanModalProps {
 export const NewLoanModal: React.FC<NewLoanModalProps> = ({
   isOpen, onClose, onAddLoan, theme: t, existingLoans = [], prefillClient = null,
 }) => {
-  if (!isOpen) return null;
+if (!isOpen) return null;
 
   const mono     = "'Space Mono', monospace";
+
+  // Escape key ? must be before any early return (Rules of Hooks)
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
   const todayStr = new Date().toISOString().split("T")[0];
 
   const [borrowerPhone,  setBorrowerPhone]  = useState(prefillClient?.borrowerPhone  || "");
