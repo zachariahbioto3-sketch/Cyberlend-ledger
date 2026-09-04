@@ -2,7 +2,7 @@
 import { useLoanStore } from "./store/loanStore";
 import { sampleLoans } from "./data/sampleLoans";
 import { Loan } from "./types";
-import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal } from "./components";
+import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal, WaitlistPage } from "./components";
 import { PortfolioDonut } from "./components/PortfolioDonut";
 import { MonthlyCollections } from "./components/MonthlyCollections";
 import { RepaymentProgress } from "./components/RepaymentProgress";
@@ -16,12 +16,12 @@ import { formatCompactCurrency } from "./utils/loanCalculations";
 export type Theme = "dark" | "light";
 
 function App() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient } = useLoanStore();
+  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist } = useLoanStore();
   const [newLoanOpen, setNewLoanOpen]   = useState(false);
   const [paymentLoan, setPaymentLoan]   = useState<Loan | null>(null);
   const [detailLoan,  setDetailLoan]    = useState<Loan | null>(null);
-  const [mobileTab,   setMobileTab]     = useState<"loans" | "analytics" | "clients">("loans");
-  const [desktopTab,  setDesktopTab]    = useState<"dashboard" | "clients">("dashboard");
+  const [mobileTab,   setMobileTab]     = useState<"loans" | "analytics" | "clients" | "waitlist">("loans");
+  const [desktopTab,  setDesktopTab]    = useState<"dashboard" | "clients" | "waitlist">("dashboard");
   const [pdfOpen,     setPdfOpen]       = useState(false);
   const handleUpdateLoan = (id: string, updates: Partial<any>) => {
     const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
@@ -123,7 +123,7 @@ function App() {
         <nav className="flex flex-col gap-2 flex-1">
           {[
             { icon: <LayoutDashboard className="w-4 h-4" />, label: "Dashboard", tab: "dashboard" as const },
-            { icon: <Users className="w-4 h-4" />, label: "Clients", tab: "clients" as const },
+            { icon: <Users className="w-4 h-4" />, label: "Clients",  tab: "clients"   as const },`n            { icon: <Clock className="w-4 h-4" />,  label: "Waitlist", tab: "waitlist"  as const },
           ].map((item) => (
             <button key={item.label} title={item.label}
               onClick={() => setDesktopTab(item.tab)}
@@ -326,7 +326,7 @@ function App() {
         </div>
 
         {/* DESKTOP CLIENTS VIEW */}
-        {desktopTab === "clients" && (
+        {desktopTab === "waitlist" && (`n            <div className="flex-1 overflow-hidden">`n              <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setNewLoanOpen(true); }} />`n            </div>`n          )}`n          {desktopTab === "waitlist" && (`n            <div className="flex-1 overflow-hidden">`n              <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setNewLoanOpen(true); }} />`n            </div>`n          )}`n          {desktopTab === "clients" && (
           <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
             <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} />
           </div>

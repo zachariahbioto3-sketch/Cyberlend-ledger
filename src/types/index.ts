@@ -1,4 +1,4 @@
-﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Other";
+﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
 
 export type LoanStatus = "Active" | "Overdue" | "Completed" | "Defaulted";
 
@@ -7,6 +7,18 @@ export type PaymentMethod = "M-Pesa" | "Bank Transfer";
 export type PaymentType = "Interest" | "Principal";
 
 export type ClientFlag = "VIP" | "Blacklisted" | "Defaulter" | "New" | "Regular";
+
+export type LoanPurpose =
+  | "Business Capital"
+  | "School Fees"
+  | "Medical Emergency"
+  | "Land/Property"
+  | "Agriculture"
+  | "Home Improvement"
+  | "Debt Consolidation"
+  | "Electronics/Assets"
+  | "Personal Use"
+  | "Other";
 
 export interface RepaymentTransaction {
   id: string;
@@ -29,6 +41,11 @@ export interface Loan {
   borrowerAddress?: string;
   borrowerIdNumber?: string;
   borrowerPhoto?: string;
+  borrowerIdPhoto?: string;
+  borrowerUsername?: string;
+  loanPurpose?: LoanPurpose;
+  kraPin?: string;
+  occupation?: string;
   clientFlags?: ClientFlag[];
   clientNotes?: string;
   referralSource?: string;
@@ -72,8 +89,27 @@ export interface BorrowerProfile {
   borrowerAddress: string;
   borrowerIdNumber: string;
   borrowerPhoto: string;
+  borrowerIdPhoto: string;
+  borrowerUsername: string;
+  loanPurpose: LoanPurpose;
+  kraPin: string;
+  occupation: string;
   clientFlags: ClientFlag[];
   clientNotes: string;
   referralSource: string;
   dateJoined: string;
+}
+
+export interface WishlistEntry {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  occupation: string;
+  amountNeeded: number;
+  purpose: LoanPurpose;
+  dateNeeded: string;
+  dateRegistered: string;
+  notes?: string;
+  status: "Pending" | "Approved" | "Rejected";
 }
