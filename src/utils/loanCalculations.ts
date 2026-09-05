@@ -1,4 +1,4 @@
-﻿import { Loan, PortfolioMetrics } from "../types";
+import { Loan, PortfolioMetrics } from "../types";
 // global variables//
 const INTEREST_RATE = 0.20;
 //functions for our loan calculator//

@@ -1,4 +1,4 @@
-﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
+xport type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
 
 export type LoanStatus = "Active" | "Overdue" | "Completed" | "Defaulted";
 

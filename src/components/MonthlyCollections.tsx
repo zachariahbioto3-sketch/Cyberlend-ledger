@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Loan } from "../types";
 
@@ -72,7 +72,7 @@ export const MonthlyCollections: React.FC<Props> = ({ loans, theme: t, compact =
         MONTHLY COLLECTIONS
       </p>
       <div style={{ height: chartHeight, minHeight: chartHeight, width: "100%", minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart data={data} barCategoryGap="30%" barGap={4}>
             <XAxis dataKey="month" tick={{ fontSize: 9, fill: t.textFaint, fontFamily: mono }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 9, fill: t.textFaint, fontFamily: mono }} axisLine={false} tickLine={false}

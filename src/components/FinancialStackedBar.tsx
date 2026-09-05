@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Loan } from "../types";
 
@@ -75,7 +75,7 @@ export const FinancialStackedBar: React.FC<Props> = ({ loans, theme: t, compact 
       </div>
 
       <div style={{ height: chartHeight, minHeight: chartHeight, width: "100%", minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart data={data} barCategoryGap="30%" barSize={compact ? 18 : 24}>
             <XAxis
               dataKey="name"

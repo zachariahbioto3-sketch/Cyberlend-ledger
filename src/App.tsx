@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
 import { useState as useModalState } from "react";
-import { sampleLoans } from "./data/sampleLoans";
+
 import { Loan } from "./types";
 import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal, WaitlistPage } from "./components";
 import { PortfolioDonut } from "./components/PortfolioDonut";
@@ -52,7 +52,7 @@ function App() {
     localStorage.setItem("cyberlend_theme", next);
   };
 
-  useEffect(() => { if (loans.length === 0) setLoans(sampleLoans); }, []);
+
 
   const handleSavePayment = (loanId: string, transaction: any) => { recordPayment(loanId, transaction); setPaymentLoan(null); };
 
@@ -67,7 +67,7 @@ function App() {
     a.click();
   };
 
-  const handleResetData = () => { if (confirm("Reset to sample data?")) setLoans(sampleLoans); };
+  const handleResetData = () => { if (confirm("Clear all data?")) { setLoans([]); } };
 
   const t = isDark ? {
     bg:           "#0f1117",
@@ -128,6 +128,7 @@ function App() {
   };
 
   return (
+    <>
     <div className="min-h-screen flex" style={{ background: t.bg, transition: "background 0.3s, color 0.3s" }}>
 
       {/* DESKTOP SIDEBAR */}
@@ -308,7 +309,7 @@ function App() {
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} � {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} &#65533; {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -405,7 +406,7 @@ function App() {
                 {[
                   { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
                   { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
-                  { label: "RETURNS � PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
+                  { label: "RETURNS &#65533; PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
                 ].map((card) => (
                   <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#1a1d27" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
                     <div className="flex items-start justify-between">
@@ -456,13 +457,13 @@ function App() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE � COLLECT NOW
+                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE &#65533; COLLECT NOW
                     </h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" � "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" &#65533; "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>
@@ -572,6 +573,7 @@ function App() {
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
       <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} theme={t} />
     </div>
+    </>
   );
 }
 

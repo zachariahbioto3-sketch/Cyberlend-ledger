@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { X, CreditCard, Check, Smartphone, Building2 } from 'lucide-react';
 import { Loan, PaymentMethod, RepaymentTransaction } from '../types';
 import { formatCurrency, formatDate } from '../utils/loanCalculations';
@@ -14,22 +14,21 @@ interface RecordPaymentModalProps {
 }
 
 export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, loan, onClose, onSavePayment, theme: t }) => {
-  
+  const mono = "'Space Mono', monospace";
+  const todayStr = new Date().toISOString().split('T')[0];
+  const [date, setDate] = useState(todayStr);
+  const [amount, setAmount] = useState<number>(loan?.monthlyPayment ?? 0);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('M-Pesa');
+  const [referenceNumber, setReferenceNumber] = useState(`REF-${Date.now().toString().slice(-6)}`);
+  const [notes, setNotes] = useState('Monthly installment');
+
   React.useEffect(() => {
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
 
   if (!isOpen || !loan) return null;
-
-  const mono = "'Space Mono', monospace";
-  const todayStr = new Date().toISOString().split('T')[0];
-  const [date, setDate] = useState(todayStr);
-  const [amount, setAmount] = useState<number>(loan.monthlyPayment);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('M-Pesa');
-  const [referenceNumber, setReferenceNumber] = useState(`REF-${Date.now().toString().slice(-6)}`);
-  const [notes, setNotes] = useState('Monthly installment');
   const newBalance = Math.max(0, loan.remainingBalance - amount);
   const inputStyle = { background: t.bgInput, borderColor: t.border, color: t.text };
 

@@ -104,7 +104,7 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
                   style={{ fontFamily: mono, color: t.textFaint }}>{tr.label}</p>
 
                 <div className="relative w-full" style={{ height: 130 }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <PieChart>
                       <Pie
                         data={data}

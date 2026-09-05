@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { PlusCircle, Download, RotateCcw, Search, TrendingUp } from 'lucide-react';
 import { PortfolioMetrics } from '../types';
 import { formatCompactCurrency } from '../utils/loanCalculations';
@@ -24,7 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({ metrics, onOpenNewLoanModal, onE
           <span className="font-bold text-sm text-white tracking-widest uppercase" style={{ fontFamily: "'Space Mono', monospace" }}>
             CYBERLEND
           </span>
-          <p className="text-[8px] text-white/30 tracking-widest uppercase">Building Wealth Together</p>
+          <p className="text-[8px] text-white/30 tracking-widest uppercase">Fast Honest Reliable</p>
         </div>
       </div>
 

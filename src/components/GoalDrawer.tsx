@@ -104,7 +104,7 @@ export const GoalDrawer: React.FC<GoalDrawerProps> = ({ goals, metrics, loans, t
                     <p className="text-[8px] font-bold uppercase tracking-widest mb-2 text-center"
                       style={{ fontFamily: mono, color: t.textFaint }}>{tr.label}</p>
                     <div className="relative w-full" style={{ height: 100 }}>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <PieChart>
                           <Pie data={data} cx="50%" cy="50%" innerRadius={28} outerRadius={40}
                             startAngle={90} endAngle={-270} paddingAngle={2} dataKey="value" strokeWidth={0}>

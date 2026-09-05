@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { X, FileText, Download, CheckCircle2, Settings } from "lucide-react";
 import { Loan, PortfolioMetrics } from "../types";
 import { generatePortfolioSummaryPdf } from "../utils/pdfReportGenerator";

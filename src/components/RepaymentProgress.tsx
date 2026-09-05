@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Loan } from "../types";
 
@@ -85,7 +85,7 @@ export const RepaymentProgress: React.FC<Props> = ({ loans, theme: t, compact = 
       </div>
 
       <div style={{ height: chartHeight, minHeight: chartHeight, width: "100%", minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart layout="vertical" data={data} barCategoryGap="25%">
             <XAxis
               type="number"

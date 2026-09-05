@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from "recharts";
 import { Loan } from "../types";
 
@@ -96,7 +96,7 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
 
       <div className="rounded-2xl p-5 border" style={cardStyle}>
         <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>ASSET GROWTH + 6-MONTH TRAJECTORY</p>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={200} minWidth={0}>
           <LineChart data={combinedAsset} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={t.border} />
             <XAxis dataKey="month" tick={axisStyle} />
@@ -119,7 +119,7 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-2xl p-5 border" style={cardStyle}>
           <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>NEW CLIENT FORMATION</p>
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={160} minWidth={0}>
             <BarChart data={clientData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={t.border} />
               <XAxis dataKey="month" tick={axisStyle} />
@@ -132,7 +132,7 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
 
         <div className="rounded-2xl p-5 border" style={cardStyle}>
           <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>RATE OF RETURN (%)</p>
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={160} minWidth={0}>
             <LineChart data={returnData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={t.border} />
               <XAxis dataKey="month" tick={axisStyle} />

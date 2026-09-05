@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { X, PlusCircle, Check, ChevronDown, User, AlertTriangle, Clock } from "lucide-react";
 import { LoanCategory, LoanPurpose, Loan } from "../types";
 import { calculateCyberlendLoan, formatCurrency, formatCompactCurrency } from "../utils/loanCalculations";

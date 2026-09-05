@@ -1,4 +1,4 @@
-﻿import { Loan } from "../types";
+import { Loan } from "../types";
 
 const today = new Date();
 const fmt = (d: Date) => d.toISOString().split("T")[0];

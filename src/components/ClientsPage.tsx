@@ -516,8 +516,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
           {monthlyCollections.length === 0 ? (
             <p className="text-xs text-center py-4" style={{ color: t.textFaint, fontFamily: mono }}>NO DATA YET</p>
           ) : (
-            <div style={{ height: 120 }}>
-              <ResponsiveContainer width="100%" height="100%">
+            <div style={{ height: 120, minWidth: 0 }}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={monthlyCollections} barGap={3} barCategoryGap="30%">
                   <XAxis dataKey="month" tick={{ fontSize: 9, fill: t.textFaint, fontFamily: mono }} axisLine={false} tickLine={false} />
                   <YAxis hide />

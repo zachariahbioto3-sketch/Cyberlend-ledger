@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { TrendingUp, Wallet, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 import { Loan, PortfolioMetrics } from '../types';
 import { formatCurrency } from '../utils/loanCalculations';
