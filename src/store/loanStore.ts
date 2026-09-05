@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry, Goals } from "../types";
 import {
   calculateCyberlendLoan,
@@ -6,6 +6,7 @@ import {
   updateLoanAfterInterest,
   closeLoanWithPrincipal,
 } from "../utils/loanCalculations";
+import { sampleLoans } from "../data/sampleLoans";
 
 const STORAGE_KEY  = "cyberlend_loans";
 const WAITLIST_KEY = "cyberlend_waitlist";
@@ -16,7 +17,18 @@ function loadGoals(): Goals { try { const r = localStorage.getItem(GOALS_KEY); r
 function saveGoals(g: Goals) { localStorage.setItem(GOALS_KEY, JSON.stringify(g)); }
 
 function loadLoans(): Loan[] {
-  try { const r = localStorage.getItem(STORAGE_KEY);  return r ? JSON.parse(r) : []; } catch { return []; }
+  try {
+    const r = localStorage.getItem(STORAGE_KEY);
+    if (r) {
+      const parsed = JSON.parse(r);
+      if (parsed.length > 0) return parsed;
+    }
+    // No data yet — seed with dummy data
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleLoans));
+    return sampleLoans;
+  } catch {
+    return sampleLoans;
+  }
 }
 function loadWaitlist(): WishlistEntry[] {
   try { const r = localStorage.getItem(WAITLIST_KEY); return r ? JSON.parse(r) : []; } catch { return []; }

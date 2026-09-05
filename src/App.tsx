@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
 import { useState as useModalState } from "react";
 
@@ -13,6 +13,7 @@ import { GrowthCharts }   from "./components/GrowthCharts";
 import { GoalsModal }      from "./components/GoalsModal";
 import { ClientEditModal } from "./components/ClientEditModal";
 import { GoalTracker }   from "./components/GoalTracker";
+import { GoalDrawer }   from "./components/GoalDrawer";
 import { TrackerBar } from './components/TrackerBar';
 import { ClientProfilePanel } from './components/ClientProfilePanel';
 import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock } from "lucide-react";
@@ -230,6 +231,109 @@ function App() {
 
         {/* MOBILE */}
         <div className="md:hidden min-h-screen" style={{ background: t.bg }}>
+          {/* ── MOBILE HEADER ── */}
+          <div className="px-5 pt-8 pb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden border" style={{ borderColor: t.borderMid }}>
+                <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>Portfolio</p>
+                <p className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>CYBERLEND</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={toggleTheme}
+                className="w-8 h-8 rounded-full border flex items-center justify-center"
+                style={{ borderColor: t.border, background: t.bgBtn, color: t.textMuted }}>
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+              <button onClick={() => setPdfOpen(true)}
+                className="w-8 h-8 rounded-full border flex items-center justify-center"
+                style={{ borderColor: t.border, background: t.bgBtn }}>
+                <FileText className="w-4 h-4" style={{ color: "#5b7cfa" }} />
+              </button>
+              <button className="w-8 h-8 rounded-full border flex items-center justify-center"
+                style={{ borderColor: t.border, background: t.bgBtn }}>
+                <Bell className="w-4 h-4" style={{ color: t.textMuted }} />
+              </button>
+            </div>
+          </div>
+
+          {/* ── HERO KPI CARD ── */}
+          <div className="mx-4 rounded-3xl p-6 mb-4 border relative overflow-hidden"
+            style={{ background: isDark ? "#1e2235" : "#1a1d27", borderColor: "rgba(91,124,250,0.25)" }}>
+            <div className="absolute -bottom-6 -right-6 w-36 h-36 opacity-10">
+              <img src="/logo.png" alt="" className="w-full h-full object-contain" />
+            </div>
+            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1" style={{ fontFamily: mono }}>TOTAL OUTSTANDING</p>
+            <p className="text-4xl font-bold text-white mb-5" style={{ fontFamily: mono }}>{formatCompactCurrency(metrics.totalOutstanding)}</p>
+            <div className="grid grid-cols-4 gap-2 pt-4 border-t border-white/10">
+              {[
+                { label: "LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent) },
+                { label: "COLLECTED", value: formatCompactCurrency(metrics.totalCollected) },
+                { label: "PROFIT",    value: formatCompactCurrency(metrics.totalProfit) },
+                { label: "ACTIVE",    value: String(metrics.activeLoansCount) },
+              ].map((s) => (
+                <div key={s.label}>
+                  <p className="text-[8px] text-white/30 uppercase tracking-widest mb-0.5" style={{ fontFamily: mono }}>{s.label}</p>
+                  <p className="text-xs font-bold text-white" style={{ fontFamily: mono }}>{s.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── CAPITAL CARDS ── */}
+          <div className="px-4 grid grid-cols-3 gap-2 mb-4">
+            {[
+              { label: "AVAILABLE", value: formatCompactCurrency(metrics.availableCapital), color: "#4ade80", border: "rgba(74,222,128,0.30)" },
+              { label: "LENDABLE",  value: formatCompactCurrency(metrics.lendableAmount),   color: "#5b7cfa", border: "rgba(91,124,250,0.30)" },
+              { label: "RETURNS",   value: formatCompactCurrency(metrics.returnsFromPreviousLoans), color: "#a78bfa", border: "rgba(167,139,250,0.30)" },
+            ].map((c) => (
+              <div key={c.label} className="rounded-2xl p-3 border" style={{ background: t.bgCard, borderColor: c.border, borderLeftWidth: "3px" }}>
+                <p className="text-[8px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{c.label}</p>
+                <p className="text-xs font-bold" style={{ fontFamily: mono, color: c.color }}>{c.value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── OVERDUE ALERT ── */}
+          {loans.filter((l) => l.status === "Overdue").length > 0 && (
+            <div className="mx-4 mb-4 rounded-2xl p-3 border flex items-start gap-2"
+              style={{ background: "rgba(239,68,68,0.07)", borderColor: "rgba(239,68,68,0.20)" }}>
+              <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#f87171" }}>
+                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE — COLLECT NOW
+                </p>
+                <div className="mt-1 flex flex-col gap-0.5">
+                  {loans.filter((l) => l.status === "Overdue").map((l) => (
+                    <p key={l.id} className="text-[10px]" style={{ color: t.textMuted }}>
+                      <span style={{ color: t.text, fontWeight: 700 }}>{l.borrowerName}</span>
+                      {" — "}{formatCompactCurrency(l.monthlyInterest)} due
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── QUICK ACTIONS ── */}
+          <div className="px-4 grid grid-cols-4 gap-2 mb-5">
+            {[
+              { label: "NEW LOAN", icon: <PlusCircle className="w-5 h-5" />,  action: () => setNewLoanOpen(true) },
+              { label: "PDF",      icon: <FileText className="w-5 h-5" />,    action: () => setPdfOpen(true) },
+              { label: "EXPORT",   icon: <Download className="w-5 h-5" />,    action: handleExportCSV },
+              { label: "RESET",    icon: <RotateCcw className="w-5 h-5" />,   action: handleResetData },
+            ].map((btn) => (
+              <button key={btn.label} onClick={btn.action}
+                className="flex flex-col items-center gap-2 py-3 rounded-2xl border transition-all active:scale-95"
+                style={{ background: t.bgCard, borderColor: t.border }}>
+                <div style={{ color: btn.label === "PDF" ? "#5b7cfa" : t.textMuted }}>{btn.icon}</div>
+                <span className="text-[8px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{btn.label}</span>
+              </button>
+            ))}
+          </div>
           <div className="px-5 pt-8 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl overflow-hidden border" style={{ borderColor: t.borderMid }}>
@@ -567,6 +671,7 @@ function App() {
       )}
 
       <ClientEditModal isOpen={clientEditTarget !== null} onClose={() => setClientEditTarget(null)} loan={clientEditTarget} onSave={handleSaveClientEdit} theme={t} />
+      <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
       <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
       <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} theme={t} />
@@ -578,3 +683,5 @@ function App() {
 }
 
 export default App;
+
+
