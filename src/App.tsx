@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoanStore } from "./store/loanStore";
 import { useState as useModalState } from "react";
 
@@ -231,7 +231,7 @@ function App() {
 
         {/* MOBILE */}
         <div className="md:hidden min-h-screen" style={{ background: t.bg }}>
-          {/* ── MOBILE HEADER ── */}
+          {/* -- MOBILE HEADER -- */}
           <div className="px-5 pt-8 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl overflow-hidden border" style={{ borderColor: t.borderMid }}>
@@ -260,7 +260,7 @@ function App() {
             </div>
           </div>
 
-          {/* ── HERO KPI CARD ── */}
+          {/* -- HERO KPI CARD -- */}
           <div className="mx-4 rounded-3xl p-6 mb-4 border relative overflow-hidden"
             style={{ background: isDark ? "#1e2235" : "#1a1d27", borderColor: "rgba(91,124,250,0.25)" }}>
             <div className="absolute -bottom-6 -right-6 w-36 h-36 opacity-10">
@@ -283,7 +283,7 @@ function App() {
             </div>
           </div>
 
-          {/* ── CAPITAL CARDS ── */}
+          {/* -- CAPITAL CARDS -- */}
           <div className="px-4 grid grid-cols-3 gap-2 mb-4">
             {[
               { label: "AVAILABLE", value: formatCompactCurrency(metrics.availableCapital), color: "#4ade80", border: "rgba(74,222,128,0.30)" },
@@ -297,20 +297,20 @@ function App() {
             ))}
           </div>
 
-          {/* ── OVERDUE ALERT ── */}
+          {/* -- OVERDUE ALERT -- */}
           {loans.filter((l) => l.status === "Overdue").length > 0 && (
             <div className="mx-4 mb-4 rounded-2xl p-3 border flex items-start gap-2"
               style={{ background: "rgba(239,68,68,0.07)", borderColor: "rgba(239,68,68,0.20)" }}>
               <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#f87171" }}>
-                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE — COLLECT NOW
+                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE � COLLECT NOW
                 </p>
                 <div className="mt-1 flex flex-col gap-0.5">
                   {loans.filter((l) => l.status === "Overdue").map((l) => (
                     <p key={l.id} className="text-[10px]" style={{ color: t.textMuted }}>
                       <span style={{ color: t.text, fontWeight: 700 }}>{l.borrowerName}</span>
-                      {" — "}{formatCompactCurrency(l.monthlyInterest)} due
+                      {" � "}{formatCompactCurrency(l.monthlyInterest)} due
                     </p>
                   ))}
                 </div>
@@ -318,8 +318,8 @@ function App() {
             </div>
           )}
 
-          {/* ── QUICK ACTIONS ── */}
-          <div className="px-4 grid grid-cols-4 gap-2 mb-5">
+          {/* -- QUICK ACTIONS -- */}
+          <div className="px-4 grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
             {[
               { label: "NEW LOAN", icon: <PlusCircle className="w-5 h-5" />,  action: () => setNewLoanOpen(true) },
               { label: "PDF",      icon: <FileText className="w-5 h-5" />,    action: () => setPdfOpen(true) },
@@ -331,64 +331,6 @@ function App() {
                 style={{ background: t.bgCard, borderColor: t.border }}>
                 <div style={{ color: btn.label === "PDF" ? "#5b7cfa" : t.textMuted }}>{btn.icon}</div>
                 <span className="text-[8px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{btn.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="px-5 pt-8 pb-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border" style={{ borderColor: t.borderMid }}>
-                <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>Portfolio</p>
-                <p className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>CYBERLEND</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button onClick={toggleTheme}
-                className="w-8 h-8 rounded-full border flex items-center justify-center"
-                style={{ borderColor: t.border, background: t.bgBtn, color: t.textMuted }}>
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-              <button className="w-8 h-8 rounded-full border flex items-center justify-center"
-                style={{ borderColor: t.border, background: t.bgBtn }}>
-                <Bell className="w-4 h-4" style={{ color: t.textMuted }} />
-              </button>
-            </div>
-          </div>
-
-          <div className="mx-4 rounded-3xl p-6 mb-5 border relative overflow-hidden"
-            style={{ background: isDark ? "#1e2235" : "#1a1d27", borderColor: "rgba(91,124,250,0.25)" }}>
-            <div className="absolute -bottom-6 -right-6 w-36 h-36 opacity-10">
-              <img src="/logo.png" alt="" className="w-full h-full object-contain" />
-            </div>
-            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1" style={{ fontFamily: mono }}>TOTAL OUTSTANDING</p>
-            <p className="text-4xl font-bold text-white mb-5" style={{ fontFamily: mono }}>{formatCompactCurrency(metrics.totalOutstanding)}</p>
-            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-white/10">
-              {[
-                { label: "LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent) },
-                { label: "COLLECTED", value: formatCompactCurrency(metrics.totalCollected) },
-                { label: "PROFIT",    value: formatCompactCurrency(metrics.totalProfit) },
-              ].map((s) => (
-                <div key={s.label}>
-                  <p className="text-[9px] text-white/30 uppercase tracking-widest mb-0.5" style={{ fontFamily: mono }}>{s.label}</p>
-                  <p className="text-sm font-bold text-white" style={{ fontFamily: mono }}>{s.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="px-4 grid grid-cols-3 gap-3 mb-5">
-            {[
-              { label: "NEW LOAN", icon: <PlusCircle className="w-5 h-5" />, action: () => setNewLoanOpen(true) },
-              { label: "EXPORT",   icon: <Download className="w-5 h-5" />,   action: handleExportCSV },
-              { label: "RESET",    icon: <RotateCcw className="w-5 h-5" />,  action: handleResetData },
-            ].map((btn) => (
-              <button key={btn.label} onClick={btn.action}
-                className="flex flex-col items-center gap-2 py-4 rounded-2xl border transition-all active:scale-95"
-                style={{ background: t.bgCard, borderColor: t.border }}>
-                <div style={{ color: t.textMuted }}>{btn.icon}</div>
-                <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{btn.label}</span>
               </button>
             ))}
           </div>
@@ -413,7 +355,7 @@ function App() {
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} &#65533; {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} � {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -510,7 +452,7 @@ function App() {
                 {[
                   { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
                   { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
-                  { label: "RETURNS &#65533; PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
+                  { label: "RETURNS  PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
                 ].map((card) => (
                   <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#1a1d27" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
                     <div className="flex items-start justify-between">
@@ -561,13 +503,13 @@ function App() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE &#65533; COLLECT NOW
+                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE  COLLECT NOW
                     </h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" &#65533; "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" � "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>

@@ -114,7 +114,7 @@ export interface WishlistEntry {
   dateNeeded: string;
   dateRegistered: string;
   notes?: string;
-  status: "Pending" | "Approved" | "Rejected";
+  status: "Enquiry" | "Pending" | "Approved" | "Rejected";
 }
 
 
@@ -124,3 +124,4 @@ export interface Goals {
   targetMonthlyReturn: number;
   targetReturnRate:    number;
 }
+

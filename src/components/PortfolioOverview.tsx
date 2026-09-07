@@ -49,7 +49,7 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ metrics, l
               {overdueLoans.map((l) => (
                 <span key={l.id}>
                   <span className="font-semibold text-white/70">{l.borrowerName}</span>
-                  {' Â· '}
+                  {' Â� '}
                   <span>{formatCurrency(l.monthlyPayment)} overdue</span>
                 </span>
               ))}
@@ -60,3 +60,4 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ metrics, l
     </div>
   );
 };
+

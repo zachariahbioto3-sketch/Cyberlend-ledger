@@ -117,12 +117,12 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}>
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border"
-        style={{ background: t.bgCard, borderColor: t.border }}>
+      <div className="relative w-full max-w-2xl rounded-3xl border flex flex-col"
+        style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b sticky top-0 z-10"
-          style={{ background: t.bgCard, borderColor: t.border }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0 z-10"
+          style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
               style={{ background: "rgba(91,124,250,0.15)" }}>
@@ -143,13 +143,13 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
           </button>
         </div>
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="px-6 py-6 space-y-6 overflow-y-auto flex-1">
 
           {/* Photo uploads */}
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>PHOTO DOCUMENTS</p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               {/* Passport photo */}
               <div>
@@ -323,8 +323,8 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t sticky bottom-0"
-          style={{ background: t.bgCard, borderColor: t.border }}>
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t shrink-0"
+          style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
           <button onClick={onClose}
             className="px-5 py-2.5 rounded-xl border text-xs font-bold"
             style={{ fontFamily: mono, background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
@@ -397,8 +397,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   const agingBuckets = useMemo(() => {
     const today = new Date();
     const buckets = [
-      { label: "130 days",  count: 0, amount: 0 },
-      { label: "3160 days", count: 0, amount: 0 },
+      { label: "1-30 days",  count: 0, amount: 0 },
+      { label: "31-60 days", count: 0, amount: 0 },
       { label: "60+ days",   count: 0, amount: 0 },
     ];
     loans.filter(l => l.status === "Overdue").forEach(l => {
@@ -516,7 +516,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
           {monthlyCollections.length === 0 ? (
             <p className="text-xs text-center py-4" style={{ color: t.textFaint, fontFamily: mono }}>NO DATA YET</p>
           ) : (
-            <div style={{ height: 120, minWidth: 0 }}>
+            <div style={{ width: "100%", height: 120, display: "block" }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={monthlyCollections} barGap={3} barCategoryGap="30%">
                   <XAxis dataKey="month" tick={{ fontSize: 9, fill: t.textFaint, fontFamily: mono }} axisLine={false} tickLine={false} />
@@ -948,3 +948,12 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
+
+
+
+
+
+
+
+

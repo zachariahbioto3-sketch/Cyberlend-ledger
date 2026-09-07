@@ -1,4 +1,4 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry, Goals } from "../types";
 import {
   calculateCyberlendLoan,
@@ -23,7 +23,7 @@ function loadLoans(): Loan[] {
       const parsed = JSON.parse(r);
       if (parsed.length > 0) return parsed;
     }
-    // No data yet — seed with dummy data
+    // No data yet � seed with dummy data
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleLoans));
     return sampleLoans;
   } catch {
@@ -54,6 +54,7 @@ interface LoanState {
   addToWaitlist:        (entry: Omit<WishlistEntry, "id" | "dateRegistered" | "status">) => void;
   removeFromWaitlist:   (id: string) => void;
   updateWaitlistStatus: (id: string, status: WishlistEntry["status"]) => void;
+  updateWaitlistAmount: (id: string, amount: number) => void;
   setTotalCapital:      (amount: number) => void;
 }
 
@@ -174,7 +175,7 @@ export const useLoanStore = create<LoanState>((set) => ({
       ...entry,
       id:             `WL-${Date.now()}`,
       dateRegistered: new Date().toISOString().slice(0, 10),
-      status:         "Pending",
+      status:         "Enquiry",
     };
     const updated = [...state.waitlist, newEntry];
     saveWaitlist(updated);
@@ -183,6 +184,14 @@ export const useLoanStore = create<LoanState>((set) => ({
 
   removeFromWaitlist: (id) => set((state) => {
     const updated = state.waitlist.filter((e) => e.id !== id);
+    saveWaitlist(updated);
+    return { waitlist: updated };
+  }),
+
+  updateWaitlistAmount: (id, amount) => set((state) => {
+    const updated = state.waitlist.map((e) =>
+      e.id === id ? { ...e, amountNeeded: amount, status: "Pending" as const } : e
+    );
     saveWaitlist(updated);
     return { waitlist: updated };
   }),
@@ -198,3 +207,6 @@ export const useLoanStore = create<LoanState>((set) => ({
     return { totalCapital: amount, metrics: calculatePortfolioMetrics(state.loans) };
   }),
 }));
+
+
+

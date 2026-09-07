@@ -41,7 +41,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(20px)' }}>
-      <div className="rounded-2xl border overflow-hidden shadow-2xl" style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", height: "82vh", overflowY: "auto" }}>
+      <div className="rounded-2xl border overflow-hidden shadow-2xl" style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", maxWidth: "640px", maxHeight: "88vh", display: "flex", flexDirection: "column" }}>
         <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: t.border }}>
           <div>
             <h3 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>{loan.borrowerName.toUpperCase()}</h3>
@@ -55,7 +55,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
           </div>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'LENT', value: formatCurrency(loan.loanAmount) },
@@ -135,5 +135,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
     </div>
   );
 };
+
+
 
 

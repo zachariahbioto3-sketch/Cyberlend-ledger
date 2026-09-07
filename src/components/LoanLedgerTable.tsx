@@ -37,7 +37,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
   };
 
   return (
-    <div className="rounded-2xl border overflow-hidden" style={{ background: t.bgCard, borderColor: t.border }}>
+    <div className="rounded-2xl border overflow-hidden hidden md:block" style={{ background: t.bgCard, borderColor: t.border }}>
       {/* Header */}
       <div className="p-5 border-b" style={{ borderColor: t.border }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -51,7 +51,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
               <input
                 type="text" placeholder="Search..." value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs rounded-lg border focus:outline-none w-40 transition-colors"
+                className="pl-8 pr-3 py-1.5 text-xs rounded-lg border focus:outline-none w-full sm:w-40 transition-colors"
                 style={{ background: t.bgBtn, borderColor: t.border, color: t.text }}
               />
             </div>
@@ -190,3 +190,5 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
     </div>
   );
 };
+
+
