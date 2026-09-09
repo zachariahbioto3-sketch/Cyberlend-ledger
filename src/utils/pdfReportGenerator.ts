@@ -5,14 +5,20 @@ import { Filesystem, Directory } from "@capacitor/filesystem";
 // Saves PDF correctly on both Web and Android APK
 export async function savePdf(doc: any, filename: string): Promise<void> {
   if (Capacitor.isNativePlatform()) {
-    // Android: use Capacitor Filesystem to write to Downloads
-    const base64 = doc.output("datauristring").split(",")[1];
-    await Filesystem.writeFile({
-      path: filename,
-      data: base64,
-      directory: Directory.Documents,
-    });
-    alert(`Saved to Documents: ${filename}`);
+    try {
+      // Android: use Capacitor Filesystem to write to Documents
+      const base64 = doc.output("datauristring").split(",")[1];
+      await Filesystem.writeFile({
+        path: filename,
+        data: base64,
+        directory: Directory.Documents,
+        recursive: true
+      });
+      alert(`Report saved successfully to Documents: ${filename}`);
+    } catch (error) {
+      console.error("Native save failed", error);
+      alert("Error saving file to device storage.");
+    }
   } else {
     // Web: normal browser download
     doc.save(filename);
@@ -202,7 +208,7 @@ export function generatePortfolioSummaryPdf(
     doc.text(`Page ${p} of ${totalPages}`, W - 12, H - 3, { align: "right" });
   }
 
-  doc.save(`cyberlend-report-${new Date().toISOString().split("T")[0]}.pdf`);
+  await savePdf(doc, `cyberlend-report-${new Date().toISOString().split("T")[0]}.pdf`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -360,7 +366,7 @@ export function generateLoanNoteStatement(loan: Loan, orgName: string, preparedB
     doc.text(`Page ${p} of ${pageCount}`, W - 12, 293, { align: "right" });
   }
 
-  doc.save(`LoanNote_${loan.loanNumber}_${loan.borrowerName.replace(/\s+/g, "_")}.pdf`);
+  await savePdf(doc, `LoanNote_${loan.loanNumber}_${loan.borrowerName.replace(/\s+/g, "_")}.pdf`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -476,7 +482,7 @@ export function generateDebtServiceReport(loans: Loan[], orgName: string, prepar
     doc.text(`Page ${p} of ${pageCount}`, W - 12, H - 4, { align: "right" });
   }
 
-  doc.save(`DebtServiceReport_${new Date().toISOString().slice(0, 10)}.pdf`);
+  await savePdf(doc, `DebtServiceReport_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -610,6 +616,6 @@ export function generateStandingReport(loans: Loan[], metrics: PortfolioMetrics,
     doc.text(`Page ${p} of ${pageCount}`, W - 12, H - 4, { align: "right" });
   }
 
-  doc.save(`StandingReport_${new Date().toISOString().slice(0, 10)}.pdf`);
+  await savePdf(doc, `StandingReport_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 

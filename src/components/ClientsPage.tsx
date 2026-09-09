@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from "react";
 import {
   Users, Search, Star, AlertTriangle, UserX,
-  Mail, MapPin, CreditCard, TrendingUp, FileText,
+  Mail, MapPin, CreditCard, TrendingUp, FileText, Calendar,
   ChevronRight, X, Edit3, Save, Flag, Plus, ArrowLeft,
   DollarSign, Activity, CheckCircle, Clock, ShieldAlert,
   BarChart2, Upload, Camera, UserPlus, Phone
@@ -13,6 +13,7 @@ import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanC
 
 interface ClientsPageProps {
   loans: Loan[];
+  onRegisterSuccess?: () => void;
   theme: any;
   onUpdateLoan?: (id: string, updates: Partial<Loan>) => void;
   onEditClient?: (loan: Loan) => void;
@@ -59,6 +60,7 @@ interface NewClientModalProps {
 }
 
 const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSave }) => {
+  const { addToWaitlist } = useLoanStore();
   const mono = "'Space Mono', monospace";
   const passportRef = useRef<HTMLInputElement>(null);
   const idRef       = useRef<HTMLInputElement>(null);
@@ -70,6 +72,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
     loanPurpose: "" as LoanPurpose | "",
     borrowerPhoto: "", borrowerIdPhoto: "",
     clientFlags: ["New"] as ClientFlag[],
+    dateNeeded: "", amountNeeded: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -103,6 +106,16 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
     onSave({
       ...form,
       dateJoined: new Date().toISOString().slice(0, 10),
+    });
+    addToWaitlist({
+      name:         form.borrowerName.trim(),
+      phone:        form.borrowerPhone.trim(),
+      email:        form.borrowerEmail.trim(),
+      occupation:   form.occupation.trim(),
+      amountNeeded: Number(form.amountNeeded) || 0,
+      purpose:      (form.loanPurpose || "Personal Use") as any,
+      dateNeeded:   form.dateNeeded,
+      notes:        form.clientNotes.trim(),
     });
     onClose();
   };
@@ -292,6 +305,32 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
               className="w-full px-4 py-2.5 rounded-xl text-xs outline-none border resize-none"
               style={inputStyle}
             />
+          </div>
+
+          {/* Waitlist Fields */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+              style={{ fontFamily: mono, color: t.textFaint }}>WAITLIST DETAILS</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ fontFamily: mono, color: t.textMuted }}>Date Needed</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: t.textFaint }} />
+                  <input type="date" value={form.dateNeeded} onChange={e => set("dateNeeded", e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs outline-none border"
+                    style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ fontFamily: mono, color: t.textMuted }}>Amount Needed (KES)</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: t.textFaint }} />
+                  <input type="number" value={form.amountNeeded} onChange={e => set("amountNeeded", e.target.value)}
+                    placeholder="0" className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs outline-none border"
+                    style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }} />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Client Flags */}
@@ -948,6 +987,15 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
 
 
 

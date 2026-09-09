@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { ToastProvider, useToast } from "./components/Toast";
 import { useLoanStore } from "./store/loanStore";
 import { useState as useModalState } from "react";
 
@@ -21,13 +24,15 @@ import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
-function App() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
+function AppInner() {
+  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, removeFromWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
+  const { showToast } = useToast();
   const [capitalModalOpen, setCapitalModalOpen] = useState(false);
   const [goalsModalOpen, setGoalsModalOpen] = useState(false);
   const [clientEditTarget, setClientEditTarget] = useState<Loan | null>(null);
   const [capitalInput, setCapitalInput] = useState<string>("");
   const [newLoanOpen, setNewLoanOpen] = useState(false);
+  const [promotedEntry, setPromotedEntry] = useState<any>(null);
   const [paymentLoan, setPaymentLoan] = useState<Loan | null>(null);
   const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
   const [mobileTab, setMobileTab] = useState<"loans" | "analytics" | "clients" | "waitlist">("loans");
@@ -55,17 +60,35 @@ function App() {
 
 
 
-  const handleSavePayment = (loanId: string, transaction: any) => { recordPayment(loanId, transaction); setPaymentLoan(null); };
+  const handleSavePayment = (loanId: string, transaction: any) => { recordPayment(loanId, transaction); setPaymentLoan(null); showToast("Payment recorded successfully", "success"); };
 
-  const handleExportCSV = () => {
-    if (loans.length === 0) { alert("No loans to export"); return; }
+  const handleExportCSV = async () => {
+    if (loans.length === 0) { showToast("No loans to export", "error"); return; }
     const headers = ["Loan #","Borrower","Phone","Principal","Total Due","Monthly","Paid","Remaining","Status"];
     const rows = loans.map((l) => [l.loanNumber,l.borrowerName,l.borrowerPhone,l.loanAmount,l.totalRepayable,l.monthlyPayment,l.amountPaid,l.remainingBalance,l.status]);
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = ["cyberlend-", new Date().toISOString().split("T")[0], ".csv"].join("");
-    a.click();
+    const filename = `cyberlend-${new Date().toISOString().split("T")[0]}.csv`;
+
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Filesystem.writeFile({
+          path: filename,
+          data: csv,
+          directory: Directory.Documents,
+          encoding: "utf8" as any, // Cast to avoid strict type issues if any
+          recursive: true
+        });
+        showToast(`CSV saved to Documents: ${filename}`, "success");
+      } catch (error) {
+        console.error("CSV save failed", error);
+        showToast("Failed to save CSV to device storage", "error");
+      }
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+      a.download = filename;
+      a.click();
+    }
   };
 
   const handleResetData = () => { if (confirm("Clear all data?")) { setLoans([]); } };
@@ -374,13 +397,13 @@ function App() {
 
           {mobileTab === "clients" && (
             <div className="pb-24">
-              <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} />
+              <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} onRegisterSuccess={() => showToast("Client registered \& added to waitlist", "success")} />
             </div>
           )}
 
           {mobileTab === "waitlist" && (
             <div className="pb-24">
-              <WaitlistPage theme={t} onPromoteToLoan={() => setNewLoanOpen(true)} />
+              <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setPromotedEntry(entry); setNewLoanOpen(true); }} />
             </div>
           )}
 
@@ -399,13 +422,13 @@ function App() {
         {/* DESKTOP CLIENTS VIEW */}
         {desktopTab === "waitlist" && (
           <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
-            <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setNewLoanOpen(true); }} />
+            <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setPromotedEntry(entry); setNewLoanOpen(true); }} />
           </div>
         )}
 
         {desktopTab === "clients" && (
           <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
-            <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} />
+            <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} onRegisterSuccess={() => showToast("Client registered \& added to waitlist", "success")} />
           </div>
         )}
 
@@ -616,7 +639,7 @@ function App() {
       <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
       <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
-      <NewLoanModal isOpen={newLoanOpen} onClose={() => setNewLoanOpen(false)} onAddLoan={(data) => { addLoan(data); setNewLoanOpen(false); }} theme={t} />
+      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if (promotedEntry?.id) { removeFromWaitlist(promotedEntry.id); showToast("Client promoted to active borrower", "success"); } else { showToast("Loan created successfully", "success"); } setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName: promotedEntry.name, borrowerPhone: promotedEntry.phone, borrowerEmail: promotedEntry.email || "", occupation: promotedEntry.occupation, loanPurpose: promotedEntry.purpose, clientNotes: promotedEntry.notes || "", clientFlags: ["New"] } as any : null} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
       <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} theme={t} />
     </div>
@@ -624,6 +647,25 @@ function App() {
   );
 }
 
-export default App;
+export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

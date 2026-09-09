@@ -98,8 +98,8 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
           {[
             { label: "AMOUNT",     value: entry.amountNeeded > 0 ? formatCompactCurrency(entry.amountNeeded) : "NOT SET" },
-            { label: "PURPOSE",    value: entry.purpose || "—" },
-            { label: "DATE NEEDED",value: entry.dateNeeded || "—" },
+            { label: "PURPOSE",    value: entry.purpose || "ï¿½" },
+            { label: "DATE NEEDED",value: entry.dateNeeded || "ï¿½" },
             { label: "REGISTERED", value: entry.dateRegistered },
           ].map((s) => (
             <div key={s.label} className="p-2.5 rounded-xl border"
@@ -117,7 +117,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
           <p className="text-[10px] mt-3 px-1" style={{ color: t.textFaint }}>{entry.notes}</p>
         )}
 
-        {/* Stage 1 — Enquiry: record amount to move to Pending */}
+        {/* Stage 1 ï¿½ Enquiry: record amount to move to Pending */}
         {entry.status === "Enquiry" && (
           <div className="mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <p className="text-[9px] font-bold uppercase tracking-widest mb-2"
@@ -156,7 +156,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
           </div>
         )}
 
-        {/* Stage 2 — Pending: approve or reject */}
+        {/* Stage 2 ï¿½ Pending: approve or reject */}
         {entry.status === "Pending" && (
           <div className="flex items-center gap-2 mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <button onClick={() => updateWaitlistStatus(entry.id, "Approved")}
@@ -177,13 +177,13 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
           </div>
         )}
 
-        {/* Stage 3 — Approved: issue loan */}
+        {/* Stage 3 ï¿½ Approved: issue loan */}
         {entry.status === "Approved" && onPromoteToLoan && (
           <div className="flex items-center gap-2 mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <button onClick={() => { onPromoteToLoan(entry); removeFromWaitlist(entry.id); }}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-bold"
               style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
-              <ArrowRight className="w-3 h-3" /> ISSUE LOAN — MOVE TO BORROWERS
+              <ArrowRight className="w-3 h-3" /> ISSUE LOAN ï¿½ MOVE TO BORROWERS
             </button>
             <button onClick={() => removeFromWaitlist(entry.id)}
               className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
@@ -214,7 +214,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>WAITLIST</h2>
           <p className="text-[10px] mt-0.5" style={{ color: t.textFaint, fontFamily: mono }}>
-            {enquiries.length} ENQUIRY · {pending.length} PENDING · {approved.length} APPROVED
+            {enquiries.length} ENQUIRY ï¿½ {pending.length} PENDING ï¿½ {approved.length} APPROVED
           </p>
         </div>
         <button onClick={() => setShowForm(!showForm)}
@@ -224,7 +224,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         </button>
       </div>
 
-      {/* Add form — no amount field, client hasn't said yet */}
+      {/* Add form ï¿½ no amount field, client hasn't said yet */}
       {showForm && (
         <div className="px-6 py-5 border-b" style={{ borderColor: t.border, background: t.bgCard }}>
           <p className="text-[10px] font-bold uppercase tracking-widest mb-1"
@@ -292,7 +292,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
               <div className="w-2 h-2 rounded-full" style={{ background: "#a78bfa" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ fontFamily: mono, color: "#a78bfa" }}>
-                STAGE 1 — ENQUIRY ({enquiries.length}) · AWAITING AMOUNT
+                STAGE 1 ï¿½ ENQUIRY ({enquiries.length}) ï¿½ AWAITING AMOUNT
               </p>
             </div>
             <div className="space-y-3">{enquiries.map(renderEntry)}</div>
@@ -306,7 +306,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
               <div className="w-2 h-2 rounded-full" style={{ background: "#f59e0b" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ fontFamily: mono, color: "#f59e0b" }}>
-                STAGE 2 — PENDING APPROVAL ({pending.length})
+                STAGE 2 ï¿½ PENDING APPROVAL ({pending.length})
               </p>
             </div>
             <div className="space-y-3">{pending.map(renderEntry)}</div>
@@ -320,7 +320,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
               <div className="w-2 h-2 rounded-full" style={{ background: "#4ade80" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ fontFamily: mono, color: "#4ade80" }}>
-                STAGE 3 — APPROVED · READY TO ISSUE ({approved.length})
+                STAGE 3 ï¿½ APPROVED ï¿½ READY TO ISSUE ({approved.length})
               </p>
             </div>
             <div className="space-y-3">{approved.map(renderEntry)}</div>

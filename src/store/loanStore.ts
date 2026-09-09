@@ -23,11 +23,11 @@ function loadLoans(): Loan[] {
       const parsed = JSON.parse(r);
       if (parsed.length > 0) return parsed;
     }
-    // No data yet — seed with dummy data
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleLoans));
-    return sampleLoans;
+    // No data yet ï¿½ seed with dummy data
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    return [];
   } catch {
-    return sampleLoans;
+    return [];
   }
 }
 function loadWaitlist(): WishlistEntry[] {
@@ -207,6 +207,8 @@ export const useLoanStore = create<LoanState>((set) => ({
     return { totalCapital: amount, metrics: calculatePortfolioMetrics(state.loans) };
   }),
 }));
+
+
 
 
 
