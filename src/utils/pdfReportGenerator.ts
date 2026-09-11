@@ -1,4 +1,4 @@
-﻿import jsPDF from "jspdf";
+import jsPDF from "jspdf";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 
@@ -14,10 +14,10 @@ export async function savePdf(doc: any, filename: string): Promise<void> {
         directory: Directory.Documents,
         recursive: true
       });
-      alert(`Report saved successfully to Documents: ${filename}`);
+      
     } catch (error) {
       console.error("Native save failed", error);
-      alert("Error saving file to device storage.");
+      
     }
   } else {
     // Web: normal browser download
@@ -35,7 +35,7 @@ interface PdfReportOptions {
   includePaidOff: boolean;
 }
 
-export function generatePortfolioSummaryPdf(
+export async function generatePortfolioSummaryPdf(
   loans: Loan[],
   metrics: PortfolioMetrics,
   options: PdfReportOptions
@@ -211,10 +211,10 @@ export function generatePortfolioSummaryPdf(
   await savePdf(doc, `cyberlend-report-${new Date().toISOString().split("T")[0]}.pdf`);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // 1. LOAN NOTE STATEMENT
-// ─────────────────────────────────────────────────────────────────────────────
-export function generateLoanNoteStatement(loan: Loan, orgName: string, preparedBy: string) {
+// -----------------------------------------------------------------------------
+export async function generateLoanNoteStatement(loan: Loan, orgName: string, preparedBy: string) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
 
@@ -369,10 +369,10 @@ export function generateLoanNoteStatement(loan: Loan, orgName: string, preparedB
   await savePdf(doc, `LoanNote_${loan.loanNumber}_${loan.borrowerName.replace(/\s+/g, "_")}.pdf`);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // 2. PORTFOLIO DEBT SERVICE REPORT
-// ─────────────────────────────────────────────────────────────────────────────
-export function generateDebtServiceReport(loans: Loan[], orgName: string, preparedBy: string) {
+// -----------------------------------------------------------------------------
+export async function generateDebtServiceReport(loans: Loan[], orgName: string, preparedBy: string) {
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
@@ -485,10 +485,10 @@ export function generateDebtServiceReport(loans: Loan[], orgName: string, prepar
   await savePdf(doc, `DebtServiceReport_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // 3. PORTFOLIO STANDING REPORT
-// ─────────────────────────────────────────────────────────────────────────────
-export function generateStandingReport(loans: Loan[], metrics: PortfolioMetrics, orgName: string, preparedBy: string) {
+// -----------------------------------------------------------------------------
+export async function generateStandingReport(loans: Loan[], metrics: PortfolioMetrics, orgName: string, preparedBy: string) {
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();

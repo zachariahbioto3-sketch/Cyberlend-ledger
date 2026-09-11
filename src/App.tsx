@@ -19,13 +19,13 @@ import { GoalTracker }   from "./components/GoalTracker";
 import { GoalDrawer }   from "./components/GoalDrawer";
 import { TrackerBar } from './components/TrackerBar';
 import { ClientProfilePanel } from './components/ClientProfilePanel';
-import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock } from "lucide-react";
+import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock, Trash2 } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
 function AppInner() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, removeFromWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
+  const { loans, setLoans, addLoan, recordPayment, deleteLoan, deleteTransaction, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, removeFromWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
   const { showToast } = useToast();
   const [capitalModalOpen, setCapitalModalOpen] = useState(false);
   const [goalsModalOpen, setGoalsModalOpen] = useState(false);
@@ -194,7 +194,7 @@ function AppInner() {
         </div>
       </aside>
 
-      <div className="flex-1 md:ml-16 flex flex-col">
+      <div className="flex-1 md:ml-16 flex flex-col min-w-0 overflow-x-hidden">
 
         {/* DESKTOP NAVBAR */}
         <header className="hidden md:flex sticky top-0 z-30 h-14 items-center px-6 gap-4 border-b"
@@ -368,25 +368,33 @@ function AppInner() {
                 {[...loans].sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()).map((loan) => {
                   const ss = statusStyle(loan.status);
                   return (
-                    <div key={loan.id} onClick={() => setDetailLoan(loan)}
+                    <div key={loan.id}
                       className="rounded-2xl p-4 border flex items-center justify-between cursor-pointer transition-all active:scale-99"
                       style={{ background: t.bgCard, borderColor: t.border }}>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1" onClick={() => setDetailLoan(loan)}>
                         <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0"
                           style={{ background: t.bgActive, borderColor: t.borderMid }}>
                           <span className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{loan.borrowerName.charAt(0)}</span>
                         </div>
                         <div>
                           <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} � {loan.monthsRemaining} mo left</p>
+                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category}  {loan.monthsRemaining} mo left</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCompactCurrency(loan.remainingBalance)}</p>
-                        <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5"
-                          style={{ fontFamily: mono, background: ss.bg, color: ss.color, borderColor: ss.border }}>
-                          {loan.status.toUpperCase()}
-                        </span>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right" onClick={() => setDetailLoan(loan)}>
+                          <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCompactCurrency(loan.remainingBalance)}</p>
+                          <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5"
+                            style={{ fontFamily: mono, background: ss.bg, color: ss.color, borderColor: ss.border }}>
+                            {loan.status.toUpperCase()}
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); if (confirm(`Delete ${loan.borrowerName}?`)) deleteLoan(loan.id); }}
+                          className="p-2 rounded-xl border flex items-center justify-center"
+                          style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
+                          <Trash2 className="w-4 h-4 text-red-400" />
+                        </button>
                       </div>
                     </div>
                   );
@@ -434,7 +442,7 @@ function AppInner() {
 
         {/* DESKTOP DASHBOARD VIEW */}
         {desktopTab === "dashboard" && (
-          <main className="hidden md:block flex-1 p-6 relative"
+          <main className="hidden md:block flex-1 p-6 relative min-w-0 overflow-x-hidden"
             style={{
               backgroundImage: "url(/logo.png)",
               backgroundRepeat: "no-repeat",
@@ -471,7 +479,7 @@ function AppInner() {
               )}
               <GoalTracker goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
               {/* THREE NEW CAPITAL CARDS */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" style={{ marginBottom: "0" }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 w-full min-w-0" style={{ marginBottom: "0" }}>
                 {[
                   { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
                   { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
@@ -491,7 +499,7 @@ function AppInner() {
               </div>
 
 <div
-                className="grid grid-cols-2 md:grid-cols-4 gap-3"
+                className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full min-w-0"
                 style={{
                   transform:  selectedClient ? "translateY(-8px)" : "translateY(0)",
                   opacity:    selectedClient ? 0 : 1,
@@ -641,7 +649,7 @@ function AppInner() {
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
       <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if (promotedEntry?.id) { removeFromWaitlist(promotedEntry.id); showToast("Client promoted to active borrower", "success"); } else { showToast("Loan created successfully", "success"); } setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName: promotedEntry.name, borrowerPhone: promotedEntry.phone, borrowerEmail: promotedEntry.email || "", occupation: promotedEntry.occupation, loanPurpose: promotedEntry.purpose, clientNotes: promotedEntry.notes || "", clientFlags: ["New"] } as any : null} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
-      <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} theme={t} />
+      <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} onDeleteLoan={deleteLoan} onDeleteTransaction={deleteTransaction} theme={t} />
     </div>
     </>
   );

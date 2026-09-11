@@ -52,7 +52,10 @@ export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
     activeLoansCount,
     completedLoansCount,
     overdueCount,
-    defaultedCount,
+ defaultedCount,
+    availableCapital: 0,
+    lendableAmount: 0,
+    returnsFromPreviousLoans: Math.round(totalCollected),
   };
 }
 

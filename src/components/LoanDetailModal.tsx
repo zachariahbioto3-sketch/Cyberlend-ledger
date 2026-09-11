@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CreditCard, Calendar, Phone, FileText, Edit3 } from "lucide-react";
+import { X, CreditCard, Calendar, Phone, FileText, Edit3, Trash2 } from "lucide-react";
 import { Loan } from '../types';
 import { formatCurrency, formatDate } from '../utils/loanCalculations';
 
@@ -9,12 +9,13 @@ interface LoanDetailModalProps {
   loan: Loan | null;
   onClose: () => void;
   onEditClient?: (loan: Loan) => void;
-  onEditClient?: (loan: Loan) => void;
   onRecordPayment: (loan: Loan) => void;
+  onDeleteLoan: (loanId: string) => void;
+  onDeleteTransaction?: (loanId: string, txId: string) => void;
   theme: ThemeTokens;
 }
 
-export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose, onRecordPayment, theme: t }) => {
+export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose, onRecordPayment, onDeleteLoan, onDeleteTransaction, theme: t }) => {
   
   React.useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -112,9 +113,17 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
                         <p className="text-[10px]" style={{ color: t.textFaint }}>{tx.paymentMethod} · {tx.referenceNumber}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs" style={{ color: t.textMuted }}>{formatDate(tx.date)}</p>
-                      {tx.notes && <p className="text-[10px]" style={{ color: t.textFaint }}>{tx.notes}</p>}
+                    <div className="text-right flex items-center gap-3">
+                      <div>
+                        <p className="text-xs" style={{ color: t.textMuted }}>{formatDate(tx.date)}</p>
+                        {tx.notes && <p className="text-[10px]" style={{ color: t.textFaint }}>{tx.notes}</p>}
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); if (confirm('Delete this transaction?')) onDeleteTransaction?.(loan.id, tx.id); }}
+                        className="p-1 rounded-lg border"
+                        style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
+                        <Trash2 className="w-3 h-3 text-red-400" />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -124,12 +133,19 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
 
           {loan.status !== 'Completed' && (
             <button onClick={() => { onClose(); onRecordPayment(loan); }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg mb-2"
               style={{ fontFamily: mono, background: t.btnPrimary, color: t.btnPrimaryTx }}>
               <CreditCard className="w-3.5 h-3.5" />
               RECORD PAYMENT — {loan.borrowerName.toUpperCase()}
             </button>
           )}
+
+          <button onClick={() => { if (confirm(`Delete ${loan.borrowerName}? This cannot be undone.`)) { onDeleteLoan(loan.id); onClose(); } }}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-bold transition-all border"
+            style={{ fontFamily: mono, borderColor: 'rgba(239,68,68,0.25)', color: '#f87171', background: 'rgba(239,68,68,0.05)' }}>
+            <Trash2 className="w-3 h-3" />
+            DELETE RECORD
+          </button>
         </div>
       </div>
     </div>

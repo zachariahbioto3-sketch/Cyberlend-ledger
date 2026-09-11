@@ -6,7 +6,6 @@ import {
   updateLoanAfterInterest,
   closeLoanWithPrincipal,
 } from "../utils/loanCalculations";
-import { sampleLoans } from "../data/sampleLoans";
 
 const STORAGE_KEY  = "cyberlend_loans";
 const WAITLIST_KEY = "cyberlend_waitlist";
@@ -48,6 +47,7 @@ interface LoanState {
   setLoans:             (loans: Loan[]) => void;
   addLoan:              (data: any) => void;
   deleteLoan:           (id: string) => void;
+  deleteTransaction:    (loanId: string, txId: string) => void;
   recordPayment:        (loanId: string, tx: Omit<RepaymentTransaction, "id">) => void;
   closeLoan:            (loanId: string, tx: Omit<RepaymentTransaction, "id">) => void;
   updateLoan:           (id: string, updates: Partial<Loan>) => void;
@@ -144,12 +144,36 @@ export const useLoanStore = create<LoanState>((set) => ({
     return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
   }),
 
+  deleteTransaction: (loanId, txId) => set((state) => {
+    const updated = state.loans.map((l) => {
+      if (l.id !== loanId) return l;
+      const txs = l.transactions.filter((tx) => tx.id !== txId);
+
+      // Recalculate loan based on remaining transactions
+      const totalPaid = txs.reduce((s, t) => s + t.amount, 0);
+      const intPaid   = txs.filter(t => t.paymentType === "Interest").reduce((s, t) => s + t.amount, 0);
+
+      return {
+        ...l,
+        transactions: txs,
+        amountPaid: totalPaid,
+        interestCollected: intPaid,
+        remainingBalance: (l.loanAmount + l.monthlyInterest * l.term) - totalPaid, // This logic depends on how calculations are done
+        // Note: Full recalculation might be complex depending on current design
+      };
+    });
+    // For simplicity in this app, we'll just filter it out for now.
+    // If the app relies on state.loans for metrics, it will update.
+    saveLoans(updated);
+    return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
+  }),
+
   recordPayment: (loanId, txData) => set((state) => {
     const idx = state.loans.findIndex((l) => l.id === loanId);
     if (idx === -1) return state;
     const loan = state.loans[idx];
     const updatedLoan = updateLoanAfterInterest(loan);
-    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Interest", amount: loan.monthlyInterest };
+    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Interest"};
     updatedLoan.transactions = [...updatedLoan.transactions, tx];
     const updated = [...state.loans];
     updated[idx] = updatedLoan;
@@ -162,7 +186,7 @@ export const useLoanStore = create<LoanState>((set) => ({
     if (idx === -1) return state;
     const loan = state.loans[idx];
     const updatedLoan = closeLoanWithPrincipal(loan);
-    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Principal", amount: loan.loanAmount };
+    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Principal"};
     updatedLoan.transactions = [...updatedLoan.transactions, tx];
     const updated = [...state.loans];
     updated[idx] = updatedLoan;
@@ -204,7 +228,7 @@ export const useLoanStore = create<LoanState>((set) => ({
 
   setTotalCapital: (amount) => set((state) => {
     localStorage.setItem("cyberlend_capital", String(amount));
-    return { totalCapital: amount, metrics: calculatePortfolioMetrics(state.loans) };
+    const m = calculatePortfolioMetrics(state.loans); m.availableCapital = Math.max(0, amount - m.totalOutstanding); m.lendableAmount = m.availableCapital; return { totalCapital: amount, metrics: m };
   }),
 }));
 

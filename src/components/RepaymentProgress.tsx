@@ -126,4 +126,3 @@ export const RepaymentProgress: React.FC<Props> = ({ loans, theme: t, compact = 
     </div>
   );
 };
-
