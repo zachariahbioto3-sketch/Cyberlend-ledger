@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+﻿import React, { useState, useMemo, useRef } from "react";
 import {
   Users, Search, Star, AlertTriangle, UserX,
   Mail, MapPin, CreditCard, TrendingUp, FileText, Calendar,
@@ -461,12 +461,12 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   return (
     <div className="flex flex-col md:flex-row flex-1 overflow-y-auto" style={{ background: t.bgCard }}>
       {/* Left column */}
-      <div className="flex flex-col px-6 py-6 gap-5 flex-1 border-r" style={{ borderColor: t.border }}>
+      <div className="flex flex-col px-4 py-4 gap-4 flex-1 md:border-r" style={{ borderColor: t.border }}>
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
           <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>SELECT A CLIENT TO VIEW THEIR PROFILE</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {portfolioStats.map(s => (
             <div key={s.label} className="rounded-2xl border p-4 flex flex-col gap-2"
               style={{ background: t.bg, borderColor: t.border }}>
@@ -522,7 +522,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
       </div>
 
       {/* Right column */}
-      <div className="flex flex-col px-6 py-6 gap-5 w-full md:w-[320px] xl:w-[360px] md:shrink-0 border-t md:border-t-0 md:border-l">
+      <div className="flex flex-col px-4 py-4 gap-4 w-full md:w-[320px] xl:w-[360px] md:shrink-0 md:border-l" style={{ borderColor: "inherit" }}>
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
           <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>COLLECTION METRICS & RISK</p>
@@ -731,7 +731,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             )}
           </div>
 
-          <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
             {(["All", ...Object.keys(FLAG_META)] as (ClientFlag | "All")[]).map(f => (
               <button key={f} onClick={() => setFilterFlag(f)}
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border whitespace-nowrap text-[10px] font-bold transition-all shrink-0"
@@ -785,7 +785,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="text-xs font-bold truncate" style={{ color: t.text }}>{c.latest.borrowerName}</p>
                       {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "#f59e0b" }} />}
@@ -818,9 +818,9 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
         <div className="flex flex-col flex-1 overflow-hidden w-full" style={{ background: t.bgCard }}>
 
           {/* Detail header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b shrink-0 gap-3"
+          <div className="flex flex-col px-3 py-3 border-b shrink-0 gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 sm:gap-3"
             style={{ borderColor: t.border }}>
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <button onClick={() => { setSelectedKey(null); setEditMode(false); }}
                 className="flex md:hidden items-center justify-center w-8 h-8 rounded-xl border shrink-0"
                 style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
@@ -860,7 +860,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
               {!editMode ? (
                 <button onClick={handleEdit}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold"
@@ -890,10 +890,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
           </div>
 
           {/* Detail body */}
-          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 sm:px-5 sm:py-5 sm:space-y-4">
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {[
                 { label: "TOTAL LENT",    value: formatCompactCurrency(selectedStats.totalLent) },
                 { label: "INTEREST PAID", value: formatCompactCurrency(selectedStats.totalCollected) },
@@ -919,7 +919,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             {/* Contact & Profile */}
             <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
               <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ fontFamily: mono, color: t.textFaint }}>CONTACT & PROFILE</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
                   {[
                     { label: "Email",      value: selectedLatest.borrowerEmail    || "", icon: <Mail className="w-3.5 h-3.5" /> },
                     { label: "Address",    value: selectedLatest.borrowerAddress  || "", icon: <MapPin className="w-3.5 h-3.5" /> },
@@ -987,6 +987,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
 
 
 

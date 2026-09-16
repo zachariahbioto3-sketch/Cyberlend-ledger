@@ -1,103 +1,81 @@
+﻿import React, { useState } from "react";
 import { Loan, PortfolioMetrics } from "../types";
-// global variables//
-const INTEREST_RATE = 0.20;
-//functions for our loan calculator//
-export function calculateCyberlendLoan(principal: number, term: number = 5) {
-  const monthlyInterest  = Math.round(principal * INTEREST_RATE);
-  const totalRepayable   = Math.round((monthlyInterest * term) + principal);
-  const monthlyPayment   = monthlyInterest;
-  return { monthlyInterest, totalRepayable, monthlyPayment };
+import type { Theme } from "../App";
+import { generatePortfolioSummaryPdf } from "../utils/pdfReportGenerator";
+
+interface PdfExportModalProps {
+  isOpen:   boolean;
+  onClose:  () => void;
+  loans:    Loan[];
+  metrics:  PortfolioMetrics;
+  theme:    Theme;
 }
 
-export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
-  let totalPrincipalLent   = 0;
-  let totalExpectedReturn  = 0;
-  let totalCollected       = 0;
-  let totalOutstanding     = 0;
-  let activeLoansCount     = 0;
-  let completedLoansCount  = 0;
-  let overdueCount         = 0;
-  let defaultedCount       = 0;
+export function PdfExportModal({ isOpen, onClose, loans, metrics, theme }: PdfExportModalProps) {
+  const isDark = theme === "dark";
+  const [orgName, setOrgName]       = useState("Cyberlend");
+  const [preparedBy, setPreparedBy] = useState("Admin");
+  const [includePaid, setIncludePaid] = useState(false);
+  const [loading, setLoading]       = useState(false);
 
-  loans.forEach((loan) => {
-    totalPrincipalLent  += loan.loanAmount;
-    totalExpectedReturn += loan.totalRepayable;
+  if (!isOpen) return null;
 
-    // Sum interest transactions directly from transaction records
-    const interestCollected = loan.transactions
-      .filter((tx) => tx.status === "Completed" && tx.paymentType === "Interest")
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    totalCollected += interestCollected;
-
-    if (loan.status === "Completed") {
-      completedLoansCount++;
-    } else if (loan.status === "Defaulted") {
-      defaultedCount++;
-    } else {
-      // Principal is still outstanding for active/overdue loans
-      totalOutstanding += loan.loanAmount;
-      activeLoansCount++;
-      if (loan.status === "Overdue") overdueCount++;
+  const handleExport = async () => {
+    setLoading(true);
+    try {
+      await generatePortfolioSummaryPdf(loans, metrics, {
+        organizationName: orgName,
+        preparedBy,
+        reportTitle: "Portfolio Summary Report",
+        includePaidOff: includePaid,
+      });
+      onClose();
+    } catch (e) {
+      console.error("PDF export failed", e);
+    } finally {
+      setLoading(false);
     }
-  });
-
-  return {
-    totalLoansOriginated: loans.length,
-    totalPrincipalLent:   Math.round(totalPrincipalLent),
-    totalExpectedReturn:  Math.round(totalExpectedReturn),
-    totalCollected:       Math.round(totalCollected),
-    totalOutstanding:     Math.round(totalOutstanding),
-    totalProfit:          Math.round(totalCollected), // profit = interest collected
-    activeLoansCount,
-    completedLoansCount,
-    overdueCount,
-    defaultedCount,
   };
-}
 
-export function updateLoanAfterInterest(loan: Loan): Loan {
-  const monthsCompleted   = loan.monthsCompleted + 1;
-  const monthsRemaining   = Math.max(0, loan.term - monthsCompleted);
-  const interestCollected = loan.interestCollected + (loan.monthlyInterest || loan.monthlyPayment);
-  const [year, month, day] = loan.originationDate.split("-").map(Number);
-  const nextDue = new Date(year, month - 1 + monthsCompleted + 1, day);
-  const nextDueDate = nextDue.toISOString().split("T")[0];
-  return {
-    ...loan,
-    amountPaid:        interestCollected,
-    interestCollected,
-    monthsCompleted,
-    monthsRemaining,
-    nextDueDate,
-    status:            "Active",
-    remainingBalance:  loan.loanAmount,
-  };
-}
+  const base = isDark ? "bg-gray-900 text-white" : "bg-white text-gray-900";
+  const sub  = isDark ? "text-gray-400" : "text-gray-500";
+  const inp  = isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-gray-100 border-gray-300 text-gray-900";
 
-export function closeLoanWithPrincipal(loan: Loan): Loan {
-  return { ...loan, remainingBalance: 0, status: "Completed" };
-}
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className={`rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 ${base}`}>
+        <h2 className="text-xl font-bold mb-1">Export PDF Report</h2>
+        <p className={`text-sm mb-4 ${sub}`}>Generate a full portfolio summary with all loan details.</p>
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-KE", {
-    style: "currency", currency: "KES",
-    minimumFractionDigits: 0, maximumFractionDigits: 0,
-  }).format(amount || 0);
-}
+        <div className="space-y-3 mb-5">
+          <div>
+            <label className={`text-xs font-medium ${sub}`}>Organisation Name</label>
+            <input value={orgName} onChange={e => setOrgName(e.target.value)}
+              className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm ${inp}`} />
+          </div>
+          <div>
+            <label className={`text-xs font-medium ${sub}`}>Prepared By</label>
+            <input value={preparedBy} onChange={e => setPreparedBy(e.target.value)}
+              className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm ${inp}`} />
+          </div>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={includePaid} onChange={e => setIncludePaid(e.target.checked)}
+              className="rounded" />
+            Include completed loans
+          </label>
+        </div>
 
-export function formatCompactCurrency(amount: number): string {
-  if (Math.abs(amount) >= 1_000_000) return `KES ${(amount / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(amount) >= 1_000)     return `KES ${(amount / 1_000).toFixed(0)}k`;
-  return formatCurrency(amount);
-}
-
-export function formatDate(dateStr: string): string {
-  if (!dateStr) return "N/A";
-  try {
-    const [year, month, day] = dateStr.split("-").map(Number);
-    return new Date(year, month - 1, day).toLocaleDateString("en-KE", {
-      year: "numeric", month: "short", day: "numeric",
-    });
-  } catch { return dateStr; }
+        <div className="flex gap-3">
+          <button onClick={onClose}
+            className={`flex-1 py-2 rounded-lg border text-sm font-medium ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-100"}`}>
+            Cancel
+          </button>
+          <button onClick={handleExport} disabled={loading}
+            className="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium">
+            {loading ? "Generating..." : "Export PDF"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

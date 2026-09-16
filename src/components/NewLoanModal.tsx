@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+﻿import React, { useState, useMemo } from "react";
 import { X, PlusCircle, Check, ChevronDown, User, AlertTriangle, Clock } from "lucide-react";
 import { LoanCategory, LoanPurpose, Loan } from "../types";
 import { calculateCyberlendLoan, formatCurrency, formatCompactCurrency } from "../utils/loanCalculations";
@@ -122,7 +122,7 @@ if (!isOpen) return null;
             </div>
             <div>
               <h3 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>
-                {isReturning ? "NEW LOAN — RETURNING CLIENT" : "NEW LOAN"}
+                {isReturning ? "NEW LOAN â€” RETURNING CLIENT" : "NEW LOAN"}
               </h3>
               <p className="text-[10px]" style={{ color: t.textFaint }}>
                 {isReturning ? `${returningClientLoans.length} previous loan(s) on file` : "Add borrower to ledger"}
@@ -161,7 +161,7 @@ if (!isOpen) return null;
                     {outstandingBalance > 0 && (
                       <span className="flex items-center gap-1 text-[10px]" style={{ fontFamily: mono, color: "#f59e0b" }}>
                         <AlertTriangle className="w-3 h-3" />
-                        {formatCompactCurrency(outstandingBalance)} outstanding — rolled into new loan
+                        {formatCompactCurrency(outstandingBalance)} outstanding â€” rolled into new loan
                       </span>
                     )}
                   </div>
@@ -183,7 +183,7 @@ if (!isOpen) return null;
                       style={{ background: t.bgCard, borderColor: t.border }}>
                       <div>
                         <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>{l.loanNumber}</p>
-                        <p className="text-[9px]" style={{ color: t.textFaint }}>{l.originationDate} · {l.category}</p>
+                        <p className="text-[9px]" style={{ color: t.textFaint }}>{l.originationDate} Â· {l.category}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>
@@ -204,7 +204,7 @@ if (!isOpen) return null;
               </div>
             )}
 
-            {/* Phone — triggers returning client lookup */}
+            {/* Phone â€” triggers returning client lookup */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>
@@ -254,7 +254,7 @@ if (!isOpen) return null;
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>
                   NEW PRINCIPAL
                 </label>
-                <input required type="number" step="500" min="500" value={loanAmount}
+                <input required type="number" min="1" value={loanAmount}
                   onChange={(e) => setLoanAmount(Number(e.target.value))}
                   className="w-full px-3 py-2 rounded-xl text-xs border focus:outline-none font-bold"
                   style={inputStyle} />

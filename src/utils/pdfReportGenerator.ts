@@ -1,23 +1,25 @@
-import jsPDF from "jspdf";
+﻿import jsPDF from "jspdf";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 
 // Saves PDF correctly on both Web and Android APK
+// On Android — saves to Downloads folder (visible in file manager)
 export async function savePdf(doc: any, filename: string): Promise<void> {
   if (Capacitor.isNativePlatform()) {
     try {
-      // Android: use Capacitor Filesystem to write to Documents
       const base64 = doc.output("datauristring").split(",")[1];
+      // ExternalStorage + Download subfolder = visible Downloads folder on all Android versions
       await Filesystem.writeFile({
-        path: filename,
+        path: `Download/${filename}`,
         data: base64,
-        directory: Directory.Documents,
-        recursive: true
+        directory: Directory.ExternalStorage,
+        recursive: true,
       });
-      
+      // Alert user exactly where to find it
+      alert(`PDF saved!\n\nFind it in your Downloads folder:\n${filename}`);
     } catch (error) {
-      console.error("Native save failed", error);
-      
+      console.error("Native PDF save failed", error);
+      alert(`Could not save PDF to Downloads.\nError: ${error}`);
     }
   } else {
     // Web: normal browser download
@@ -618,4 +620,5 @@ export async function generateStandingReport(loans: Loan[], metrics: PortfolioMe
 
   await savePdf(doc, `StandingReport_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
+
 

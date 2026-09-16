@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { X, CreditCard, Check, Smartphone, Building2 } from 'lucide-react';
 import { Loan, PaymentMethod, RepaymentTransaction } from '../types';
 import { formatCurrency, formatDate } from '../utils/loanCalculations';
@@ -49,7 +49,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
             </div>
             <div>
               <h3 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>RECORD PAYMENT</h3>
-              <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerName} Â· {loan.loanNumber}</p>
+              <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerName} Ã‚Â· {loan.loanNumber}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg" style={{ color: t.textFaint }}><X className="w-4 h-4" /></button>
@@ -77,7 +77,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
             </div>
             <div>
               <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>AMOUNT (KES)</label>
-              <input required type="number" step="100" min="1" value={amount} onChange={(e) => setAmount(Number(e.target.value))}
+              <input required type="number" min="1" value={amount} onChange={(e) => setAmount(Number(e.target.value))}
                 className="w-full px-3 py-2 rounded-xl text-xs border focus:outline-none font-bold transition-colors"
                 style={{ ...inputStyle, fontFamily: mono }} />
             </div>
@@ -118,7 +118,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
           <div className="p-3 rounded-2xl border flex justify-between items-center" style={{ background: t.bgActive, borderColor: t.borderMid }}>
             <span className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BALANCE AFTER:</span>
             <span className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-              {formatCurrency(newBalance)} {newBalance === 0 ? 'âœ“ CLEARED' : ''}
+              {formatCurrency(newBalance)} {newBalance === 0 ? 'Ã¢Å“â€œ CLEARED' : ''}
             </span>
           </div>
 
