@@ -1,5 +1,5 @@
-﻿import { create } from "zustand";
-import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry, Goals, LoanAgreement } from "../types";
+import { create } from "zustand";
+import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry, Goals } from "../types";
 import {
   calculateCyberlendLoan,
   calculatePortfolioMetrics,
@@ -7,10 +7,9 @@ import {
   closeLoanWithPrincipal,
 } from "../utils/loanCalculations";
 
-const STORAGE_KEY    = "cyberlend_loans";
-const WAITLIST_KEY   = "cyberlend_waitlist";
-const GOALS_KEY      = "cyberlend_goals";
-const AGREEMENT_KEY  = "cyberlend_agreements";
+const STORAGE_KEY  = "cyberlend_loans";
+const WAITLIST_KEY = "cyberlend_waitlist";
+const GOALS_KEY    = "cyberlend_goals";
 
 const DEFAULT_GOALS: Goals = { targetPortfolioSize: 500000, targetClientCount: 20, targetMonthlyReturn: 50000, targetReturnRate: 10 };
 function loadGoals(): Goals { try { const r = localStorage.getItem(GOALS_KEY); return r ? { ...DEFAULT_GOALS, ...JSON.parse(r) } : DEFAULT_GOALS; } catch { return DEFAULT_GOALS; } }
@@ -19,30 +18,31 @@ function saveGoals(g: Goals) { localStorage.setItem(GOALS_KEY, JSON.stringify(g)
 function loadLoans(): Loan[] {
   try {
     const r = localStorage.getItem(STORAGE_KEY);
-    if (r) { const parsed = JSON.parse(r); if (parsed.length > 0) return parsed; }
+    if (r) {
+      const parsed = JSON.parse(r);
+      if (parsed.length > 0) return parsed;
+    }
+    // No data yet � seed with dummy data
     localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
     return [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 function loadWaitlist(): WishlistEntry[] {
   try { const r = localStorage.getItem(WAITLIST_KEY); return r ? JSON.parse(r) : []; } catch { return []; }
 }
-function loadAgreements(): LoanAgreement[] {
-  try { const r = localStorage.getItem(AGREEMENT_KEY); return r ? JSON.parse(r) : []; } catch { return []; }
-}
 function saveLoans(loans: Loan[]) { localStorage.setItem(STORAGE_KEY, JSON.stringify(loans)); }
 function saveWaitlist(w: WishlistEntry[]) { localStorage.setItem(WAITLIST_KEY, JSON.stringify(w)); }
-function saveAgreements(a: LoanAgreement[]) { localStorage.setItem(AGREEMENT_KEY, JSON.stringify(a)); }
 
 interface LoanState {
-  loans:          Loan[];
-  metrics:        PortfolioMetrics;
-  waitlist:       WishlistEntry[];
-  agreements:     LoanAgreement[];
+  loans:    Loan[];
+  metrics:  PortfolioMetrics;
+  waitlist: WishlistEntry[];
   selectedClient: Loan | null;
-  totalCapital:   number;
-  goals:          Goals;
-  setGoals:             (goals: Goals) => void;
+  totalCapital: number;
+  goals: Goals;
+  setGoals: (goals: Goals) => void;
   setSelectedClient:    (c: Loan | null) => void;
   setLoans:             (loans: Loan[]) => void;
   addLoan:              (data: any) => void;
@@ -56,24 +56,20 @@ interface LoanState {
   updateWaitlistStatus: (id: string, status: WishlistEntry["status"]) => void;
   updateWaitlistAmount: (id: string, amount: number) => void;
   setTotalCapital:      (amount: number) => void;
-  addAgreement:         (agreement: LoanAgreement) => void;
-  updateAgreement:      (id: string, updates: Partial<LoanAgreement>) => void;
-  deleteAgreement:      (id: string) => void;
 }
 
-const initialLoans      = loadLoans();
-const initialWaitlist   = loadWaitlist();
-const initialAgreements = loadAgreements();
+const initialLoans    = loadLoans();
+const initialWaitlist = loadWaitlist();
 
 function loadCapital(): number {
-  try { const v = localStorage.getItem("cyberlend_capital"); return v ? parseFloat(v) : 0; } catch { return 0; }
+  try { const v = localStorage.getItem("cyberlend_capital"); return v ? parseFloat(v) : 0; }
+  catch { return 0; }
 }
 
 export const useLoanStore = create<LoanState>((set) => ({
   loans:          initialLoans,
   metrics:        calculatePortfolioMetrics(initialLoans),
   waitlist:       initialWaitlist,
-  agreements:     initialAgreements,
   selectedClient: null,
   totalCapital:   loadCapital(),
   goals:          loadGoals(),
@@ -135,8 +131,7 @@ export const useLoanStore = create<LoanState>((set) => ({
       monthsCompleted:   0,
       monthsRemaining:   loanData.term,
       transactions:      [],
-      notes:             loanData.notes     || "",
-      agreementId:       loanData.agreementId || undefined,
+      notes:             loanData.notes || "",
     };
     const updated = [...state.loans, newLoan];
     saveLoans(updated);
@@ -152,11 +147,23 @@ export const useLoanStore = create<LoanState>((set) => ({
   deleteTransaction: (loanId, txId) => set((state) => {
     const updated = state.loans.map((l) => {
       if (l.id !== loanId) return l;
-      const txs        = l.transactions.filter((tx) => tx.id !== txId);
-      const totalPaid  = txs.reduce((s, t) => s + t.amount, 0);
-      const intPaid    = txs.filter(t => t.paymentType === "Interest").reduce((s, t) => s + t.amount, 0);
-      return { ...l, transactions: txs, amountPaid: totalPaid, interestCollected: intPaid, remainingBalance: (l.loanAmount + l.monthlyInterest * l.term) - totalPaid };
+      const txs = l.transactions.filter((tx) => tx.id !== txId);
+
+      // Recalculate loan based on remaining transactions
+      const totalPaid = txs.reduce((s, t) => s + t.amount, 0);
+      const intPaid   = txs.filter(t => t.paymentType === "Interest").reduce((s, t) => s + t.amount, 0);
+
+      return {
+        ...l,
+        transactions: txs,
+        amountPaid: totalPaid,
+        interestCollected: intPaid,
+        remainingBalance: (l.loanAmount + l.monthlyInterest * l.term) - totalPaid, // This logic depends on how calculations are done
+        // Note: Full recalculation might be complex depending on current design
+      };
     });
+    // For simplicity in this app, we'll just filter it out for now.
+    // If the app relies on state.loans for metrics, it will update.
     saveLoans(updated);
     return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
   }),
@@ -166,7 +173,7 @@ export const useLoanStore = create<LoanState>((set) => ({
     if (idx === -1) return state;
     const loan = state.loans[idx];
     const updatedLoan = updateLoanAfterInterest(loan);
-    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Interest" };
+    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Interest"};
     updatedLoan.transactions = [...updatedLoan.transactions, tx];
     const updated = [...state.loans];
     updated[idx] = updatedLoan;
@@ -179,7 +186,7 @@ export const useLoanStore = create<LoanState>((set) => ({
     if (idx === -1) return state;
     const loan = state.loans[idx];
     const updatedLoan = closeLoanWithPrincipal(loan);
-    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Principal" };
+    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Principal"};
     updatedLoan.transactions = [...updatedLoan.transactions, tx];
     const updated = [...state.loans];
     updated[idx] = updatedLoan;
@@ -188,7 +195,12 @@ export const useLoanStore = create<LoanState>((set) => ({
   }),
 
   addToWaitlist: (entry) => set((state) => {
-    const newEntry: WishlistEntry = { ...entry, id: `WL-${Date.now()}`, dateRegistered: new Date().toISOString().slice(0, 10), status: "Enquiry" };
+    const newEntry: WishlistEntry = {
+      ...entry,
+      id:             `WL-${Date.now()}`,
+      dateRegistered: new Date().toISOString().slice(0, 10),
+      status:         "Enquiry",
+    };
     const updated = [...state.waitlist, newEntry];
     saveWaitlist(updated);
     return { waitlist: updated };
@@ -201,7 +213,9 @@ export const useLoanStore = create<LoanState>((set) => ({
   }),
 
   updateWaitlistAmount: (id, amount) => set((state) => {
-    const updated = state.waitlist.map((e) => e.id === id ? { ...e, amountNeeded: amount, status: "Pending" as const } : e);
+    const updated = state.waitlist.map((e) =>
+      e.id === id ? { ...e, amountNeeded: amount, status: "Pending" as const } : e
+    );
     saveWaitlist(updated);
     return { waitlist: updated };
   }),
@@ -214,27 +228,11 @@ export const useLoanStore = create<LoanState>((set) => ({
 
   setTotalCapital: (amount) => set((state) => {
     localStorage.setItem("cyberlend_capital", String(amount));
-    const m = calculatePortfolioMetrics(state.loans);
-    m.availableCapital = Math.max(0, amount - m.totalOutstanding);
-    m.lendableAmount   = m.availableCapital;
-    return { totalCapital: amount, metrics: m };
-  }),
-
-  addAgreement: (agreement) => set((state) => {
-    const updated = [...state.agreements, agreement];
-    saveAgreements(updated);
-    return { agreements: updated };
-  }),
-
-  updateAgreement: (id, updates) => set((state) => {
-    const updated = state.agreements.map((a) => a.id === id ? { ...a, ...updates } : a);
-    saveAgreements(updated);
-    return { agreements: updated };
-  }),
-
-  deleteAgreement: (id) => set((state) => {
-    const updated = state.agreements.filter((a) => a.id !== id);
-    saveAgreements(updated);
-    return { agreements: updated };
+    const m = calculatePortfolioMetrics(state.loans); m.availableCapital = Math.max(0, amount - m.totalOutstanding); m.lendableAmount = m.availableCapital; return { totalCapital: amount, metrics: m };
   }),
 }));
+
+
+
+
+

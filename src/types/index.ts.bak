@@ -1,4 +1,4 @@
-﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
+export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
 
 export type LoanStatus = "Active" | "Overdue" | "Completed" | "Defaulted";
 
@@ -19,14 +19,6 @@ export type LoanPurpose =
   | "Electronics/Assets"
   | "Personal Use"
   | "Other";
-
-export type InterestBasis = "Flat Rate" | "Reducing Balance" | "Other";
-
-export type AgreementStatus = "Draft" | "Active" | "Completed";
-
-export type DisbursementMethod = "Mobile Money" | "Bank Transfer" | "Cheque" | "Cash" | "Other";
-
-export type RepaymentFrequency = "Daily" | "Weekly" | "Bi-weekly" | "Monthly" | "Other";
 
 export interface RepaymentTransaction {
   id: string;
@@ -75,7 +67,6 @@ export interface Loan {
   monthsRemaining: number;
   transactions: RepaymentTransaction[];
   notes?: string;
-  agreementId?: string;
 }
 
 export interface PortfolioMetrics {
@@ -126,107 +117,11 @@ export interface WishlistEntry {
   status: "Enquiry" | "Pending" | "Approved" | "Rejected";
 }
 
+
 export interface Goals {
   targetPortfolioSize: number;
-  targetClientCount: number;
+  targetClientCount:   number;
   targetMonthlyReturn: number;
-  targetReturnRate: number;
+  targetReturnRate:    number;
 }
 
-export interface Guarantor {
-  fullName: string;
-  idNumber: string;
-  address: string;
-  phone: string;
-  email: string;
-  occupation: string;
-}
-
-export interface RepaymentRow {
-  instalment: number;
-  dueDate: string;
-  principal: number;
-  interest: number;
-  fees: number;
-  totalDue: number;
-  balance: number;
-}
-
-export interface LenderDetails {
-  fullName: string;
-  idNumber: string;
-  address: string;
-  phone: string;
-  email: string;
-}
-
-export interface AgreementFacility {
-  requestedAmount: number;
-  approvedAmount: number;
-  amountInWords: string;
-  purpose: LoanPurpose;
-  disbursementDate: string;
-  maturityDate: string;
-  term: number;
-}
-
-export interface AgreementInterest {
-  rate: number;
-  basis: InterestBasis;
-  otherBasisDescription?: string;
-  calculationMethod?: string;
-  totalInterestPayable?: number;
-}
-
-export interface AgreementFees {
-  processingFeeType: "None" | "Percentage" | "Fixed";
-  processingFeeValue: number;
-  otherFees: string;
-  totalFees: number;
-}
-
-export interface AgreementDisbursement {
-  method: DisbursementMethod;
-  otherMethodDescription?: string;
-  accountOrPhone: string;
-  reference: string;
-}
-
-export interface AgreementRepayment {
-  frequency: RepaymentFrequency;
-  numberOfInstalments: number;
-  amountPerInstalment: number;
-  firstPaymentDate: string;
-  finalPaymentDate: string;
-  paymentMethod: PaymentMethod;
-  paymentAccount: string;
-}
-
-export interface LoanAgreement {
-  id: string;
-  agreementNumber: string;
-  agreementVersion: string;
-  date: string;
-  status: AgreementStatus;
-  lender: LenderDetails;
-  borrower: {
-    fullName: string;
-    idNumber: string;
-    dateOfBirth: string;
-    address: string;
-    phone: string;
-    email: string;
-    occupation: string;
-    employerOrBusiness: string;
-  };
-  guarantor: Guarantor;
-  facility: AgreementFacility;
-  interest: AgreementInterest;
-  fees: AgreementFees;
-  netDisbursed: number;
-  disbursement: AgreementDisbursement;
-  repayment: AgreementRepayment;
-  repaymentSchedule: RepaymentRow[];
-  linkedLoanId?: string;
-  createdAt: string;
-}

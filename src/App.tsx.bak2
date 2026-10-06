@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
@@ -19,8 +19,7 @@ import { GoalTracker }   from "./components/GoalTracker";
 import { GoalDrawer }   from "./components/GoalDrawer";
 import { TrackerBar } from './components/TrackerBar';
 import { ClientProfilePanel } from './components/ClientProfilePanel';
-import { AgreementsPage } from './components/AgreementsPage';
-import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock, Trash2, ScrollText } from "lucide-react";
+import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock, Trash2 } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
@@ -36,8 +35,8 @@ function AppInner() {
   const [promotedEntry, setPromotedEntry] = useState<any>(null);
   const [paymentLoan, setPaymentLoan] = useState<Loan | null>(null);
   const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
-  const [mobileTab, setMobileTab] = useState<"loans" | "analytics" | "clients" | "waitlist" | "agreements">("loans");
-  const [desktopTab, setDesktopTab] = useState<"dashboard" | "clients" | "waitlist" | "agreements">("dashboard");
+  const [mobileTab, setMobileTab] = useState<"loans" | "analytics" | "clients" | "waitlist">("loans");
+  const [desktopTab, setDesktopTab] = useState<"dashboard" | "clients" | "waitlist">("dashboard");
   const [pdfOpen, setPdfOpen] = useState(false);
   const handleUpdateLoan = (id: string, updates: Partial<any>) => {
     const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
@@ -166,8 +165,7 @@ function AppInner() {
           {[
             { icon: <LayoutDashboard className="w-4 h-4" />, label: "Dashboard", tab: "dashboard" as const },
             { icon: <Users className="w-4 h-4" />, label: "Clients",  tab: "clients"   as const },
-            { icon: <Clock className="w-4 h-4" />,  label: "Waitlist",    tab: "waitlist"    as const },
-            { icon: <ScrollText className="w-4 h-4" />, label: "Agreements", tab: "agreements" as const },
+            { icon: <Clock className="w-4 h-4" />,  label: "Waitlist", tab: "waitlist"  as const },
           ].map((item) => (
             <button key={item.label} title={item.label}
               onClick={() => setDesktopTab(item.tab)}
@@ -329,13 +327,13 @@ function AppInner() {
               <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#f87171" }}>
-                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE ï¿½ COLLECT NOW
+                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE � COLLECT NOW
                 </p>
                 <div className="mt-1 flex flex-col gap-0.5">
                   {loans.filter((l) => l.status === "Overdue").map((l) => (
                     <p key={l.id} className="text-[10px]" style={{ color: t.textMuted }}>
                       <span style={{ color: t.text, fontWeight: 700 }}>{l.borrowerName}</span>
-                      {" ï¿½ "}{formatCompactCurrency(l.monthlyInterest)} due
+                      {" � "}{formatCompactCurrency(l.monthlyInterest)} due
                     </p>
                   ))}
                 </div>
@@ -417,12 +415,6 @@ function AppInner() {
             </div>
           )}
 
-          {mobileTab === "agreements" && (
-            <div className="pb-24">
-              <AgreementsPage theme={t} />
-            </div>
-          )}
-
           {mobileTab === "analytics" && (
             <div className="px-4 pb-24 space-y-3">
               <h2 className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>ANALYTICS</h2>
@@ -439,14 +431,6 @@ function AppInner() {
         {desktopTab === "waitlist" && (
           <div className="hidden md:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
             <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setPromotedEntry(entry); setNewLoanOpen(true); }} />
-          </div>
-        )}
-
-        {desktopTab === "agreements" && (
-          <div className="hidden md:flex flex-1 overflow-auto" style={{ background: t.bg }}>
-            <div className="w-full">
-              <AgreementsPage theme={t} />
-            </div>
           </div>
         )}
 
@@ -556,7 +540,7 @@ function AppInner() {
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" ï¿½ "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" � "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>
@@ -601,8 +585,7 @@ function AppInner() {
             { tab: "loans",     icon: <LayoutDashboard className="w-4 h-4" />, label: "LOANS" },
             { tab: "analytics", icon: <TrendingUp className="w-4 h-4" />,      label: "ANALYTICS" },
             { tab: "clients",   icon: <Users className="w-4 h-4" />,           label: "CLIENTS" },
-            { tab: "waitlist",    icon: <Clock className="w-4 h-4" />,       label: "WAITLIST" },
-            { tab: "agreements", icon: <ScrollText className="w-4 h-4" />,  label: "AGREE" },
+            { tab: "waitlist",  icon: <Clock className="w-4 h-4" />,           label: "WAITLIST" },
           ].map((item) => (
             <button key={item.tab} onClick={() => setMobileTab(item.tab as any)} className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"

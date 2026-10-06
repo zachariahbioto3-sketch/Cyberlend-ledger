@@ -1,34 +1,123 @@
-﻿import { Loan, PortfolioMetrics } from "../types";
+﻿import { Loan, PortfolioMetrics, RepaymentRow, InterestBasis } from "../types";
 
-const INTEREST_RATE = 0.20;
+const DEFAULT_INTEREST_RATE = 0.20;
 
+// ─── EXISTING CYBERLEND LOAN MODEL ───────────────────────────────────────────
 // Recurring interest-only loan model:
 // Borrower pays interest each month, principal stays unchanged.
 // Loan closes only when borrower pays principal + interest together.
+
 export function calculateCyberlendLoan(principal: number, term: number = 5) {
-  const monthlyInterest = Math.ceil(principal * INTEREST_RATE);
-  const monthlyPayment  = monthlyInterest; // monthly = interest only
-  // totalRepayable = principal + (interest * term) — an estimate, not a deadline
+  const monthlyInterest = Math.ceil(principal * DEFAULT_INTEREST_RATE);
+  const monthlyPayment  = monthlyInterest;
   const totalRepayable  = principal + (monthlyInterest * term);
   return { monthlyInterest, totalRepayable, monthlyPayment };
 }
 
+// ─── AGREEMENT REPAYMENT SCHEDULE ────────────────────────────────────────────
+// Generates full repayment schedule table for the loan agreement PDF.
+// Supports Flat Rate and Reducing Balance interest basis.
+
+export function generateRepaymentSchedule(
+  principal: number,
+  annualRatePercent: number,
+  basis: InterestBasis,
+  termMonths: number,
+  startDate: string,
+  feesPerInstalment: number = 0
+): RepaymentRow[] {
+  const rows: RepaymentRow[] = [];
+  const monthlyRate = annualRatePercent / 100;
+
+  if (basis === "Flat Rate" || basis === "Other") {
+    // Flat Rate: interest calculated on original principal every month
+    // Principal paid as lump sum on final instalment (Cyberlend model)
+    const interestPerMonth = Math.ceil(principal * monthlyRate);
+    let balance = principal;
+
+    for (let i = 1; i <= termMonths; i++) {
+      const isLast      = i === termMonths;
+      const principalDue = isLast ? principal : 0;
+      const totalDue    = principalDue + interestPerMonth + feesPerInstalment;
+      balance           = isLast ? 0 : principal;
+
+      rows.push({
+        instalment: i,
+        dueDate:    addMonths(startDate, i),
+        principal:  principalDue,
+        interest:   interestPerMonth,
+        fees:       feesPerInstalment,
+        totalDue,
+        balance,
+      });
+    }
+  } else if (basis === "Reducing Balance") {
+    // Reducing Balance: interest recalculates on outstanding principal each month
+    // Equal principal repayment each month
+    const principalPerMonth = Math.ceil(principal / termMonths);
+    let balance = principal;
+
+    for (let i = 1; i <= termMonths; i++) {
+      const isLast       = i === termMonths;
+      const interestDue  = Math.ceil(balance * monthlyRate);
+      const principalDue = isLast ? balance : Math.min(principalPerMonth, balance);
+      const totalDue     = principalDue + interestDue + feesPerInstalment;
+      balance            = Math.max(0, balance - principalDue);
+
+      rows.push({
+        instalment: i,
+        dueDate:    addMonths(startDate, i),
+        principal:  principalDue,
+        interest:   interestDue,
+        fees:       feesPerInstalment,
+        totalDue,
+        balance,
+      });
+    }
+  }
+
+  return rows;
+}
+
+// ─── SCHEDULE SUMMARY HELPERS ─────────────────────────────────────────────────
+
+export function scheduleTotalInterest(rows: RepaymentRow[]): number {
+  return rows.reduce((sum, r) => sum + r.interest, 0);
+}
+
+export function scheduleTotalDue(rows: RepaymentRow[]): number {
+  return rows.reduce((sum, r) => sum + r.totalDue, 0);
+}
+
+// ─── DATE HELPER ──────────────────────────────────────────────────────────────
+
+function addMonths(dateStr: string, months: number): string {
+  try {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const d = new Date(year, month - 1 + months, day);
+    return d.toISOString().split("T")[0];
+  } catch {
+    return dateStr;
+  }
+}
+
+// ─── PORTFOLIO METRICS ────────────────────────────────────────────────────────
+
 export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
   let totalPrincipalLent       = 0;
   let totalExpectedReturn      = 0;
-  let totalCollected           = 0; // sum of all interest payments received
-  let totalOutstanding         = 0; // principal still in the field
+  let totalCollected           = 0;
+  let totalOutstanding         = 0;
   let activeLoansCount         = 0;
   let completedLoansCount      = 0;
   let overdueCount             = 0;
   let defaultedCount           = 0;
-  let returnsFromPreviousLoans = 0; // principal recovered from closed loans
+  let returnsFromPreviousLoans = 0;
 
   loans.forEach((loan) => {
     totalPrincipalLent  += loan.loanAmount;
     totalExpectedReturn += loan.totalRepayable;
 
-    // Only count completed interest transactions as collected
     const interestCollected = loan.transactions
       .filter((tx) => tx.status === "Completed" && tx.paymentType === "Interest")
       .reduce((sum, tx) => sum + tx.amount, 0);
@@ -37,23 +126,18 @@ export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
 
     if (loan.status === "Completed") {
       completedLoansCount++;
-      // Principal has been returned — it's available to lend again
       returnsFromPreviousLoans += loan.loanAmount;
     } else if (loan.status === "Defaulted") {
       defaultedCount++;
     } else {
-      // Active / Overdue — principal is still out in the field
       totalOutstanding += loan.loanAmount;
       activeLoansCount++;
       if (loan.status === "Overdue") overdueCount++;
     }
   });
 
-  // Profit = all interest collected (principal is not income, it's returned capital)
   const totalProfit      = totalCollected;
-  // Capital available to re-lend = recovered principal from closed loans
   const availableCapital = returnsFromPreviousLoans;
-  // Conservative lendable amount = 80% of available capital
   const lendableAmount   = Math.floor(availableCapital * 0.8);
 
   return {
@@ -73,36 +157,36 @@ export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
   };
 }
 
-// Called when borrower pays interest for the month.
-// Principal stays the same — loan recurs to them automatically.
+// ─── LOAN LIFECYCLE ───────────────────────────────────────────────────────────
+
 export function updateLoanAfterInterest(loan: Loan): Loan {
-  const monthsCompleted   = loan.monthsCompleted + 1;
-  const interestCollected = loan.interestCollected + loan.monthlyInterest;
+  const monthsCompleted    = loan.monthsCompleted + 1;
+  const interestCollected  = loan.interestCollected + loan.monthlyInterest;
   const [year, month, day] = loan.originationDate.split("-").map(Number);
-  const nextDue     = new Date(year, month - 1 + monthsCompleted + 1, day);
-  const nextDueDate = nextDue.toISOString().split("T")[0];
+  const nextDue            = new Date(year, month - 1 + monthsCompleted + 1, day);
+  const nextDueDate        = nextDue.toISOString().split("T")[0];
 
   return {
     ...loan,
     interestCollected,
-    amountPaid:       interestCollected,      // tracks total interest paid so far
+    amountPaid:      interestCollected,
     monthsCompleted,
-    monthsRemaining:  Math.max(0, loan.term - monthsCompleted),
+    monthsRemaining: Math.max(0, loan.term - monthsCompleted),
     nextDueDate,
-    remainingBalance: loan.loanAmount,        // principal never changes until closure
+    remainingBalance: loan.loanAmount,
     status:           "Active",
   };
 }
 
-// Called when borrower decides to close the loan.
-// They pay principal + this month's interest — loan is terminated.
 export function closeLoanWithPrincipal(loan: Loan): Loan {
   return {
     ...loan,
-    remainingBalance: 0,          // principal fully returned
+    remainingBalance: 0,
     status:           "Completed",
   };
 }
+
+// ─── FORMATTING ───────────────────────────────────────────────────────────────
 
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-KE", {
@@ -125,4 +209,24 @@ export function formatDate(dateStr: string): string {
       year: "numeric", month: "short", day: "numeric",
     });
   } catch { return dateStr; }
+}
+
+export function numberToWords(amount: number): string {
+  if (amount === 0) return "Zero Shillings Only";
+  const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  function convert(n: number): string {
+    if (n < 20)   return ones[n];
+    if (n < 100)  return tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "");
+    if (n < 1000) return ones[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + convert(n % 100) : "");
+    if (n < 1_000_000) return convert(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + convert(n % 1000) : "");
+    if (n < 1_000_000_000) return convert(Math.floor(n / 1_000_000)) + " Million" + (n % 1_000_000 ? " " + convert(n % 1_000_000) : "");
+    return convert(Math.floor(n / 1_000_000_000)) + " Billion" + (n % 1_000_000_000 ? " " + convert(n % 1_000_000_000) : "");
+  }
+
+  const rounded = Math.round(amount);
+  return convert(rounded) + " Shillings Only";
 }
