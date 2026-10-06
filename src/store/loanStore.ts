@@ -1,10 +1,10 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 import { Loan, RepaymentTransaction, PortfolioMetrics, WishlistEntry, Goals, LoanAgreement } from "../types";
 import {
   calculateCyberlendLoan,
   calculatePortfolioMetrics,
   updateLoanAfterInterest,
-  closeLoanWithPrincipal,
+  closeLoanWithPrincipal, nextDueAfter,
 } from "../utils/loanCalculations";
 
 const STORAGE_KEY    = "cyberlend_loans";
@@ -155,7 +155,7 @@ export const useLoanStore = create<LoanState>((set) => ({
       const txs        = l.transactions.filter((tx) => tx.id !== txId);
       const totalPaid  = txs.reduce((s, t) => s + t.amount, 0);
       const intPaid    = txs.filter(t => t.paymentType === "Interest").reduce((s, t) => s + t.amount, 0);
-      return { ...l, transactions: txs, amountPaid: totalPaid, interestCollected: intPaid, remainingBalance: (l.loanAmount + l.monthlyInterest * l.term) - totalPaid };
+      const removed = l.transactions.find((tx) => tx.id === txId); const wasInterest = removed?.paymentType === "Interest"; const wasPrincipal = removed?.paymentType === "Principal"; const stillCompleted = l.status === "Completed" && !wasPrincipal; const monthsCompleted = Math.max(0, l.monthsCompleted - (wasInterest ? 1 : 0)); return { ...l, transactions: txs, amountPaid: totalPaid, interestCollected: intPaid, monthsCompleted, monthsRemaining: Math.max(0, l.term - monthsCompleted), nextDueDate: nextDueAfter(l.originationDate, monthsCompleted), remainingBalance: stillCompleted ? 0 : l.loanAmount, status: (stillCompleted ? "Completed" : l.status === "Completed" ? "Active" : l.status) as Loan["status"] };
     });
     saveLoans(updated);
     return { loans: updated, metrics: calculatePortfolioMetrics(updated) };
@@ -165,8 +165,8 @@ export const useLoanStore = create<LoanState>((set) => ({
     const idx = state.loans.findIndex((l) => l.id === loanId);
     if (idx === -1) return state;
     const loan = state.loans[idx];
-    const updatedLoan = updateLoanAfterInterest(loan);
-    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Interest" };
+    if (loan.status === "Completed") return state; const updatedLoan = updateLoanAfterInterest(loan, txData.amount);
+    const tx: RepaymentTransaction = { id: `TX-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, ...txData, paymentType: "Interest" };
     updatedLoan.transactions = [...updatedLoan.transactions, tx];
     const updated = [...state.loans];
     updated[idx] = updatedLoan;
@@ -179,7 +179,7 @@ export const useLoanStore = create<LoanState>((set) => ({
     if (idx === -1) return state;
     const loan = state.loans[idx];
     const updatedLoan = closeLoanWithPrincipal(loan);
-    const tx: RepaymentTransaction = { id: `TX-${Date.now()}`, ...txData, paymentType: "Principal" };
+    const tx: RepaymentTransaction = { id: `TX-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, ...txData, paymentType: "Principal" };
     updatedLoan.transactions = [...updatedLoan.transactions, tx];
     const updated = [...state.loans];
     updated[idx] = updatedLoan;

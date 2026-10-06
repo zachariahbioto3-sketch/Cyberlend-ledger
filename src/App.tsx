@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
@@ -26,7 +26,7 @@ import { formatCompactCurrency } from "./utils/loanCalculations";
 export type Theme = "dark" | "light";
 
 function AppInner() {
-  const { loans, setLoans, addLoan, recordPayment, deleteLoan, deleteTransaction, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, removeFromWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
+  const { loans, setLoans, addLoan, recordPayment, closeLoan, deleteLoan, deleteTransaction, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, removeFromWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
   const { showToast } = useToast();
   const [capitalModalOpen, setCapitalModalOpen] = useState(false);
   const [goalsModalOpen, setGoalsModalOpen] = useState(false);
@@ -61,7 +61,7 @@ function AppInner() {
 
 
 
-  const handleSavePayment = (loanId: string, transaction: any) => { recordPayment(loanId, transaction); setPaymentLoan(null); showToast("Payment recorded successfully", "success"); };
+  const handleSavePayment = (loanId: string, txs: any[]) => { txs.forEach((tx) => (tx.paymentType === "Principal" ? closeLoan(loanId, tx) : recordPayment(loanId, tx))); setPaymentLoan(null); showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded - loan rolled over", "success"); };
 
   const handleExportCSV = async () => {
     if (loans.length === 0) { showToast("No loans to export", "error"); return; }
@@ -673,24 +673,3 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

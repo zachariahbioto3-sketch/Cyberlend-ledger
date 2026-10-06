@@ -1,4 +1,4 @@
-﻿import { Loan, PortfolioMetrics, RepaymentRow, InterestBasis } from "../types";
+import { Loan, PortfolioMetrics, RepaymentRow, InterestBasis } from "../types";
 
 const DEFAULT_INTEREST_RATE = 0.20;
 
@@ -159,28 +159,36 @@ export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
 
 // ─── LOAN LIFECYCLE ───────────────────────────────────────────────────────────
 
-export function updateLoanAfterInterest(loan: Loan): Loan {
-  const monthsCompleted    = loan.monthsCompleted + 1;
-  const interestCollected  = loan.interestCollected + loan.monthlyInterest;
-  const [year, month, day] = loan.originationDate.split("-").map(Number);
-  const nextDue            = new Date(year, month - 1 + monthsCompleted + 1, day);
-  const nextDueDate        = nextDue.toISOString().split("T")[0];
+export function toLocalISO(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
+export function nextDueAfter(originationDate: string, monthsCompleted: number): string {
+  const [year, month, day] = originationDate.split("-").map(Number);
+  return toLocalISO(new Date(year, month - 1 + monthsCompleted + 1, day));
+}
+
+export function updateLoanAfterInterest(loan: Loan, amount: number = loan.monthlyInterest): Loan {
+  const monthsCompleted = loan.monthsCompleted + 1;
   return {
     ...loan,
-    interestCollected,
-    amountPaid:      interestCollected,
+    interestCollected: loan.interestCollected + amount,
+    amountPaid:        loan.amountPaid + amount,
     monthsCompleted,
-    monthsRemaining: Math.max(0, loan.term - monthsCompleted),
-    nextDueDate,
-    remainingBalance: loan.loanAmount,
-    status:           "Active",
+    monthsRemaining:   Math.max(0, loan.term - monthsCompleted),
+    nextDueDate:       nextDueAfter(loan.originationDate, monthsCompleted),
+    remainingBalance:  loan.loanAmount,
+    status:            "Active",
   };
 }
 
 export function closeLoanWithPrincipal(loan: Loan): Loan {
   return {
     ...loan,
+    amountPaid:       loan.amountPaid + loan.loanAmount,
     remainingBalance: 0,
     status:           "Completed",
   };
