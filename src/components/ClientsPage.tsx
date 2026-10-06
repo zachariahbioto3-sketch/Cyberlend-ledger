@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {
   Users, Search, Star, AlertTriangle, UserX,
   Mail, MapPin, CreditCard, TrendingUp, FileText, Calendar,
@@ -822,7 +822,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             style={{ borderColor: t.border }}>
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <button onClick={() => { setSelectedKey(null); setEditMode(false); }}
-                className="flex md:hidden items-center justify-center w-8 h-8 rounded-xl border shrink-0"
+                className="flex lg:hidden items-center justify-center w-8 h-8 rounded-xl border shrink-0"
                 style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -882,7 +882,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 </>
               )}
               <button onClick={() => { setSelectedKey(null); setEditMode(false); setSelectedClient(null); }}
-                className="hidden md:flex items-center justify-center p-2 rounded-xl border"
+                className="hidden lg:flex items-center justify-center p-2 rounded-xl border"
                 style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
                 <X className="w-4 h-4" />
               </button>

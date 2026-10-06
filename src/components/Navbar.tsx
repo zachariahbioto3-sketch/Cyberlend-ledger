@@ -12,7 +12,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ metrics, onOpenNewLoanModal, onExportCSV, onResetData }) => {
   return (
-    <header className="hidden md:flex sticky top-0 z-30 h-14 items-center px-6 gap-4 border-b border-white/8"
+    <header className="hidden lg:flex sticky top-0 z-30 h-14 items-center px-6 gap-4 border-b border-white/8"
       style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(20px)' }}>
 
       {/* Brand */}
