@@ -459,20 +459,20 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   ];
 
   return (
-    <div className="flex flex-col md:flex-row flex-1 overflow-y-auto" style={{ background: t.bgCard }}>
+    <div className="flex flex-col lg:flex-row flex-1 min-w-0 overflow-y-auto" style={{ background: t.bgCard }}>
       {/* Left column */}
-      <div className="flex flex-col px-4 py-4 gap-4 flex-1 md:border-r" style={{ borderColor: t.border }}>
+      <div className="flex flex-col px-4 py-4 gap-4 flex-1 min-w-0 lg:border-r" style={{ borderColor: t.border }}>
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
           <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>SELECT A CLIENT TO VIEW THEIR PROFILE</p>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">
           {portfolioStats.map(s => (
             <div key={s.label} className="rounded-2xl border p-4 flex flex-col gap-2"
               style={{ background: t.bg, borderColor: t.border }}>
-              <div className="flex items-center justify-between">
-                <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
-                <span style={{ color: s.color }}>{s.icon}</span>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[9px] uppercase tracking-widest truncate min-w-0" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
+                <span className="shrink-0" style={{ color: s.color }}>{s.icon}</span>
               </div>
               <p className="text-lg font-bold" style={{ fontFamily: mono, color: s.color }}>{s.value}</p>
             </div>
@@ -522,7 +522,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
       </div>
 
       {/* Right column */}
-      <div className="flex flex-col px-4 py-4 gap-4 w-full md:w-[320px] xl:w-[360px] md:shrink-0 md:border-l" style={{ borderColor: "inherit" }}>
+      <div className="flex flex-col px-4 py-4 gap-4 w-full lg:w-[320px] xl:w-[360px] lg:shrink-0">
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
           <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>COLLECTION METRICS & RISK</p>
@@ -682,7 +682,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
   const isMobileDetail = selectedKey !== null;
 
   return (
-    <div className="flex flex-col md:flex-row h-full min-h-screen" style={{ background: t.bg }}>
+    <div className="flex flex-col md:flex-row flex-1 w-full min-w-0 min-h-[calc(100vh-56px)]" style={{ background: t.bg }}>
 
       {/* NEW CLIENT MODAL */}
       {showNewClient && (
@@ -987,22 +987,3 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
