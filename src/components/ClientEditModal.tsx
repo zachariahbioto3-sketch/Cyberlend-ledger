@@ -10,7 +10,7 @@ interface ClientEditModalProps {
   theme:   any;
 }
 
-const FLAG_OPTIONS: ClientFlag[] = ["VIP", "Blacklisted", "Defaulter", "New", "Regular"];
+const FLAG_OPTIONS: ClientFlag[] = ["VIP", "Risk", "Blacklisted", "Defaulter", "New", "Regular"];
 
 export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClose, loan, onSave, theme: t }) => {
   const mono = "'Space Mono', monospace";
@@ -70,7 +70,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   const labelStyle = { fontFamily: mono, color: t.textFaint };
 
   const FLAG_COLORS: Record<ClientFlag, string> = {
-    VIP: "#f59e0b", Blacklisted: "#f87171", Defaulter: "#ef4444", New: "#5b7cfa", Regular: "#4ade80",
+    VIP: "#f59e0b", Risk: "#fb923c", Blacklisted: "#f87171", Defaulter: "#ef4444", New: "#5b7cfa", Regular: "#4ade80",
   };
 
   return (

@@ -23,6 +23,9 @@ const FLAG_META: Record<ClientFlag, { color: string; bg: string; border: string;
   VIP:         { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
   New:         { color: "#5b7cfa", bg: "rgba(91,124,250,0.12)",  border: "rgba(91,124,250,0.3)",  icon: <Plus className="w-3 h-3" /> },
   Regular:     { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
+  Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
+  Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
+  Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
   Defaulter:   { color: "#f87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", icon: <AlertTriangle className="w-3 h-3" /> },
   Blacklisted: { color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.3)",   icon: <UserX className="w-3 h-3" /> },
 };
@@ -116,6 +119,10 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
       purpose:      (form.loanPurpose || "Personal Use") as any,
       dateNeeded:   form.dateNeeded,
       notes:        form.clientNotes.trim(),
+      idNumber:     form.borrowerIdNumber.trim(),
+      address:      form.borrowerAddress.trim(),
+      kraPin:       form.kraPin.trim(),
+      referralSource: form.referralSource.trim(),
     });
     onClose();
   };
@@ -789,6 +796,9 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="text-xs font-bold truncate" style={{ color: t.text }}>{c.latest.borrowerName}</p>
                       {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "#f59e0b" }} />}
+                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
+                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
+                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
                       {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#dc2626" }} />}
                     </div>
                     <p className="text-[10px] truncate" style={{ color: t.textFaint, fontFamily: mono }}>

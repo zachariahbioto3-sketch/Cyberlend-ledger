@@ -1,7 +1,8 @@
-﻿import React, { useState, useMemo } from "react";
-import { X, PlusCircle, Check, ChevronDown, User, AlertTriangle, Clock } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { X, PlusCircle, Check, ChevronDown, User, AlertTriangle, Clock, FileText } from "lucide-react";
 import { LoanCategory, LoanPurpose, Loan } from "../types";
 import { calculateCyberlendLoan, formatCurrency, formatCompactCurrency } from "../utils/loanCalculations";
+import { AgreementForm } from "./AgreementForm";
 
 const LOAN_PURPOSES: LoanPurpose[] = [
   "Business Capital","School Fees","Medical Emergency","Land/Property",
@@ -43,6 +44,9 @@ if (!isOpen) return null;
   const [loanPurpose,    setLoanPurpose]    = useState<LoanPurpose | "">(prefillClient?.loanPurpose || "");
   const [originationDate,setOriginationDate]= useState(todayStr);
   const [notes,          setNotes]          = useState("");
+
+  const [showAgreement, setShowAgreement] = useState(false);
+  const [agreementRef, setAgreementRef] = useState<{ id: string; number: string } | null>(null);
 
   // Detect returning client by phone number
   const returningClientLoans = useMemo(() => {
@@ -98,7 +102,8 @@ if (!isOpen) return null;
       term,
       category,
       originationDate,
-      notes: notes.trim(),
+      notes: notes.trim() || (agreementRef ? "Agreement: " + agreementRef.number : ""),
+      agreementId: agreementRef?.id,
     });
     onClose();
   };
@@ -329,7 +334,14 @@ if (!isOpen) return null;
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2 px-5 pb-5 pt-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 px-5 pb-5 pt-2">
+            <button type="button"
+              onClick={() => { if (!borrowerName.trim() || !borrowerPhone.trim()) { alert("Enter the borrower name and phone first"); return; } setShowAgreement(true); }}
+              className="mr-auto flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold"
+              style={{ fontFamily: mono, background: agreementRef ? "rgba(74,222,128,0.12)" : t.bgBtn, borderColor: agreementRef ? "rgba(74,222,128,0.3)" : t.border, color: agreementRef ? "#4ade80" : t.textMuted }}>
+              {agreementRef ? <Check className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
+              {agreementRef ? "AGREEMENT " + agreementRef.number : "CREATE AGREEMENT"}
+            </button>
             <button type="button" onClick={onClose}
               className="px-4 py-2 rounded-xl text-xs font-medium"
               style={{ color: t.textMuted }}>Cancel</button>
@@ -340,6 +352,11 @@ if (!isOpen) return null;
             </button>
           </div>
         </form>
+        {showAgreement && (
+          <AgreementForm theme={t} onClose={() => setShowAgreement(false)}
+            prefill={{ fullName: borrowerName.trim(), phone: borrowerPhone.trim(), email: borrowerEmail.trim(), idNumber: latestLoan?.borrowerIdNumber || prefillClient?.borrowerIdNumber || "", address: latestLoan?.borrowerAddress || prefillClient?.borrowerAddress || "", occupation: latestLoan?.occupation || prefillClient?.occupation || "", approvedAmount: loanAmount, term, disbursementDate: originationDate }}
+            onCreated={(id, number) => setAgreementRef({ id, number })} />
+        )}
       </div>
     </div>
   );

@@ -37,6 +37,8 @@ function AppInner() {
   const [paymentLoan, setPaymentLoan] = useState<Loan | null>(null);
   const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
   const [mobileTab, setMobileTab] = useState<"loans" | "analytics" | "clients" | "waitlist" | "agreements">("loans");
+  const [mSearch, setMSearch] = useState("");
+  const [mStatus, setMStatus] = useState("ALL");
   const [desktopTab, setDesktopTab] = useState<"dashboard" | "clients" | "waitlist" | "agreements">("dashboard");
   const [pdfOpen, setPdfOpen] = useState(false);
   const handleUpdateLoan = (id: string, updates: Partial<any>) => {
@@ -366,8 +368,23 @@ function AppInner() {
                 <h2 className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>LOANS</h2>
                 <span className="text-[10px]" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS</span>
               </div>
+              <div className="mb-3 space-y-2">
+                <input type="text" value={mSearch} onChange={(e) => setMSearch(e.target.value)}
+                  placeholder="Search name, phone, loan no..."
+                  className="w-full px-3 py-2 text-xs rounded-xl border focus:outline-none"
+                  style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }} />
+                <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                  {["ALL", "Active", "Overdue", "Completed", "Defaulted"].map((s) => (
+                    <button key={s} onClick={() => setMStatus(s)}
+                      className="px-3 py-1.5 rounded-full border whitespace-nowrap text-[10px] font-bold shrink-0"
+                      style={{ fontFamily: mono, background: mStatus === s ? t.btnPrimary : t.bgCard, color: mStatus === s ? t.btnPrimaryTx : t.textMuted, borderColor: mStatus === s ? t.btnPrimary : t.border }}>
+                      {s.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="space-y-2">
-                {[...loans].sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()).map((loan) => {
+                {[...loans].filter((l) => { const q = mSearch.trim().toLowerCase(); return (!q || l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q)) && (mStatus === "ALL" || l.status === mStatus); }).sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()).map((loan) => {
                   const ss = statusStyle(loan.status);
                   return (
                     <div key={loan.id}
@@ -664,7 +681,7 @@ function AppInner() {
       <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
       <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
-      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if (promotedEntry?.id) { removeFromWaitlist(promotedEntry.id); showToast("Client promoted to active borrower", "success"); } else { showToast("Loan created successfully", "success"); } setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName: promotedEntry.name, borrowerPhone: promotedEntry.phone, borrowerEmail: promotedEntry.email || "", occupation: promotedEntry.occupation, loanPurpose: promotedEntry.purpose, clientNotes: promotedEntry.notes || "", clientFlags: ["New"] } as any : null} />
+      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if (promotedEntry?.id) { removeFromWaitlist(promotedEntry.id); showToast("Client promoted to active borrower", "success"); } else { showToast("Loan created successfully", "success"); } setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName: promotedEntry.name, borrowerPhone: promotedEntry.phone, borrowerEmail: promotedEntry.email || "", occupation: promotedEntry.occupation, loanPurpose: promotedEntry.purpose, borrowerIdNumber: promotedEntry.idNumber || "", borrowerAddress: promotedEntry.address || "", kraPin: promotedEntry.kraPin || "", referralSource: promotedEntry.referralSource || "", clientNotes: promotedEntry.notes || "", clientFlags: ["New"] } as any : null} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
       <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} onDeleteLoan={deleteLoan} onDeleteTransaction={deleteTransaction} theme={t} />
     </div>

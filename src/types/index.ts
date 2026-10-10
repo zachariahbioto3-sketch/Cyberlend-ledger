@@ -1,4 +1,4 @@
-﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
+export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
 
 export type LoanStatus = "Active" | "Overdue" | "Completed" | "Defaulted";
 
@@ -6,7 +6,7 @@ export type PaymentMethod = "M-Pesa" | "Bank Transfer";
 
 export type PaymentType = "Interest" | "Principal";
 
-export type ClientFlag = "VIP" | "Blacklisted" | "Defaulter" | "New" | "Regular";
+export type ClientFlag = "VIP" | "Risk" | "Blacklisted" | "Defaulter" | "New" | "Regular";
 
 export type LoanPurpose =
   | "Business Capital"
@@ -123,6 +123,10 @@ export interface WishlistEntry {
   dateNeeded: string;
   dateRegistered: string;
   notes?: string;
+  idNumber?: string;
+  address?: string;
+  kraPin?: string;
+  referralSource?: string;
   status: "Enquiry" | "Pending" | "Approved" | "Rejected";
 }
 

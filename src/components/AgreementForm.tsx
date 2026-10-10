@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLoanStore } from "../store/loanStore";
 import {
   generateRepaymentSchedule,
@@ -22,7 +22,14 @@ import {
   PaymentMethod,
 } from "../types";
 
+export interface AgreementPrefill {
+  fullName: string; phone: string; email?: string; idNumber?: string; address?: string; occupation?: string;
+  approvedAmount?: number; term?: number; disbursementDate?: string;
+}
+
 interface AgreementFormProps {
+  prefill?: AgreementPrefill;
+  onCreated?: (agreementId: string, agreementNumber: string) => void;
   onClose: () => void;
   theme: any;
 }
@@ -41,27 +48,97 @@ const LOAN_PURPOSES: LoanPurpose[] = [
   "Agriculture","Home Improvement","Debt Consolidation","Electronics/Assets","Personal Use","Other",
 ];
 
-export function AgreementForm({ onClose, theme: t }: AgreementFormProps) {
-  const { addAgreement, addLoan, loans } = useLoanStore();
+const LENDER_KEY = "cyberlend_lender_default";
+function loadLender(): LenderDetails {
+  try { const raw = localStorage.getItem(LENDER_KEY); return raw ? { ...EMPTY_LENDER, ...JSON.parse(raw) } : EMPTY_LENDER; } catch { return EMPTY_LENDER; }
+}
+const normPhone = (p: string) => (p || "").replace(/\D/g, "").slice(-9);
+
+interface ClientRec {
+  key: string; label: string; name: string; phone: string; email: string;
+  idNumber: string; address: string; occupation: string; purpose?: LoanPurpose; amount?: number;
+}
+
+export function AgreementForm({ onClose, theme: t, prefill, onCreated }: AgreementFormProps) {
+  const { addAgreement, addLoan, loans, agreements, waitlist } = useLoanStore();
   const [step, setStep] = useState(1);
   const TOTAL_STEPS = 7;
 
-  const [lender,       setLender]       = useState<LenderDetails>(EMPTY_LENDER);
-  const [borrower,     setBorrower]     = useState(EMPTY_BORROWER);
+  const [lender,       setLender]       = useState<LenderDetails>(loadLender);
+  const [borrower,     setBorrower]     = useState(prefill ? { ...EMPTY_BORROWER, fullName: prefill.fullName, phone: prefill.phone, email: prefill.email || "", idNumber: prefill.idNumber || "", address: prefill.address || "", occupation: prefill.occupation || "" } : EMPTY_BORROWER);
   const [guarantor,    setGuarantor]    = useState<Guarantor>(EMPTY_GUARANTOR);
-  const [facility,     setFacility]     = useState<AgreementFacility>(EMPTY_FACILITY);
+  const [facility,     setFacility]     = useState<AgreementFacility>(prefill ? { ...EMPTY_FACILITY, approvedAmount: prefill.approvedAmount ?? EMPTY_FACILITY.approvedAmount, term: prefill.term ?? EMPTY_FACILITY.term, disbursementDate: prefill.disbursementDate ?? EMPTY_FACILITY.disbursementDate } : EMPTY_FACILITY);
   const [interest,     setInterest]     = useState<AgreementInterest>(EMPTY_INTEREST);
   const [fees,         setFees]         = useState<AgreementFees>(EMPTY_FEES);
   const [disbursement, setDisbursement] = useState<AgreementDisbursement>(EMPTY_DISBURSEMENT);
   const [repayment,    setRepayment]    = useState<AgreementRepayment>(EMPTY_REPAYMENT);
-  const [existingClient, setExistingClient] = useState("");
+  const [clientQuery, setClientQuery] = useState("");
 
-  function handleClientSelect(loanId: string) {
-    setExistingClient(loanId);
-    const loan = loans.find((l) => l.id === loanId);
-    if (!loan) return;
-    setBorrower({ fullName: loan.borrowerName || "", idNumber: loan.borrowerIdNumber || "", dateOfBirth: "", address: loan.borrowerAddress || "", phone: loan.borrowerPhone || "", email: loan.borrowerEmail || "", occupation: loan.occupation || "", employerOrBusiness: "" });
+  // Everyone we already know: loans + waitlist/registered clients, merged by phone number
+  const clients = useMemo(() => {
+    const map = new Map<string, ClientRec>();
+    [...loans].sort((a, b) => (a.originationDate < b.originationDate ? -1 : 1)).forEach((l) => {
+      const k = normPhone(l.borrowerPhone) || l.id;
+      map.set(k, { key: k, label: "", name: l.borrowerName, phone: l.borrowerPhone, email: l.borrowerEmail || "", idNumber: l.borrowerIdNumber || "", address: l.borrowerAddress || "", occupation: l.occupation || "", purpose: l.loanPurpose });
+    });
+    waitlist.forEach((w) => {
+      const k = normPhone(w.phone) || w.id;
+      const ex = map.get(k);
+      if (ex) {
+        ex.email = ex.email || w.email || ""; ex.idNumber = ex.idNumber || w.idNumber || ""; ex.address = ex.address || w.address || "";
+        ex.occupation = ex.occupation || w.occupation || ""; ex.purpose = ex.purpose || w.purpose; ex.amount = ex.amount ?? w.amountNeeded;
+      } else {
+        map.set(k, { key: k, label: "", name: w.name, phone: w.phone, email: w.email || "", idNumber: w.idNumber || "", address: w.address || "", occupation: w.occupation || "", purpose: w.purpose, amount: w.amountNeeded });
+      }
+    });
+    return [...map.values()].map((c) => ({ ...c, label: c.name + " (" + c.phone + ")" })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [loans, waitlist]);
+
+  // Fill the form from a saved client, plus anything we kept from their previous agreement
+  function applyClient(c: ClientRec, keep = false) {
+    const k = normPhone(c.phone);
+    const prev = [...agreements].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+      .find((a) => (k && normPhone(a.borrower.phone) === k) || (c.idNumber && a.borrower.idNumber === c.idNumber));
+    const pick = (cur: string, saved?: string) => (keep ? cur || saved || "" : saved || cur);
+    setBorrower((b) => ({
+      ...b,
+      fullName: pick(b.fullName, c.name),
+      idNumber: pick(b.idNumber, c.idNumber || prev?.borrower.idNumber),
+      dateOfBirth: b.dateOfBirth || prev?.borrower.dateOfBirth || "",
+      address: pick(b.address, c.address || prev?.borrower.address),
+      phone: pick(b.phone, c.phone),
+      email: pick(b.email, c.email || prev?.borrower.email),
+      occupation: pick(b.occupation, c.occupation || prev?.borrower.occupation),
+      employerOrBusiness: b.employerOrBusiness || prev?.borrower.employerOrBusiness || "",
+    }));
+    if (prev?.guarantor?.fullName) setGuarantor((g) => (g.fullName ? g : prev.guarantor));
+    setFacility((f) => ({ ...f, purpose: keep ? f.purpose : (c.purpose || f.purpose), requestedAmount: f.requestedAmount || c.amount || 0, approvedAmount: f.approvedAmount || c.amount || 0 }));
+    setClientQuery(c.label);
   }
+
+  // Offer saved details when the phone or ID typed matches someone we know
+  const match = useMemo(() => {
+    const k = normPhone(borrower.phone);
+    const id = borrower.idNumber.trim();
+    const hit = clients.find((c) => (k.length >= 9 && normPhone(c.phone) === k) || (id.length >= 5 && c.idNumber === id));
+    if (!hit) return null;
+    const differs = hit.name !== borrower.fullName || (hit.idNumber && hit.idNumber !== borrower.idNumber) || (hit.address && hit.address !== borrower.address) || (hit.email && hit.email !== borrower.email) || (hit.occupation && hit.occupation !== borrower.occupation);
+    return differs ? hit : null;
+  }, [clients, borrower]);
+
+  // Opened from the New Loan modal: top up with anything we already know about this client
+  useEffect(() => {
+    if (!prefill) return;
+    const c = clients.find((x) => normPhone(x.phone) === normPhone(prefill.phone));
+    if (c) applyClient(c, true);
+  }, []);
+
+  // Disbursement goes to the borrower; repayments come back to the lender
+  useEffect(() => {
+    if (step !== 6) return;
+    if (borrower.phone) setDisbursement((d) => (d.accountOrPhone ? d : { ...d, accountOrPhone: borrower.phone }));
+    if (lender.phone) setRepayment((r) => (r.paymentAccount ? r : { ...r, paymentAccount: lender.phone }));
+  }, [step]);
 
   const processingFee = useMemo(() => {
     if (fees.processingFeeType === "None")       return 0;
@@ -93,8 +170,10 @@ export function AgreementForm({ onClose, theme: t }: AgreementFormProps) {
       repayment: { ...repayment, numberOfInstalments: facility.term, firstPaymentDate: repaymentSchedule[0]?.dueDate || "", finalPaymentDate: repaymentSchedule[repaymentSchedule.length - 1]?.dueDate || "", amountPerInstalment: repaymentSchedule[0]?.totalDue || 0 },
       repaymentSchedule, createdAt: new Date().toISOString(),
     };
+    try { localStorage.setItem(LENDER_KEY, JSON.stringify(lender)); } catch { /* ignore */ }
     addAgreement(agreement);
-    addLoan({ borrowerName: borrower.fullName, borrowerPhone: borrower.phone, borrowerEmail: borrower.email, borrowerAddress: borrower.address, borrowerIdNumber: borrower.idNumber, occupation: borrower.occupation, loanAmount: facility.approvedAmount, term: facility.term, category: "Personal", originationDate: facility.disbursementDate, loanPurpose: facility.purpose, notes: `Agreement: ${agreementNumber}`, agreementId });
+    onCreated?.(agreementId, agreementNumber);
+    if (!onCreated) addLoan({ borrowerName: borrower.fullName, borrowerPhone: borrower.phone, borrowerEmail: borrower.email, borrowerAddress: borrower.address, borrowerIdNumber: borrower.idNumber, occupation: borrower.occupation, loanAmount: facility.approvedAmount, term: facility.term, category: "Personal", originationDate: facility.disbursementDate, loanPurpose: facility.purpose, notes: `Agreement: ${agreementNumber}`, agreementId });
     onClose();
   }
 
@@ -173,12 +252,19 @@ export function AgreementForm({ onClose, theme: t }: AgreementFormProps) {
             <div className="mb-6">
               <SectionHeading>2. Borrower Information</SectionHeading>
               <div className="mb-4">
-                <Field label="Auto-fill from existing client">
-                  <select className={input} style={inputSx} value={existingClient} onChange={(e) => handleClientSelect(e.target.value)}>
-                    <option value="">— Select existing client —</option>
-                    {loans.map((l) => <option key={l.id} value={l.id}>{l.borrowerName} ({l.borrowerPhone})</option>)}
-                  </select>
+                <Field label="Auto-fill from a saved client (type a name or phone)">
+                  <input className={input} style={inputSx} list="agr-clients" value={clientQuery} placeholder="Start typing..."
+                    onChange={(e) => { setClientQuery(e.target.value); const c = clients.find((x) => x.label === e.target.value); if (c) applyClient(c); }} />
+                  <datalist id="agr-clients">{clients.map((c) => <option key={c.key} value={c.label} />)}</datalist>
                 </Field>
+                {match && (
+                  <div className="mt-2 flex items-center justify-between gap-3 px-3 py-2 rounded-xl border text-xs"
+                    style={{ background: t.bgActive, borderColor: t.borderMid, color: t.text }}>
+                    <span>Saved details found for <b>{match.name}</b></span>
+                    <button type="button" onClick={() => applyClient(match)} className="px-3 py-1 rounded-lg font-bold shrink-0"
+                      style={{ background: t.btnPrimary, color: t.btnPrimaryTx }}>USE THEM</button>
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(["fullName","idNumber","dateOfBirth","address","phone","email","occupation","employerOrBusiness"] as const).map((f) => (
