@@ -313,12 +313,20 @@ function AppInner() {
           {/* -- CAPITAL CARDS -- */}
           <div className="px-4 grid grid-cols-3 gap-2 mb-4">
             {[
-              { label: "AVAILABLE", value: formatCompactCurrency(metrics.availableCapital), color: "#4ade80", border: "rgba(74,222,128,0.30)" },
-              { label: "LENDABLE",  value: formatCompactCurrency(metrics.lendableAmount),   color: "#5b7cfa", border: "rgba(91,124,250,0.30)" },
-              { label: "RETURNS",   value: formatCompactCurrency(metrics.returnsFromPreviousLoans), color: "#a78bfa", border: "rgba(167,139,250,0.30)" },
+              { label: "AVAILABLE", value: formatCompactCurrency(metrics.availableCapital), color: "#4ade80", border: "rgba(74,222,128,0.30)", hasAction: true },
+              { label: "LENDABLE",  value: formatCompactCurrency(metrics.lendableAmount),   color: "#5b7cfa", border: "rgba(91,124,250,0.30)", hasAction: false },
+              { label: "RETURNS",   value: formatCompactCurrency(metrics.returnsFromPreviousLoans), color: "#a78bfa", border: "rgba(167,139,250,0.30)", hasAction: false },
             ].map((c) => (
-              <div key={c.label} className="rounded-2xl p-3 border" style={{ background: t.bgCard, borderColor: c.border, borderLeftWidth: "3px" }}>
-                <p className="text-[8px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{c.label}</p>
+              <div key={c.label}
+                onClick={() => { if (c.hasAction) { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); } }}
+                className={`rounded-2xl p-3 border ${c.hasAction ? "cursor-pointer active:scale-95 transition-transform" : ""}`}
+                style={{ background: t.bgCard, borderColor: c.border, borderLeftWidth: "3px" }}>
+                <div className="flex items-start justify-between gap-1">
+                  <p className="text-[8px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{c.label}</p>
+                  {c.hasAction && (
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border" style={{ fontFamily: mono, borderColor: c.border, color: c.color }}>SET</span>
+                  )}
+                </div>
                 <p className="text-xs font-bold" style={{ fontFamily: mono, color: c.color }}>{c.value}</p>
               </div>
             ))}

@@ -689,7 +689,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
   const isMobileDetail = selectedKey !== null;
 
   return (
-    <div className="flex flex-col md:flex-row flex-1 w-full min-w-0 min-h-[calc(100vh-56px)]" style={{ background: t.bg }}>
+    <div className="flex flex-col lg:flex-row flex-1 w-full min-w-0 min-h-[calc(100vh-56px)]" style={{ background: t.bg }}>
 
       {/* NEW CLIENT MODAL */}
       {showNewClient && (
@@ -705,7 +705,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
 
       {/* LEFT  CLIENT LIST */}
       <div
-        className={`flex flex-col border-r shrink-0 ${isMobileDetail ? "hidden md:flex" : "flex"} w-full md:w-[300px] md:min-w-[260px] md:max-w-[300px]`}
+        className={`flex flex-col border-r shrink-0 ${isMobileDetail ? "hidden lg:flex" : "flex"} w-full lg:w-[300px] lg:min-w-[260px] lg:max-w-[300px]`}
         style={{ borderColor: t.border, background: t.bg }}>
 
         <div className="px-4 pt-5 pb-4 border-b" style={{ borderColor: t.border }}>

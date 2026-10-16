@@ -6,7 +6,7 @@ interface ClientEditModalProps {
   isOpen:  boolean;
   onClose: () => void;
   loan:    Loan | null;
-  onSave:  (updates: Partial<Loan>) => void;
+  onSave:  (id: string, updates: Partial<Loan>) => void;
   theme:   any;
 }
 
@@ -62,7 +62,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   const handleSave = () => {
     if (!form.borrowerName?.trim()) { alert("Name is required"); return; }
     if (!form.borrowerPhone?.trim()) { alert("Phone is required"); return; }
-    onSave(form);
+    onSave(loan.id, form);
     onClose();
   };
 

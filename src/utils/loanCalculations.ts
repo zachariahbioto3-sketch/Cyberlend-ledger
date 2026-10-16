@@ -103,7 +103,7 @@ function addMonths(dateStr: string, months: number): string {
 
 // ─── PORTFOLIO METRICS ────────────────────────────────────────────────────────
 
-export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
+export function calculatePortfolioMetrics(loans: Loan[], totalCapital: number = 0): PortfolioMetrics {
   let totalPrincipalLent       = 0;
   let totalExpectedReturn      = 0;
   let totalCollected           = 0;
@@ -137,7 +137,7 @@ export function calculatePortfolioMetrics(loans: Loan[]): PortfolioMetrics {
   });
 
   const totalProfit      = totalCollected;
-  const availableCapital = returnsFromPreviousLoans;
+  const availableCapital = Math.max(0, totalCapital - totalOutstanding);
   const lendableAmount   = Math.floor(availableCapital * 0.8);
 
   return {
