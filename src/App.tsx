@@ -52,14 +52,7 @@ function AppInner() {
     setClientEditTarget(null);
   };
 
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("cyberlend_theme") as Theme) || "dark");
-
-  const isDark = theme === "dark";
-  const toggleTheme = () => {
-    const next = isDark ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("cyberlend_theme", next);
-  };
+  // theme: dark-only, tokens via CSS variables
 
 
 
@@ -698,3 +691,4 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
