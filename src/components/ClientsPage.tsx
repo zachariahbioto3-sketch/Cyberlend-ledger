@@ -379,8 +379,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
           </button>
           <button onClick={handleSubmit}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold"
-            style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
-            <UserPlus className="w-3.5 h-3.5" />
+            style={{ fontFamily: mono, background: "var(--primary)", color: "var(--primary-foreground)" }}><UserPlus className="w-3.5 h-3.5" />
             REGISTER CLIENT
           </button>
         </div>
@@ -566,13 +565,13 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
             <div style={{ width: "100%", height: 120, display: "block" }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={monthlyCollections} barGap={3} barCategoryGap="30%">
-                  <XAxis dataKey="month" tick={{ fontSize: 9, fill: t.textFaint, fontFamily: mono }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 9, fill: "rgba(243,234,216,0.35)", fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} />
                   <YAxis hide />
                   <Tooltip cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                    contentStyle={{ background: t.bgCard, border: `1px solid ${t.borderMid}`, borderRadius: 10, fontFamily: mono, fontSize: 10 }}
+                    contentStyle={{ background: "var(--card)", border: "1px solid rgba(243,234,216,0.14)", borderRadius: 10, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--foreground)" }}
                     formatter={(v: number) => [`KES ${v.toLocaleString()}`, undefined]} />
-                  <Bar dataKey="collected"   name="Collected" fill="#3b82f6" radius={[3,3,0,0]} />
-                  <Bar dataKey="outstanding" name="Due"       fill="#ef4444" opacity={0.6} radius={[3,3,0,0]} />
+                  <Bar dataKey="collected"   name="Collected" fill="var(--gold-500)" radius={[3,3,0,0]} />
+                  <Bar dataKey="outstanding" name="Due"       fill="var(--danger-fg)" opacity={0.5} radius={[3,3,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -717,8 +716,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             <button
               onClick={() => setShowNewClient(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
-              style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
-              <UserPlus className="w-3.5 h-3.5" />
+              style={{ fontFamily: mono, background: "var(--primary)", color: "var(--primary-foreground)" }}><UserPlus className="w-3.5 h-3.5" />
               NEW
             </button>
           </div>
@@ -976,3 +974,8 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
+
+
+
+

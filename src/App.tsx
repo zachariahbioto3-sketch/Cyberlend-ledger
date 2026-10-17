@@ -1,702 +1,427 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
 import { useLoanStore } from "./store/loanStore";
-import { useState as useModalState } from "react";
-
 import { Loan } from "./types";
 import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal, WaitlistPage } from "./components";
-import { PortfolioDonut } from "./components/PortfolioDonut";
-import { MonthlyCollections } from "./components/MonthlyCollections";
-import { RepaymentProgress } from "./components/RepaymentProgress";
-import { ClientsPage } from "./components/ClientsPage";
+import { PortfolioDonut }      from "./components/PortfolioDonut";
+import { MonthlyCollections }  from "./components/MonthlyCollections";
+import { RepaymentProgress }   from "./components/RepaymentProgress";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
-import { GrowthCharts }   from "./components/GrowthCharts";
-import { GoalsModal }      from "./components/GoalsModal";
-import { ClientEditModal } from "./components/ClientEditModal";
-import { GoalTracker }   from "./components/GoalTracker";
-import { GoalDrawer }   from "./components/GoalDrawer";
-import { TrackerBar } from './components/TrackerBar';
-import { ClientProfilePanel } from './components/ClientProfilePanel';
-import { AgreementsPage } from './components/AgreementsPage';
-import { FaqGrid } from "./components/FaqGrid";
-import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock, Trash2, ScrollText } from "lucide-react";
+import { ClientsPage }         from "./components/ClientsPage";
+import { GrowthCharts }        from "./components/GrowthCharts";
+import { GoalsModal }          from "./components/GoalsModal";
+import { ClientEditModal }     from "./components/ClientEditModal";
+import { GoalTracker }         from "./components/GoalTracker";
+import { GoalDrawer }          from "./components/GoalDrawer";
+import { TrackerBar }          from "./components/TrackerBar";
+import { ClientProfilePanel }  from "./components/ClientProfilePanel";
+import { AgreementsPage }      from "./components/AgreementsPage";
+import { ExportMenu } from "./components/ExportMenu";
+import { FaqGrid }             from "./components/FaqGrid";
+import { Sidebar }             from "./components/Sidebar";
+import { BottomTabBar }        from "./components/BottomTabBar";
+import { Header }              from "./components/Header";
+import { StatTile }            from "./components/StatTile";
+import { AnimatedAmount }      from "./components/AnimatedAmount";
+import { ConfirmDialog }       from "./components/ConfirmDialog";
+import { Button }              from "./components/ui/button";
+import { Download, PlusCircle, Bell, FileText, Trash2, Sun, Moon } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
-function AppInner() {
-  const { loans, setLoans, addLoan, recordPayment, closeLoan, deleteLoan, deleteTransaction, metrics, selectedClient, setSelectedClient, waitlist, addToWaitlist, removeFromWaitlist, totalCapital, setTotalCapital, goals, setGoals } = useLoanStore();
-  const { showToast } = useToast();
-  const [capitalModalOpen, setCapitalModalOpen] = useState(false);
-  const [goalsModalOpen, setGoalsModalOpen] = useState(false);
-  const [clientEditTarget, setClientEditTarget] = useState<Loan | null>(null);
-  const [capitalInput, setCapitalInput] = useState<string>("");
-  const [newLoanOpen, setNewLoanOpen] = useState(false);
-  const [promotedEntry, setPromotedEntry] = useState<any>(null);
-  const [paymentLoan, setPaymentLoan] = useState<Loan | null>(null);
-  const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
-  const [mobileTab, setMobileTab] = useState<"loans" | "analytics" | "clients" | "waitlist" | "agreements">("loans");
-  const [mSearch, setMSearch] = useState("");
-  const [mStatus, setMStatus] = useState("ALL");
-  const [desktopTab, setDesktopTab] = useState<"dashboard" | "clients" | "waitlist" | "agreements">("dashboard");
-  const [pdfOpen, setPdfOpen] = useState(false);
-  const handleUpdateLoan = (id: string, updates: Partial<any>) => {
-    useLoanStore.getState().updateLoan(id, updates);
-   };
+// CSS-variable shim — keeps old child components working without modifying them
+const t = {
+  bg:           "var(--background)",
+  bgCard:       "var(--card)",
+  bgCardHover:  "var(--bg-raised)",
+  bgSidebar:    "var(--card)",
+  bgNav:        "var(--card)",
+  bgInput:      "var(--input)",
+  bgModal:      "var(--card)",
+  bgBtn:        "var(--bg-raised)",
+  bgActive:     "var(--bg-raised)",
+  border:       "var(--border)",
+  borderMid:    "rgba(243,234,216,0.14)",
+  borderStrong: "rgba(243,234,216,0.25)",
+  text:         "var(--foreground)",
+  textMuted:    "var(--muted-foreground)",
+  textFaint:    "rgba(243,234,216,0.30)",
+  btnPrimary:   "var(--primary)",
+  btnPrimaryTx: "var(--primary-foreground)",
+  rowAlt:       "rgba(255,255,255,0.02)",
+  rowHover:     "rgba(255,255,255,0.04)",
+  progressBg:   "rgba(255,255,255,0.10)",
+  progressFill: "var(--primary)",
+};
 
+function AppInner() {
+  const {
+    loans, setLoans, addLoan, recordPayment, closeLoan, deleteLoan,
+    deleteTransaction, metrics, selectedClient, setSelectedClient,
+    totalCapital, setTotalCapital, goals, setGoals,
+    removeFromWaitlist,
+  } = useLoanStore();
+  const { showToast } = useToast();
+
+  const [capitalModalOpen, setCapitalModalOpen] = useState(false);
+  const [goalsModalOpen,   setGoalsModalOpen]   = useState(false);
+  const [clientEditTarget, setClientEditTarget] = useState<Loan | null>(null);
+  const [capitalInput,     setCapitalInput]     = useState("");
+  const [newLoanOpen,      setNewLoanOpen]      = useState(false);
+  const [promotedEntry,    setPromotedEntry]    = useState<any>(null);
+  const [paymentLoan,      setPaymentLoan]      = useState<Loan | null>(null);
+  const [detailLoan,       setDetailLoan]       = useState<Loan | null>(null);
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
+  const toggleTheme = () => { const d = !isDark; setIsDark(d); document.documentElement.classList.toggle("dark", d); localStorage.setItem("cyberlend-theme", d ? "dark" : "light"); };
+  const [confirmReset,     setConfirmReset]     = useState(false);
+  const [pdfOpen,          setPdfOpen]          = useState(false);
+  const [mSearch,          setMSearch]          = useState("");
+  const [mStatus,          setMStatus]          = useState("ALL");
+  const [mobileTab,  setMobileTab]  = useState<"loans"|"analytics"|"clients"|"waitlist"|"agreements">("loans");
+  const [desktopTab, setDesktopTab] = useState<"dashboard"|"clients"|"waitlist"|"agreements">("dashboard");
+
+  const handleUpdateLoan    = (id: string, updates: Partial<any>) => useLoanStore.getState().updateLoan(id, updates);
   const handleSaveClientEdit = (id: string, updates: Partial<Loan>) => {
-    const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
-    setLoans(updated);
+    setLoans(loans.map((l) => l.id === id ? { ...l, ...updates } : l));
     setClientEditTarget(null);
   };
-
-  // theme: dark-only, tokens via CSS variables
-  const [isDark, setIsDark] = useState(() => localStorage.getItem("cyberlend-theme") !== "light");
-  useEffect(() => { document.documentElement.classList.toggle("dark", isDark); localStorage.setItem("cyberlend-theme", isDark ? "dark" : "light"); }, [isDark]);
-  const toggleTheme = () => setIsDark((d) => !d);
-
-
-
-  const handleSavePayment = (loanId: string, txs: any[]) => { txs.forEach((tx) => (tx.paymentType === "Principal" ? closeLoan(loanId, tx) : recordPayment(loanId, tx))); setPaymentLoan(null); showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded - loan rolled over", "success"); };
-
+  const handleSavePayment = (loanId: string, txs: any[]) => {
+    txs.forEach((tx) => tx.paymentType === "Principal" ? closeLoan(loanId, tx) : recordPayment(loanId, tx));
+    setPaymentLoan(null);
+    showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded – loan rolled over", "success");
+  };
   const handleExportCSV = async () => {
-    if (loans.length === 0) { showToast("No loans to export", "error"); return; }
+    if (!loans.length) { showToast("No loans to export", "error"); return; }
     const headers = ["Loan #","Borrower","Phone","Principal","Total Due","Monthly","Paid","Remaining","Status"];
-    const rows = loans.map((l) => [l.loanNumber,l.borrowerName,l.borrowerPhone,l.loanAmount,l.totalRepayable,l.monthlyPayment,l.amountPaid,l.remainingBalance,l.status]);
-    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const rows    = loans.map((l) => [l.loanNumber,l.borrowerName,l.borrowerPhone,l.loanAmount,l.totalRepayable,l.monthlyPayment,l.amountPaid,l.remainingBalance,l.status]);
+    const csv     = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const filename = `cyberlend-${new Date().toISOString().split("T")[0]}.csv`;
-
     if (Capacitor.isNativePlatform()) {
-      try {
-        await Filesystem.writeFile({
-          path: filename,
-          data: csv,
-          directory: Directory.Documents,
-          encoding: "utf8" as any, // Cast to avoid strict type issues if any
-          recursive: true
-        });
-        showToast(`CSV saved to Documents: ${filename}`, "success");
-      } catch (error) {
-        console.error("CSV save failed", error);
-        showToast("Failed to save CSV to device storage", "error");
-      }
+      try { await Filesystem.writeFile({ path: filename, data: csv, directory: Directory.Documents, encoding: "utf8" as any, recursive: true }); showToast(`Saved: ${filename}`, "success"); }
+      catch { showToast("Failed to save CSV", "error"); }
     } else {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-      a.download = filename;
-      a.click();
+      a.download = filename; a.click();
     }
   };
+  const handleResetData = () => { setLoans([]); setConfirmReset(false); showToast("All data cleared", "info"); };
 
-  const handleResetData = () => { if (confirm("Clear all data?")) { setLoans([]); } };
+  const overdueLoans = loans.filter((l) => l.status === "Overdue");
 
-  const t = isDark ? {
-    bg:           "#0a0a0a",
-    bgCard:       "#141414",
-    bgCardHover:  "#1c1c1c",
-    bgSidebar:    "#141414",
-    bgNav:        "rgba(20,20,20,0.95)",
-    bgInput:      "#0f0f0f",
-    bgModal:      "#141414",
-    bgBtn:        "#1c1c1c",
-    bgActive:     "#262626",
-    border:       "rgba(255,255,255,0.08)",
-    borderMid:    "rgba(255,255,255,0.14)",
-    borderStrong: "rgba(255,255,255,0.25)",
-    text:         "#f3ead8",
-    textMuted:    "rgba(243,234,216,0.55)",
-    textFaint:    "rgba(243,234,216,0.30)",
-    btnPrimary:   "#c49a2f",
-    btnPrimaryTx: "#0a0a0a",
-    rowAlt:       "rgba(255,255,255,0.02)",
-    rowHover:     "rgba(255,255,255,0.04)",
-    progressBg:   "rgba(255,255,255,0.10)",
-    progressFill: "#c49a2f",
-  } : {
-    bg:           "#f6f1e6",
-    bgCard:       "#ffffff",
-    bgCardHover:  "#fbf7ee",
-    bgSidebar:    "#ffffff",
-    bgNav:        "rgba(255,255,255,0.95)",
-    bgInput:      "#f6f1e6",
-    bgModal:      "#ffffff",
-    bgBtn:        "#f6f1e6",
-    bgActive:     "#e6dcc4",
-    border:       "rgba(0,0,0,0.08)",
-    borderMid:    "rgba(0,0,0,0.13)",
-    borderStrong: "rgba(0,0,0,0.22)",
-    text:         "#0a0a0a",
-    textMuted:    "rgba(10,10,10,0.55)",
-    textFaint:    "rgba(10,10,10,0.35)",
-    btnPrimary:   "#c49a2f",
-    btnPrimaryTx: "#0a0a0a",
-    rowAlt:       "rgba(0,0,0,0.02)",
-    rowHover:     "rgba(0,0,0,0.04)",
-    progressBg:   "rgba(0,0,0,0.08)",
-    progressFill: "#c49a2f",
-  };
-
-  const mono = "var(--font-mono)";
-
-  const statusStyle = (status: string) => {
-    const map: Record<string, { bg: string; color: string; border: string }> = {
-      Active:    { bg: isDark ? "rgba(196,154,47,0.15)" : "rgba(196,154,47,0.10)", color: isDark ? "#c49a2f" : "#7a5a10",  border: "rgba(196,154,47,0.25)" },
-      Overdue:   { bg: "rgba(239,68,68,0.12)",  color: "#f87171",  border: "rgba(239,68,68,0.25)" },
-      Completed: { bg: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: t.textMuted, border: t.border },
-      Defaulted: { bg: "rgba(180,20,20,0.12)",  color: "#fca5a5",  border: "rgba(180,20,20,0.25)" },
-    };
-    return map[status] || map.Completed;
-  };
+  const statusStyle = (status: string) => ({
+    Active:    { bg: "rgba(196,154,47,0.15)", color: "var(--gold-500)",        border: "rgba(196,154,47,0.25)" },
+    Overdue:   { bg: "rgba(239,68,68,0.12)",  color: "#f87171",                border: "rgba(239,68,68,0.25)" },
+    Completed: { bg: "rgba(255,255,255,0.06)", color: "var(--muted-foreground)", border: "var(--border)" },
+    Defaulted: { bg: "rgba(180,20,20,0.12)",  color: "#fca5a5",                border: "rgba(180,20,20,0.25)" },
+  } as Record<string,{bg:string;color:string;border:string}>)[status] ?? { bg:"rgba(255,255,255,0.06)", color:"var(--muted-foreground)", border:"var(--border)" };
 
   return (
     <>
-    <div className="min-h-screen flex" style={{ background: t.bg, transition: "background 0.3s, color 0.3s" }}>
+      {/* -- DESKTOP -- */}
+      <div className="hidden lg:flex min-h-screen" style={{ background:"var(--background)" }}>
+        <Sidebar active={desktopTab} onChange={setDesktopTab} />
+        <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+          <Header onSearch={() => {}} />
 
-      {/* DESKTOP SIDEBAR */}
-      <aside className="hidden lg:flex flex-col w-16 items-center py-6 gap-4 fixed h-full z-40 border-r"
-        style={{ background: t.bgSidebar, borderColor: t.border }}>
-        <div className="w-10 h-10 rounded-xl overflow-hidden border mb-3" style={{ borderColor: t.borderMid }}>
-          <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
-        </div>
-        <nav className="flex flex-col gap-2 flex-1">
-          {[
-            { icon: <LayoutDashboard className="w-4 h-4" />, label: "Dashboard", tab: "dashboard" as const },
-            { icon: <Users className="w-4 h-4" />, label: "Clients",  tab: "clients"   as const },
-            { icon: <Clock className="w-4 h-4" />,  label: "Waitlist",    tab: "waitlist"    as const },
-            { icon: <ScrollText className="w-4 h-4" />, label: "Agreements", tab: "agreements" as const },
-          ].map((item) => (
-            <button key={item.label} title={item.label}
-              onClick={() => setDesktopTab(item.tab)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-              style={{
-                background:  desktopTab === item.tab ? t.bgActive : "transparent",
-                color:       desktopTab === item.tab ? t.text : t.textFaint,
-                border:      desktopTab === item.tab ? "1px solid " + t.borderMid : "1px solid transparent",
-              }}>
-              {item.icon}
-            </button>
-          ))}
-        </nav>
-        <div className="flex flex-col gap-2">
-          <button onClick={toggleTheme} title="Toggle theme"
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-            style={{ color: t.textMuted, border: "1px solid " + t.border, background: t.bgBtn }}>
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-          <button onClick={handleExportCSV} title="Export"
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ color: t.textFaint }}><Download className="w-4 h-4" /></button>
-          <button onClick={handleResetData} title="Reset"
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ color: t.textFaint }}><RotateCcw className="w-4 h-4" /></button>
-        </div>
-      </aside>
-
-      <div className="flex-1 lg:ml-16 flex flex-col min-w-0 overflow-x-hidden">
-
-        {/* DESKTOP NAVBAR */}
-        <header className="hidden lg:flex sticky top-0 z-30 h-14 items-center px-6 gap-4 border-b"
-          style={{ background: t.bgNav, backdropFilter: "blur(20px)", borderColor: t.border }}>
-          <div className="flex items-center gap-3 min-w-[220px]">
-            <div className="w-8 h-8 rounded-lg overflow-hidden border" style={{ borderColor: t.borderMid }}>
-              <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
-            </div>
-            <div>
-              <span className="font-bold text-sm tracking-widest" style={{ fontFamily: mono, color: t.text }}>CYBERLEND</span>
-              <p className="text-[8px] tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BUILDING WEALTH TOGETHER</p>
-            </div>
+          <div className="flex items-center justify-end gap-2 px-6 py-2 border-b" style={{ borderColor:"var(--border)" }}>
+            <ExportMenu loans={loans} />
+            <Button variant="ghost" size="sm" onClick={() => setPdfOpen(true)}><FileText className="w-3 h-3 mr-1"/>PDF</Button>
+            <Button variant="ghost" size="sm" onClick={toggleTheme}>{isDark ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}</Button>
+            <Button size="sm" onClick={() => setNewLoanOpen(true)}><PlusCircle className="w-3.5 h-3.5 mr-1"/>NEW LOAN</Button>
           </div>
-          <div className="hidden lg:flex items-center gap-5 text-xs ml-4">
-            {[
-              { label: "LENT",        value: formatCompactCurrency(metrics.totalPrincipalLent) },
-              { label: "OUTSTANDING", value: formatCompactCurrency(metrics.totalOutstanding) },
-              { label: "COLLECTED",   value: formatCompactCurrency(metrics.totalCollected) },
-              { label: "PROFIT",      value: formatCompactCurrency(metrics.totalProfit) },
-            ].map((m, i) => (
-              <React.Fragment key={m.label}>
-                {i > 0 && <div className="w-px h-5" style={{ background: t.border }} />}
-                <div>
-                  <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{m.label}</p>
-                  <p className="font-bold text-xs" style={{ fontFamily: mono, color: t.text }}>{m.value}</p>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 ml-auto">
-            <button onClick={toggleTheme}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
-              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
-              {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-              <span style={{ fontFamily: mono }}>{isDark ? "LIGHT" : "DARK"}</span>
-            </button>
-            <button onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
-              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
-              <Download className="w-3 h-3" /> Export
-            </button>
-            <button onClick={() => setPdfOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
-              style={{ background: t.bgBtn, borderColor: t.border, color: t.textMuted }}>
-              <FileText className="w-3 h-3" /> PDF
-            </button>
-            <button onClick={handleResetData} className="p-1.5 rounded-lg" style={{ color: t.textFaint }}>
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-            <button onClick={() => setNewLoanOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-lg"
-              style={{ fontFamily: mono, background: t.btnPrimary, color: t.btnPrimaryTx }}>
-              <PlusCircle className="w-3.5 h-3.5" /> NEW LOAN
-            </button>
-          </div>
-        </header>
 
-        {/* MOBILE */}
-        <div className="lg:hidden min-h-screen" style={{ background: t.bg }}>
-          {/* -- MOBILE HEADER -- */}
-          <div className="px-5 pt-8 pb-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border" style={{ borderColor: t.borderMid }}>
-                <img src="/logo.png" alt="Cyberlend" className="w-full h-full object-cover" />
-              </div>
+          {/* Dashboard */}
+          {desktopTab === "dashboard" && (
+            <main className="flex-1 p-6 space-y-5 max-w-[1600px] mx-auto w-full">
               <div>
-                <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>Portfolio</p>
-                <p className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>CYBERLEND</p>
+                <h1 className="cl-mono text-lg font-bold tracking-widest" style={{ color:"var(--foreground)" }}>PORTFOLIO OVERVIEW</h1>
+                <p className="cl-mono text-[11px] tracking-widest mt-0.5" style={{ color:"rgba(243,234,216,0.3)" }}>BUILDING WEALTH TOGETHER</p>
+              </div>
+
+              {selectedClient && <TrackerBar metrics={metrics} theme={t} selectedClient={selectedClient} onClose={() => setSelectedClient(null)} />}
+              {selectedClient && (
+                <div className="px-6 py-4 overflow-y-auto">
+                  <ClientProfilePanel client={selectedClient} metrics={metrics} theme={t} allLoans={loans} />
+                </div>
+              )}
+
+              <GoalTracker goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
+
+              {/* Capital cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label:"AVAILABLE CAPITAL", value: metrics.availableCapital, sub: totalCapital > 0 ? `Total pool: ${formatCompactCurrency(totalCapital)}` : "Set total capital", color:"#4ade80", border:"rgba(74,222,128,0.30)", action:true },
+                  { label:"LENDABLE NOW",       value: metrics.lendableAmount,   sub:"80% of available capital", color:"var(--gold-500)", border:"rgba(196,154,47,0.30)", action:false },
+                  { label:"RETURNS PREV LOANS", value: metrics.returnsFromPreviousLoans, sub:`${metrics.completedLoansCount} completed loans`, color:"var(--gold-400)", border:"rgba(212,168,67,0.30)", action:false },
+                ].map((card) => (
+                  <div key={card.label} className="rounded-[12px] p-5 border" style={{ background:"var(--card)", borderColor:card.border, borderLeftWidth:"3px" }}>
+                    <div className="flex items-start justify-between">
+                      <p className="cl-mono text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color:"rgba(243,234,216,0.3)" }}>{card.label}</p>
+                      {card.action && (
+                        <button onClick={() => { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); }}
+                          className="cl-mono text-[9px] font-bold px-2 py-0.5 rounded-lg border"
+                          style={{ borderColor:card.border, color:card.color }}>SET</button>
+                      )}
+                    </div>
+                    <AnimatedAmount value={card.value} className="cl-mono text-xl font-bold block mb-1" style={{ color:card.color }} />
+                    <p className="cl-mono text-[10px]" style={{ color:"rgba(243,234,216,0.3)" }}>{card.sub}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* KPI stat tiles */}
+              <div className={`grid grid-cols-4 gap-3 transition-all duration-300 ${selectedClient ? "opacity-0 max-h-0 overflow-hidden pointer-events-none" : "opacity-100"}`}>
+                <StatTile label="TOTAL LENT"  value={formatCompactCurrency(metrics.totalPrincipalLent)} />
+                <StatTile label="OUTSTANDING" value={formatCompactCurrency(metrics.totalOutstanding)} />
+                <StatTile label="COLLECTED"   value={formatCompactCurrency(metrics.totalCollected)} />
+                <StatTile label="NET PROFIT"  value={formatCompactCurrency(metrics.totalProfit)} />
+              </div>
+
+              {/* Overdue alert */}
+              {overdueLoans.length > 0 && (
+                <div className="rounded-[12px] p-4 border flex items-start gap-3" style={{ background:"rgba(239,68,68,0.07)", borderColor:"rgba(239,68,68,0.20)" }}>
+                  <div className="p-2 rounded-xl shrink-0" style={{ background:"rgba(239,68,68,0.12)" }}>
+                    <Bell className="w-4 h-4 text-red-400" />
+                  </div>
+                  <div>
+                    <h4 className="cl-mono text-sm font-bold" style={{ color:"var(--foreground)" }}>{overdueLoans.length} OVERDUE — COLLECT NOW</h4>
+                    <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color:"var(--muted-foreground)" }}>
+                      {overdueLoans.map((l) => (
+                        <span key={l.id}><span className="font-semibold" style={{ color:"var(--foreground)" }}>{l.borrowerName}</span> — {formatCompactCurrency(l.monthlyPayment)} overdue</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Charts */}
+              <div className={`transition-all duration-300 ${selectedClient ? "opacity-0 max-h-0 overflow-hidden" : "opacity-100"}`}>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <PortfolioDonut metrics={metrics} />
+                  <MonthlyCollections loans={loans} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <RepaymentProgress loans={loans} />
+                  <FinancialStackedBar loans={loans} />
+                </div>
+              </div>
+              <GrowthCharts loans={loans} theme={t} />
+              <LoanLedgerTable loans={loans} onSelectLoan={setDetailLoan} onRecordPayment={setPaymentLoan} onDeleteLoan={deleteLoan} onOpenNewLoan={() => setNewLoanOpen(true)} theme={t} />
+              <FaqGrid />
+            </main>
+          )}
+
+          {desktopTab === "clients"    && <div className="flex-1 overflow-hidden"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
+          {desktopTab === "waitlist"   && <div className="flex-1 overflow-hidden"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
+          {desktopTab === "agreements" && <div className="flex-1 overflow-auto"><AgreementsPage theme={t} /></div>}
+        </div>
+      </div>
+
+      {/* -- MOBILE -- */}
+      <div className="lg:hidden min-h-screen" style={{ background:"var(--background)" }}>
+        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b" style={{ borderColor:"var(--border)", paddingTop:"max(1rem, env(safe-area-inset-top))" }}>
+          <span className="font-brand text-xl" style={{ color:"var(--gold-500)" }}>Cyberlend</span>
+          <div className="flex gap-2">
+            <button onClick={() => setPdfOpen(true)} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
+              <FileText className="w-4 h-4" style={{ color:"var(--gold-500)" }} />
+            </button>
+            <button onClick={toggleTheme} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
+              {isDark ? <Sun className="w-4 h-4" style={{ color:"var(--gold-500)" }} /> : <Moon className="w-4 h-4" style={{ color:"var(--gold-500)" }} />}
+            </button>
+            <button className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
+              <Bell className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />
+            </button>
+            <button onClick={() => setNewLoanOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background:"var(--primary)" }}>
+              <PlusCircle className="w-4 h-4" style={{ color:"var(--primary-foreground)" }} />
+            </button>
+          </div>
+        </div>
+
+        {mobileTab === "loans" && (
+          <>
+            {/* Hero KPI */}
+            <div className="mx-4 mt-4 rounded-[12px] p-5 border relative overflow-hidden" style={{ background:"var(--bg-raised)", borderColor:"rgba(196,154,47,0.25)" }}>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-5"><img src="/logo.png" alt="" className="w-full h-full object-contain" /></div>
+              <p className="cl-mono text-[10px] uppercase tracking-widest mb-1" style={{ color:"rgba(243,234,216,0.4)" }}>TOTAL OUTSTANDING</p>
+              <AnimatedAmount value={metrics.totalOutstanding} className="cl-mono text-4xl font-bold block mb-4" style={{ color:"var(--foreground)" }} />
+              <div className="grid grid-cols-2 gap-2 pt-4 border-t" style={{ borderColor:"var(--border)" }}>
+                {[
+                  { label:"LENT",      value: metrics.totalPrincipalLent, raw:false },
+                  { label:"COLLECTED", value: metrics.totalCollected,     raw:false },
+                  { label:"PROFIT",    value: metrics.totalProfit,        raw:false },
+                  { label:"ACTIVE",    value: metrics.activeLoansCount,   raw:true  },
+                ].map((s) => (
+                  <div key={s.label}>
+                    <p className="cl-mono text-[8px] uppercase tracking-widest mb-0.5" style={{ color:"rgba(243,234,216,0.3)" }}>{s.label}</p>
+                    {s.raw
+                      ? <p className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{s.value}</p>
+                      : <AnimatedAmount value={s.value as number} className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }} />
+                    }
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={toggleTheme}
-                className="w-8 h-8 rounded-full border flex items-center justify-center"
-                style={{ borderColor: t.border, background: t.bgBtn, color: t.textMuted }}>
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-              <button onClick={() => setPdfOpen(true)}
-                className="w-8 h-8 rounded-full border flex items-center justify-center"
-                style={{ borderColor: t.border, background: t.bgBtn }}>
-                <FileText className="w-4 h-4" style={{ color: "#c49a2f" }} />
-              </button>
-              <button className="w-8 h-8 rounded-full border flex items-center justify-center"
-                style={{ borderColor: t.border, background: t.bgBtn }}>
-                <Bell className="w-4 h-4" style={{ color: t.textMuted }} />
-              </button>
-            </div>
-          </div>
 
-          {mobileTab === "loans" && (<>
-          {/* -- HERO KPI CARD -- */}
-          <div className="mx-4 rounded-3xl p-6 mb-4 border relative overflow-hidden"
-            style={{ background: isDark ? "#1c1c1c" : "#141414", borderColor: "rgba(196,154,47,0.25)" }}>
-            <div className="absolute -bottom-6 -right-6 w-36 h-36 opacity-10">
-              <img src="/logo.png" alt="" className="w-full h-full object-contain" />
-            </div>
-            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1" style={{ fontFamily: mono }}>TOTAL OUTSTANDING</p>
-            <p className="text-4xl font-bold text-white mb-5" style={{ fontFamily: mono }}>{formatCompactCurrency(metrics.totalOutstanding)}</p>
-            <div className="grid grid-cols-2 gap-2 pt-4 border-t border-white/10">
+            {/* Capital mini-cards */}
+            <div className="px-4 mt-3 grid grid-cols-3 gap-2">
               {[
-                { label: "LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent) },
-                { label: "COLLECTED", value: formatCompactCurrency(metrics.totalCollected) },
-                { label: "PROFIT",    value: formatCompactCurrency(metrics.totalProfit) },
-                { label: "ACTIVE",    value: String(metrics.activeLoansCount) },
-              ].map((s) => (
-                <div key={s.label}>
-                  <p className="text-[8px] text-white/30 uppercase tracking-widest mb-0.5" style={{ fontFamily: mono }}>{s.label}</p>
-                  <p className="text-xs font-bold text-white" style={{ fontFamily: mono }}>{s.value}</p>
+                { label:"AVAILABLE", value: metrics.availableCapital, color:"#4ade80", border:"rgba(74,222,128,0.30)", action:true },
+                { label:"LENDABLE",  value: metrics.lendableAmount,   color:"var(--gold-500)", border:"rgba(196,154,47,0.30)", action:false },
+                { label:"RETURNS",   value: metrics.returnsFromPreviousLoans, color:"var(--gold-400)", border:"rgba(212,168,67,0.30)", action:false },
+              ].map((c) => (
+                <div key={c.label} onClick={() => { if (c.action) { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); } }}
+                  className={`rounded-[10px] p-3 border ${c.action ? "cursor-pointer" : ""}`}
+                  style={{ background:"var(--card)", borderColor:c.border, borderLeftWidth:"3px" }}>
+                  <div className="flex items-start justify-between gap-1">
+                    <p className="cl-mono text-[8px] font-bold uppercase tracking-widest mb-1" style={{ color:"rgba(243,234,216,0.3)" }}>{c.label}</p>
+                    {c.action && <span className="cl-mono text-[8px] font-bold px-1 py-0.5 rounded border" style={{ borderColor:c.border, color:c.color }}>SET</span>}
+                  </div>
+                  <AnimatedAmount value={c.value} className="cl-mono text-xs font-bold" style={{ color:c.color }} />
                 </div>
               ))}
             </div>
-          </div>
 
-          {/* -- CAPITAL CARDS -- */}
-          <div className="px-4 grid grid-cols-3 gap-2 mb-4">
-            {[
-              { label: "AVAILABLE", value: formatCompactCurrency(metrics.availableCapital), color: "#4ade80", border: "rgba(74,222,128,0.30)", hasAction: true },
-              { label: "LENDABLE",  value: formatCompactCurrency(metrics.lendableAmount),   color: "#c49a2f", border: "rgba(196,154,47,0.30)", hasAction: false },
-              { label: "RETURNS",   value: formatCompactCurrency(metrics.returnsFromPreviousLoans), color: "#d4a843", border: "rgba(212,168,67,0.30)", hasAction: false },
-            ].map((c) => (
-              <div key={c.label}
-                onClick={() => { if (c.hasAction) { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); } }}
-                className={`rounded-2xl p-3 border ${c.hasAction ? "cursor-pointer active:scale-95 transition-transform" : ""}`}
-                style={{ background: t.bgCard, borderColor: c.border, borderLeftWidth: "3px" }}>
-                <div className="flex items-start justify-between gap-1">
-                  <p className="text-[8px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{c.label}</p>
-                  {c.hasAction && (
-                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border" style={{ fontFamily: mono, borderColor: c.border, color: c.color }}>SET</span>
-                  )}
-                </div>
-                <p className="text-xs font-bold" style={{ fontFamily: mono, color: c.color }}>{c.value}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* -- OVERDUE ALERT -- */}
-          {loans.filter((l) => l.status === "Overdue").length > 0 && (
-            <div className="mx-4 mb-4 rounded-2xl p-3 border flex items-start gap-2"
-              style={{ background: "rgba(239,68,68,0.07)", borderColor: "rgba(239,68,68,0.20)" }}>
-              <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#f87171" }}>
-                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE - COLLECT NOW
-                </p>
-                <div className="mt-1 flex flex-col gap-0.5">
-                  {loans.filter((l) => l.status === "Overdue").map((l) => (
-                    <p key={l.id} className="text-[10px]" style={{ color: t.textMuted }}>
-                      <span style={{ color: t.text, fontWeight: 700 }}>{l.borrowerName}</span>
-                      {" - "}{formatCompactCurrency(l.monthlyInterest)} due
+            {/* Overdue alert */}
+            {overdueLoans.length > 0 && (
+              <div className="mx-4 mt-3 rounded-[10px] p-3 border flex items-start gap-2" style={{ background:"rgba(239,68,68,0.07)", borderColor:"rgba(239,68,68,0.20)" }}>
+                <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="cl-mono text-xs font-bold" style={{ color:"#f87171" }}>{overdueLoans.length} OVERDUE — COLLECT NOW</p>
+                  {overdueLoans.map((l) => (
+                    <p key={l.id} className="cl-mono text-[10px] mt-0.5" style={{ color:"var(--muted-foreground)" }}>
+                      <span style={{ color:"var(--foreground)", fontWeight:700 }}>{l.borrowerName}</span> — {formatCompactCurrency(l.monthlyInterest)} due
                     </p>
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Quick actions */}
+            <div className="px-4 mt-3 grid grid-cols-3 gap-2 mb-4">
+              {[
+                { label:"NEW",    icon:<PlusCircle className="w-5 h-5"/>, action:() => setNewLoanOpen(true), gold:true },
+                { label:"PDF",    icon:<FileText className="w-5 h-5"/>,   action:() => setPdfOpen(true),      gold:false },
+                { label:"EXPORT", icon:<Download className="w-5 h-5"/>,   action:handleExportCSV,             gold:false },
+
+              ].map((btn) => (
+                <button key={btn.label} onClick={btn.action}
+                  className="flex flex-col items-center gap-2 py-3 rounded-[10px] border transition-all active:scale-95"
+                  style={{ background:"var(--card)", borderColor:btn.gold ? "rgba(196,154,47,0.30)" : "var(--border)" }}>
+                  <div style={{ color:btn.gold ? "var(--gold-500)" : "var(--muted-foreground)" }}>{btn.icon}</div>
+                  <span className="cl-mono text-[8px] font-bold uppercase tracking-widest" style={{ color:"rgba(243,234,216,0.3)" }}>{btn.label}</span>
+                </button>
+              ))}
             </div>
-          )}
 
-          {/* -- QUICK ACTIONS -- */}
-          <div className="px-4 grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
-            {[
-              { label: "NEW LOAN", icon: <PlusCircle className="w-5 h-5" />,  action: () => setNewLoanOpen(true) },
-              { label: "PDF",      icon: <FileText className="w-5 h-5" />,    action: () => setPdfOpen(true) },
-              { label: "EXPORT",   icon: <Download className="w-5 h-5" />,    action: handleExportCSV },
-              { label: "RESET",    icon: <RotateCcw className="w-5 h-5" />,   action: handleResetData },
-            ].map((btn) => (
-              <button key={btn.label} onClick={btn.action}
-                className="flex flex-col items-center gap-2 py-3 rounded-2xl border transition-all active:scale-95"
-                style={{ background: t.bgCard, borderColor: t.border }}>
-                <div style={{ color: btn.label === "PDF" ? "#c49a2f" : t.textMuted }}>{btn.icon}</div>
-                <span className="text-[8px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{btn.label}</span>
-              </button>
-            ))}
-          </div>
-
-          </>)}
-
-          {mobileTab === "loans" && (
-            <div className="px-4 pb-24">
+            {/* Loan list */}
+            <div className="px-4 pb-28">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>LOANS</h2>
-                <span className="text-[10px]" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS</span>
+                <h2 className="cl-mono text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(243,234,216,0.3)" }}>LOANS</h2>
+                <span className="cl-mono text-[10px]" style={{ color:"rgba(243,234,216,0.3)" }}>{loans.length} RECORDS</span>
               </div>
               <div className="mb-3 space-y-2">
-                <input type="text" value={mSearch} onChange={(e) => setMSearch(e.target.value)}
-                  placeholder="Search name, phone, loan no..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border focus:outline-none"
-                  style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }} />
-                <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                  {["ALL", "Active", "Overdue", "Completed", "Defaulted"].map((s) => (
+                <input type="text" value={mSearch} onChange={(e) => setMSearch(e.target.value)} placeholder="Search name, phone, loan no..."
+                  className="w-full px-3 py-2 cl-mono text-xs rounded-[8px] border focus:outline-none"
+                  style={{ background:"var(--input)", borderColor:"var(--border)", color:"var(--foreground)" }} />
+                <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth:"none" }}>
+                  {["ALL","Active","Overdue","Completed","Defaulted"].map((s) => (
                     <button key={s} onClick={() => setMStatus(s)}
-                      className="px-3 py-1.5 rounded-full border whitespace-nowrap text-[10px] font-bold shrink-0"
-                      style={{ fontFamily: mono, background: mStatus === s ? t.btnPrimary : t.bgCard, color: mStatus === s ? t.btnPrimaryTx : t.textMuted, borderColor: mStatus === s ? t.btnPrimary : t.border }}>
+                      className="px-3 py-1.5 rounded-full border whitespace-nowrap cl-mono text-[10px] font-bold shrink-0 transition-colors"
+                      style={{ background:mStatus===s ? "var(--primary)" : "var(--card)", color:mStatus===s ? "var(--primary-foreground)" : "var(--muted-foreground)", borderColor:mStatus===s ? "var(--primary)" : "var(--border)" }}>
                       {s.toUpperCase()}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="space-y-2">
-                {[...loans].filter((l) => { const q = mSearch.trim().toLowerCase(); return (!q || l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q)) && (mStatus === "ALL" || l.status === mStatus); }).sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()).map((loan) => {
-                  const ss = statusStyle(loan.status);
-                  return (
-                    <div key={loan.id}
-                      className="rounded-2xl p-4 border flex items-center justify-between cursor-pointer transition-all active:scale-99"
-                      style={{ background: t.bgCard, borderColor: t.border }}>
-                      <div className="flex items-center gap-3 flex-1" onClick={() => setDetailLoan(loan)}>
-                        <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0"
-                          style={{ background: t.bgActive, borderColor: t.borderMid }}>
-                          <span className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{loan.borrowerName.charAt(0)}</span>
+                {[...loans]
+                  .filter((l) => {
+                    const q = mSearch.trim().toLowerCase();
+                    return (!q || l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q)) && (mStatus==="ALL" || l.status===mStatus);
+                  })
+                  .sort((a,b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime())
+                  .map((loan) => {
+                    const ss = statusStyle(loan.status);
+                    return (
+                      <div key={loan.id}
+                        className="rounded-[10px] p-4 border flex items-center justify-between cursor-pointer transition-all active:scale-99"
+                        style={{ background:"var(--card)", borderColor:"var(--border)" }}>
+                        <div className="flex items-center gap-3 flex-1" onClick={() => setDetailLoan(loan)}>
+                          <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0" style={{ background:"var(--bg-raised)", borderColor:"rgba(243,234,216,0.14)" }}>
+                            <span className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{loan.borrowerName.charAt(0)}</span>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold" style={{ color:"var(--foreground)" }}>{loan.borrowerName}</p>
+                            <p className="cl-mono text-[10px]" style={{ color:"rgba(243,234,216,0.3)" }}>{loan.category} · {loan.monthsRemaining} mo left</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs font-bold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                          <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category}  {loan.monthsRemaining} mo left</p>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right" onClick={() => setDetailLoan(loan)}>
+                            <p className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{formatCompactCurrency(loan.remainingBalance)}</p>
+                            <span className="cl-mono text-[9px] font-bold border rounded-full px-1.5 py-0.5" style={{ background:ss.bg, color:ss.color, borderColor:ss.border }}>{loan.status.toUpperCase()}</span>
+                          </div>
+                          <button onClick={(e) => { e.stopPropagation(); if (confirm(`Delete ${loan.borrowerName}?`)) deleteLoan(loan.id); }}
+                            className="p-2 rounded-[8px] border" style={{ background:"var(--bg-raised)", borderColor:"var(--border)" }}>
+                            <Trash2 className="w-4 h-4 text-red-400" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right" onClick={() => setDetailLoan(loan)}>
-                          <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCompactCurrency(loan.remainingBalance)}</p>
-                          <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5"
-                            style={{ fontFamily: mono, background: ss.bg, color: ss.color, borderColor: ss.border }}>
-                            {loan.status.toUpperCase()}
-                          </span>
-                        </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); if (confirm(`Delete ${loan.borrowerName}?`)) deleteLoan(loan.id); }}
-                          className="p-2 rounded-xl border flex items-center justify-center"
-                          style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                }
               </div>
             </div>
-          )}
-
-          {mobileTab === "clients" && (
-            <div className="pb-24">
-              <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} onRegisterSuccess={() => showToast("Client registered \& added to waitlist", "success")} />
-            </div>
-          )}
-
-          {mobileTab === "waitlist" && (
-            <div className="pb-24">
-              <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setPromotedEntry(entry); setNewLoanOpen(true); }} />
-            </div>
-          )}
-
-          {mobileTab === "agreements" && (
-            <div className="pb-24">
-              <AgreementsPage theme={t} />
-            </div>
-          )}
-
-          {mobileTab === "analytics" && (
-            <div className="px-4 pb-24 space-y-3">
-              <h2 className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>ANALYTICS</h2>
-              <PortfolioDonut metrics={metrics} theme={t} compact />
-              <MonthlyCollections loans={loans} theme={t} compact />
-              <RepaymentProgress loans={loans} theme={t} compact />
-              <FinancialStackedBar loans={loans} theme={t} compact />
-              <GrowthCharts loans={loans} theme={t} />
-            </div>
-          )}
-        </div>
-
-        {/* DESKTOP CLIENTS VIEW */}
-        {desktopTab === "waitlist" && (
-          <div className="hidden lg:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
-            <WaitlistPage theme={t} onPromoteToLoan={(entry) => { setPromotedEntry(entry); setNewLoanOpen(true); }} />
-          </div>
+          </>
         )}
 
-        {desktopTab === "agreements" && (
-          <div className="hidden lg:flex flex-1 overflow-auto" style={{ background: t.bg }}>
-            <div className="w-full">
-              <AgreementsPage theme={t} />
-            </div>
-          </div>
-        )}
+        {mobileTab === "analytics"  && <div className="px-4 pb-28 pt-4 space-y-3"><PortfolioDonut metrics={metrics} compact /><MonthlyCollections loans={loans} compact /><RepaymentProgress loans={loans} compact /><FinancialStackedBar loans={loans} compact /><GrowthCharts loans={loans} theme={t} /></div>}
+        {mobileTab === "clients"    && <div className="pb-28"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
+        {mobileTab === "waitlist"   && <div className="pb-28"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
+        {mobileTab === "agreements" && <div className="pb-28"><AgreementsPage theme={t} /></div>}
 
-        {desktopTab === "clients" && (
-          <div className="hidden lg:flex flex-1 overflow-hidden" style={{ background: t.bg }}>
-            <ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(loan) => setClientEditTarget(loan)} onRegisterSuccess={() => showToast("Client registered \& added to waitlist", "success")} />
-          </div>
-        )}
-
-        {/* DESKTOP DASHBOARD VIEW */}
-        {desktopTab === "dashboard" && (
-          <main className="hidden lg:block flex-1 p-6 relative min-w-0 overflow-x-hidden"
-            style={{
-              backgroundImage: "url(/logo.png)",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center center",
-              backgroundSize: "420px",
-            }}>
-            <div className="absolute inset-0 pointer-events-none"
-              style={{ background: isDark ? "rgba(10,10,10,0.92)" : "rgba(240,242,248,0.93)" }} />
-            <div className="relative z-10 space-y-5 max-w-[1600px] mx-auto">
-              <div>
-                <h1 className="text-lg font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h1>
-                <p className="text-[11px] mt-0.5 tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>BUILDING WEALTH TOGETHER</p>
-              </div>
-              {selectedClient && (
-                <TrackerBar
-                  metrics={metrics}
-                  theme={t}
-                  selectedClient={selectedClient}
-                  onClose={() => setSelectedClient(null)}
-                />
-              )}
-              {selectedClient && (
-                <div
-                  className="px-6 py-4 overflow-y-auto"
-                  style={{ animation: "profileSlideIn 0.35s cubic-bezier(0.16,1,0.3,1)" }}
-                >
-                  <ClientProfilePanel
-                    client={selectedClient}
-                    metrics={metrics}
-                    theme={t}
-                    allLoans={loans}
-                  />
-                </div>
-              )}
-              <GoalTracker goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
-              {/* THREE NEW CAPITAL CARDS */}
-              <div className="grid grid-cols-3 gap-3 w-full min-w-0">
-                {[
-                  { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
-                  { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#c49a2f", borderColor: "rgba(196,154,47,0.30)", hasAction: false },
-                  { label: "RETURNS  PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#d4a843", borderColor: "rgba(212,168,67,0.30)", hasAction: false },
-                ].map((card) => (
-                  <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#141414" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
-                    <div className="flex items-start justify-between">
-                      <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>{card.label}</p>
-                      {card.hasAction && (
-                        <button onClick={() => { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); }} className="text-[9px] font-bold px-2 py-0.5 rounded-lg border" style={{ fontFamily: mono, borderColor: card.borderColor, color: card.color }}>SET</button>
-                      )}
-                    </div>
-                    <p className="text-xl font-bold" style={{ fontFamily: mono, color: card.color }}>{card.value}</p>
-                    <p className="text-[10px] mt-1" style={{ color: t.textFaint }}>{card.sub}</p>
-                  </div>
-                ))}
-              </div>
-
-<div
-                className="grid grid-cols-4 gap-3 w-full min-w-0"
-                style={{
-                  transform:  selectedClient ? "translateY(-8px)" : "translateY(0)",
-                  opacity:    selectedClient ? 0 : 1,
-                  maxHeight:  selectedClient ? "0px" : "300px",
-                  overflow:   "hidden",
-                  transition: "transform 0.3s ease, opacity 0.25s ease, max-height 0.35s ease",
-                  pointerEvents: selectedClient ? "none" : "auto",
-                }}
-              >
-                {[
-                  { label: "TOTAL LENT",  value: formatCompactCurrency(metrics.totalPrincipalLent), sub: metrics.totalLoansOriginated + " loans" },
-                  { label: "OUTSTANDING", value: formatCompactCurrency(metrics.totalOutstanding),   sub: metrics.activeLoansCount + " active" },
-                  { label: "COLLECTED",   value: formatCompactCurrency(metrics.totalCollected),     sub: metrics.completedLoansCount + " completed" },
-                  { label: "NET PROFIT",  value: formatCompactCurrency(metrics.totalProfit),        sub: "from interest" },
-                ].map((card, i) => (
-                  <div key={card.label} className="rounded-2xl p-5 border transition-all"
-                    style={{
-                      background:  i === 0 ? (isDark ? "#1c1c1c" : "#e8ebf8") : t.bgCard,
-                      borderColor: i === 0 ? "rgba(196,154,47,0.30)" : t.border,
-                    }}>
-                    <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>{card.label}</p>
-                    <p className="text-xl font-bold" style={{ fontFamily: mono, color: i === 0 ? "#c49a2f" : t.text }}>{card.value}</p>
-                    <p className="text-[10px] mt-1" style={{ color: t.textFaint }}>{card.sub}</p>
-                  </div>
-                ))}
-              </div>
-              {loans.filter((l) => l.status === "Overdue").length > 0 && (
-                <div className="rounded-2xl p-4 border flex items-start gap-3"
-                  style={{ background: "rgba(239,68,68,0.07)", borderColor: "rgba(239,68,68,0.20)" }}>
-                  <div className="p-2 rounded-xl shrink-0" style={{ background: "rgba(239,68,68,0.12)" }}>
-                    <Bell className="w-4 h-4 text-red-400" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>
-                      {loans.filter((l) => l.status === "Overdue").length} OVERDUE  COLLECT NOW
-                    </h4>
-                    <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color: t.textMuted }}>
-                      {loans.filter((l) => l.status === "Overdue").map((l) => (
-                        <span key={l.id}>
-                          <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" - "}{formatCompactCurrency(l.monthlyPayment)} overdue
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div
-                style={{
-                  maxHeight: selectedClient ? "0px" : "800px",
-                  opacity:   selectedClient ? 0 : 1,
-                  overflow:  "hidden",
-                  transition: "max-height 0.35s ease-in-out, opacity 0.25s ease-in-out",
-                }}
-              >
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <PortfolioDonut metrics={metrics} theme={t} />
-                  <MonthlyCollections loans={loans} theme={t} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <RepaymentProgress loans={loans} theme={t} />
-                  <FinancialStackedBar loans={loans} theme={t} />
-                </div>
-              </div>
-              <GrowthCharts loans={loans} theme={t} />
-
-              <LoanLedgerTable
-                loans={loans}
-                onSelectLoan={setDetailLoan}
-                onRecordPayment={setPaymentLoan}
-                onDeleteLoan={deleteLoan}
-                onOpenNewLoan={() => setNewLoanOpen(true)}
-                theme={t}
-              />
-
-              <FaqGrid />
-            </div>
-          </main>
-        )}
-
-        {/* MOBILE BOTTOM NAV */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 flex items-center justify-around px-4 py-4 z-30 border-t"
-          style={{ background: t.bgNav, backdropFilter: "blur(20px)", borderColor: t.border }}>
-          {[
-            { tab: "loans",     icon: <LayoutDashboard className="w-4 h-4" />, label: "LOANS" },
-            { tab: "analytics", icon: <TrendingUp className="w-4 h-4" />,      label: "ANALYTICS" },
-            { tab: "clients",   icon: <Users className="w-4 h-4" />,           label: "CLIENTS" },
-            { tab: "waitlist",    icon: <Clock className="w-4 h-4" />,       label: "WAITLIST" },
-            { tab: "agreements", icon: <ScrollText className="w-4 h-4" />,  label: "AGREE" },
-          ].map((item) => (
-            <button key={item.tab} onClick={() => setMobileTab(item.tab as any)} className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                style={{ background: mobileTab === item.tab ? t.bgActive : "transparent" }}>
-                <span style={{ color: mobileTab === item.tab ? t.btnPrimary : t.textFaint }}>{item.icon}</span>
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-widest"
-                style={{ fontFamily: mono, color: mobileTab === item.tab ? t.btnPrimary : t.textFaint }}>{item.label}</span>
-            </button>
-          ))}
-          <button onClick={() => setNewLoanOpen(true)} className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: t.btnPrimary }}>
-              <PlusCircle className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>NEW</span>
-          </button>
-        </nav>
-
-        <div className="lg:hidden h-20" />
+        <BottomTabBar active={mobileTab} onChange={setMobileTab} />
       </div>
 
+      {/* -- MODALS -- */}
       {capitalModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}>
-          <div className="rounded-2xl p-6 border w-full max-w-sm"
-            style={{ background: t.bgModal, borderColor: t.borderMid }}>
-            <p className="text-sm font-bold tracking-widest mb-1" style={{ fontFamily: mono, color: t.text }}>SET TOTAL CAPITAL</p>
-            <p className="text-[10px] mb-4" style={{ color: t.textFaint, fontFamily: mono }}>
-              This is the total pool of money available to the lending business.
-            </p>
-            <input
-              type="number"
-              value={capitalInput}
-              onChange={(e) => setCapitalInput(e.target.value)}
-              placeholder="e.g. 500000"
-              className="w-full px-4 py-3 rounded-xl border text-sm mb-4 outline-none"
-              style={{ background: t.bgInput, borderColor: t.borderMid, color: t.text, fontFamily: mono }}
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)" }}>
+          <div className="rounded-[12px] p-6 border w-full max-w-sm" style={{ background:"var(--card)", borderColor:"rgba(243,234,216,0.14)" }}>
+            <p className="cl-mono text-sm font-bold tracking-widest mb-1" style={{ color:"var(--foreground)" }}>SET TOTAL CAPITAL</p>
+            <p className="cl-mono text-[10px] mb-4" style={{ color:"rgba(243,234,216,0.3)" }}>Total pool of money available to the lending business.</p>
+            <input type="number" value={capitalInput} onChange={(e) => setCapitalInput(e.target.value)} placeholder="e.g. 500000"
+              className="w-full px-4 py-3 rounded-[8px] border cl-mono text-sm mb-4 outline-none focus:border-[var(--gold-500)]"
+              style={{ background:"var(--input)", borderColor:"rgba(243,234,216,0.14)", color:"var(--foreground)" }} />
             <div className="flex gap-3">
-              <button onClick={() => setCapitalModalOpen(false)}
-                className="flex-1 py-2.5 rounded-xl border text-xs font-bold"
-                style={{ fontFamily: mono, borderColor: t.border, color: t.textMuted, background: t.bgBtn }}>
-                CANCEL
-              </button>
-              <button onClick={() => {
-                  const val = parseFloat(capitalInput);
-                  if (!isNaN(val) && val > 0) { setTotalCapital(val); setCapitalModalOpen(false); }
-                }}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold"
-                style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
-                SAVE
-              </button>
+              <Button variant="outline" className="flex-1" onClick={() => setCapitalModalOpen(false)}>CANCEL</Button>
+              <Button className="flex-1" onClick={() => { const v=parseFloat(capitalInput); if(!isNaN(v)&&v>0){setTotalCapital(v);setCapitalModalOpen(false);} }}>SAVE</Button>
             </div>
           </div>
         </div>
       )}
 
+      <ConfirmDialog open={confirmReset} title="Clear all data?" description="This permanently deletes all loans, clients and transactions. Cannot be undone." confirmLabel="Clear everything" destructive onConfirm={handleResetData} onCancel={() => setConfirmReset(false)} />
       <ClientEditModal isOpen={clientEditTarget !== null} onClose={() => setClientEditTarget(null)} loan={clientEditTarget} onSave={handleSaveClientEdit} theme={t} />
       <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
       <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
-      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if (promotedEntry?.id) { removeFromWaitlist(promotedEntry.id); showToast("Client promoted to active borrower", "success"); } else { showToast("Loan created successfully", "success"); } setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName: promotedEntry.name, borrowerPhone: promotedEntry.phone, borrowerEmail: promotedEntry.email || "", occupation: promotedEntry.occupation, loanPurpose: promotedEntry.purpose, borrowerIdNumber: promotedEntry.idNumber || "", borrowerAddress: promotedEntry.address || "", kraPin: promotedEntry.kraPin || "", referralSource: promotedEntry.referralSource || "", clientNotes: promotedEntry.notes || "", clientFlags: ["New"] } as any : null} />
+      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if(promotedEntry?.id){removeFromWaitlist(promotedEntry.id);showToast("Client promoted to active borrower","success");}else{showToast("Loan created successfully","success");} setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName:promotedEntry.name, borrowerPhone:promotedEntry.phone, borrowerEmail:promotedEntry.email||"", occupation:promotedEntry.occupation, loanPurpose:promotedEntry.purpose, borrowerIdNumber:promotedEntry.idNumber||"", borrowerAddress:promotedEntry.address||"", kraPin:promotedEntry.kraPin||"", referralSource:promotedEntry.referralSource||"", clientNotes:promotedEntry.notes||"", clientFlags:["New"] } as any : null} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
       <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} onDeleteLoan={deleteLoan} onDeleteTransaction={deleteTransaction} theme={t} />
-    </div>
     </>
   );
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
+
+
+
+
+
+
+
 
