@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Loan, PortfolioMetrics } from "../types";
 import type { Theme } from "../App";
 import { generatePortfolioSummaryPdf } from "../utils/pdfReportGenerator";
