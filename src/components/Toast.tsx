@@ -9,10 +9,10 @@ const ToastContext = createContext<ToastContextValue>({ showToast: () => {} })
 export const useToast = () => useContext(ToastContext)
 
 const CONFIG: Record<ToastType, { border: string; icon: string; label: string }> = {
-  success: { border: "#7fc98f", icon: "#7fc98f", label: "?" },
-  error:   { border: "#e07070", icon: "#e07070", label: "?" },
-  warning: { border: "#d4a843", icon: "#d4a843", label: "?" },
-  info:    { border: "#70a8e0", icon: "#70a8e0", label: "?" },
+  success: { border: "#7fc98f", icon: "#7fc98f", label: "\u2713" },
+  error:   { border: "#e07070", icon: "#e07070", label: "\u2715" },
+  warning: { border: "#d4a843", icon: "#d4a843", label: "!" },
+  info:    { border: "#70a8e0", icon: "#70a8e0", label: "i" },
 }
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -55,14 +55,14 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 fontSize: 12, fontWeight: 700, flexShrink: 0,
               }}>{c.label}</span>
               <span style={{ color: "#f3ead8", fontSize: 12, flex: 1, lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
-                {message}
+                {toast.message}
               </span>
               <button onClick={() => remove(toast.id)} style={{
                 background: "none", border: "none",
                 color: "rgba(243,234,216,0.4)",
                 cursor: "pointer", fontSize: 14, lineHeight: 1, flexShrink: 0,
                 padding: "0 2px",
-              }}>?</button>
+              }}>\u00d7</button>
             </div>
           )
         })}
