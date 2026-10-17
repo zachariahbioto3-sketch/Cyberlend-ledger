@@ -25,7 +25,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
 
   if (!loan) return null;
 
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   const pct = Math.round((loan.amountPaid / loan.totalRepayable) * 100);
 
   const statusStyle = (status: string) => {

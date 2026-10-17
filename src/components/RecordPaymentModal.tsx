@@ -18,7 +18,7 @@ const NOTE_INTEREST = 'Monthly interest - loan rolled over';
 const NOTE_SETTLE = 'Principal + interest - loan settled';
 
 export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, loan, onClose, onSavePayment, theme: t }) => {
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   const [mode, setMode] = useState<PayMode>('interest');
   const [date, setDate] = useState(toLocalISO(new Date()));
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('M-Pesa');

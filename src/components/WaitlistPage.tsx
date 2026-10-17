@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Clock, UserPlus, CheckCircle, XCircle, Trash2, ChevronDown, DollarSign, ArrowRight } from "lucide-react";
 import { useLoanStore } from "../store/loanStore";
 import { WishlistEntry, LoanPurpose } from "../types";
@@ -14,7 +14,7 @@ interface WaitlistPageProps { theme: any; onPromoteToLoan?: (entry: WishlistEntr
 
 export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteToLoan }) => {
   const { waitlist, addToWaitlist, removeFromWaitlist, updateWaitlistStatus, updateWaitlistAmount } = useLoanStore();
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
 
   const [showForm, setShowForm]         = useState(false);
   const [amountEntry, setAmountEntry]   = useState<{ id: string; value: string } | null>(null);
@@ -52,7 +52,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
   };
 
   const stageMeta = {
-    Enquiry:  { color: "#a78bfa", bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.30)", label: "ENQUIRY"  },
+    Enquiry:  { color: "#d4a843", bg: "rgba(212,168,67,0.12)", border: "rgba(212,168,67,0.30)", label: "ENQUIRY"  },
     Pending:  { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.30)",  label: "PENDING"  },
     Approved: { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.30)",  label: "APPROVED" },
     Rejected: { color: "#f87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.30)", label: "REJECTED" },
@@ -121,7 +121,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {entry.status === "Enquiry" && (
           <div className="mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <p className="text-[9px] font-bold uppercase tracking-widest mb-2"
-              style={{ fontFamily: mono, color: "#a78bfa" }}>
+              style={{ fontFamily: mono, color: "#d4a843" }}>
               WAITING FOR CLIENT TO STATE AMOUNT
             </p>
             {isRecordingAmount ? (
@@ -137,7 +137,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
                 />
                 <button onClick={() => handleRecordAmount(entry.id)}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold"
-                  style={{ fontFamily: mono, background: "#a78bfa", color: "#fff" }}>
+                  style={{ fontFamily: mono, background: "#d4a843", color: "#fff" }}>
                   <ArrowRight className="w-3 h-3" /> CONFIRM
                 </button>
                 <button onClick={() => setAmountEntry(null)}
@@ -149,7 +149,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
             ) : (
               <button onClick={() => setAmountEntry({ id: entry.id, value: "" })}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
-                style={{ fontFamily: mono, background: "rgba(167,139,250,0.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,0.3)" }}>
+                style={{ fontFamily: mono, background: "rgba(212,168,67,0.12)", color: "#d4a843", border: "1px solid rgba(212,168,67,0.3)" }}>
                 <DollarSign className="w-3 h-3" /> RECORD AMOUNT
               </button>
             )}
@@ -182,7 +182,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
           <div className="flex items-center gap-2 mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <button onClick={() => { onPromoteToLoan(entry); removeFromWaitlist(entry.id); }}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-bold"
-              style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+              style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
               <ArrowRight className="w-3 h-3" /> ISSUE LOAN ï¿½ MOVE TO BORROWERS
             </button>
             <button onClick={() => removeFromWaitlist(entry.id)}
@@ -219,7 +219,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         </div>
         <button onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold"
-          style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+          style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
           <UserPlus className="w-3.5 h-3.5" /> ADD CLIENT
         </button>
       </div>
@@ -229,7 +229,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         <div className="px-6 py-5 border-b" style={{ borderColor: t.border, background: t.bgCard }}>
           <p className="text-[10px] font-bold uppercase tracking-widest mb-1"
             style={{ fontFamily: mono, color: t.textFaint }}>NEW ENQUIRY</p>
-          <p className="text-[10px] mb-4" style={{ fontFamily: mono, color: "#a78bfa" }}>
+          <p className="text-[10px] mb-4" style={{ fontFamily: mono, color: "#d4a843" }}>
             Register the client first. Amount will be recorded once they confirm what they need.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
@@ -275,7 +275,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
             </button>
             <button onClick={handleAdd}
               className="px-4 py-2 rounded-xl text-xs font-bold"
-              style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+              style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
               REGISTER CLIENT
             </button>
           </div>
@@ -289,9 +289,9 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {enquiries.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#a78bfa" }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: "#d4a843" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ fontFamily: mono, color: "#a78bfa" }}>
+                style={{ fontFamily: mono, color: "#d4a843" }}>
                 STAGE 1 ï¿½ ENQUIRY ({enquiries.length}) ï¿½ AWAITING AMOUNT
               </p>
             </div>

@@ -12,7 +12,7 @@ interface ClientProfilePanelProps {
 }
 
 export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, theme: t, allLoans, onEditClient }) => {
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
 
   const clientLoans = allLoans.filter(l => l.borrowerName === client.borrowerName).sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime());
   const totalBorrowed = clientLoans.reduce((s, l) => s + l.loanAmount, 0);
@@ -21,7 +21,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, 
   const hasOverdue    = clientLoans.some(l => l.status === "Overdue");
 
   const statusColor = (status: string) => {
-    if (status === "Active")    return "#5b7cfa";
+    if (status === "Active")    return "#c49a2f";
     if (status === "Overdue")   return "#f87171";
     if (status === "Completed") return "#4ade80";
     return t.textMuted;
@@ -87,7 +87,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, 
       {/* KPI row */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         {[
-          { label: "TOTAL BORROWED", value: formatCompactCurrency(totalBorrowed), icon: <TrendingUp className="w-3.5 h-3.5" />, color: "#5b7cfa" },
+          { label: "TOTAL BORROWED", value: formatCompactCurrency(totalBorrowed), icon: <TrendingUp className="w-3.5 h-3.5" />, color: "#c49a2f" },
           { label: "TOTAL PAID",     value: formatCompactCurrency(totalPaid),     icon: <CheckCircle className="w-3.5 h-3.5" />, color: "#4ade80" },
           { label: "STILL OWING",   value: formatCompactCurrency(totalOwed),     icon: <AlertCircle className="w-3.5 h-3.5" />, color: hasOverdue ? "#f87171" : "#f59e0b" },
         ].map(k => (
@@ -156,7 +156,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, 
               <div className="w-full rounded-full h-1.5" style={{ background: t.progressBg }}>
                 <div
                   className="h-1.5 rounded-full transition-all duration-700"
-                  style={{ width: pct + "%", background: loan.status === "Overdue" ? "#f87171" : "#5b7cfa" }}
+                  style={{ width: pct + "%", background: loan.status === "Overdue" ? "#f87171" : "#c49a2f" }}
                 />
               </div>
               <p className="text-[9px] mt-1" style={{ color: t.textFaint }}>{pct}% repaid</p>

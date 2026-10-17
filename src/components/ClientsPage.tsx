@@ -21,7 +21,7 @@ interface ClientsPageProps {
 
 const FLAG_META: Record<ClientFlag, { color: string; bg: string; border: string; icon: React.ReactNode }> = {
   VIP:         { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
-  New:         { color: "#5b7cfa", bg: "rgba(91,124,250,0.12)",  border: "rgba(91,124,250,0.3)",  icon: <Plus className="w-3 h-3" /> },
+  New:         { color: "#c49a2f", bg: "rgba(196,154,47,0.12)",  border: "rgba(196,154,47,0.3)",  icon: <Plus className="w-3 h-3" /> },
   Regular:     { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
   Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
   Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
@@ -64,7 +64,7 @@ interface NewClientModalProps {
 
 const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSave }) => {
   const { addToWaitlist } = useLoanStore();
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   const passportRef = useRef<HTMLInputElement>(null);
   const idRef       = useRef<HTMLInputElement>(null);
 
@@ -145,8 +145,8 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
           style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-              style={{ background: "rgba(91,124,250,0.15)" }}>
-              <UserPlus className="w-4 h-4" style={{ color: "#5b7cfa" }} />
+              style={{ background: "rgba(196,154,47,0.15)" }}>
+              <UserPlus className="w-4 h-4" style={{ color: "#c49a2f" }} />
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>
@@ -178,7 +178,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                   onChange={e => handleImage("borrowerPhoto", e.target.files?.[0])} />
                 <button onClick={() => passportRef.current?.click()}
                   className="w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                  style={{ borderColor: form.borrowerPhoto ? "#5b7cfa" : t.border, background: t.bgActive }}>
+                  style={{ borderColor: form.borrowerPhoto ? "#c49a2f" : t.border, background: t.bgActive }}>
                   {form.borrowerPhoto ? (
                     <img src={form.borrowerPhoto} alt="passport"
                       className="w-full h-full object-cover rounded-2xl" />
@@ -200,7 +200,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                   onChange={e => handleImage("borrowerIdPhoto", e.target.files?.[0])} />
                 <button onClick={() => idRef.current?.click()}
                   className="w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                  style={{ borderColor: form.borrowerIdPhoto ? "#5b7cfa" : t.border, background: t.bgActive }}>
+                  style={{ borderColor: form.borrowerIdPhoto ? "#c49a2f" : t.border, background: t.bgActive }}>
                   {form.borrowerIdPhoto ? (
                     <img src={form.borrowerIdPhoto} alt="id"
                       className="w-full h-full object-cover rounded-2xl" />
@@ -378,7 +378,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
           </button>
           <button onClick={handleSubmit}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold"
-            style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+            style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
             <UserPlus className="w-3.5 h-3.5" />
             REGISTER CLIENT
           </button>
@@ -392,7 +392,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 interface PortfolioSummaryPanelProps { loans: Loan[]; theme: any; grouped: Record<string, Loan[]>; }
 
 const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, theme: t, grouped }) => {
-  const mono    = "'Space Mono', monospace";
+  const mono    = "var(--font-mono)";
   const metrics = calculatePortfolioMetrics(loans);
   const totalClients = Object.keys(grouped).length;
 
@@ -457,10 +457,10 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   }, [loans]);
 
   const portfolioStats = [
-    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#5b7cfa" },
+    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#c49a2f" },
     { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "#4ade80" },
     { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "#f59e0b" },
-    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "#5b7cfa" },
+    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "#c49a2f" },
     { label: "OVERDUE",         value: String(metrics.overdueCount),                      icon: <Clock className="w-4 h-4" />,       color: metrics.overdueCount > 0 ? "#f87171" : "#4ade80" },
     { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "#4ade80" },
   ];
@@ -509,17 +509,17 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
                 style={{ background: t.bgActive, borderColor: t.border }}>
                 <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 border"
                   style={{
-                    background:  b.hasOverdue ? "rgba(248,113,113,0.15)" : "rgba(91,124,250,0.12)",
-                    borderColor: b.hasOverdue ? "rgba(248,113,113,0.4)"  : "rgba(91,124,250,0.3)",
+                    background:  b.hasOverdue ? "rgba(248,113,113,0.15)" : "rgba(196,154,47,0.12)",
+                    borderColor: b.hasOverdue ? "rgba(248,113,113,0.4)"  : "rgba(196,154,47,0.3)",
                   }}>
-                  <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: b.hasOverdue ? "#f87171" : "#5b7cfa" }}>{i + 1}</span>
+                  <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: b.hasOverdue ? "#f87171" : "#c49a2f" }}>{i + 1}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold truncate" style={{ color: t.text }}>{b.name}</p>
                   <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{b.phone}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#5b7cfa" }}>{formatCompactCurrency(b.totalLent)}</p>
+                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#c49a2f" }}>{formatCompactCurrency(b.totalLent)}</p>
                   {b.hasOverdue && <p className="text-[9px]" style={{ color: "#f87171", fontFamily: mono }}>OVERDUE</p>}
                 </div>
               </div>
@@ -538,7 +538,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
-            <BarChart2 className="w-3.5 h-3.5" style={{ color: "#5b7cfa" }} />
+            <BarChart2 className="w-3.5 h-3.5" style={{ color: "#c49a2f" }} />
           </div>
           <div className="flex items-end gap-3 mb-3">
             <p className="text-3xl font-bold" style={{ fontFamily: mono, color: collectionRate >= 80 ? "#4ade80" : collectionRate >= 50 ? "#f59e0b" : "#f87171" }}>
@@ -555,7 +555,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
           <div className="flex items-center justify-between mb-4">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>MONTHLY COLLECTIONS</p>
             <div className="flex gap-3 text-[9px]" style={{ fontFamily: mono }}>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#5b7cfa" }} />COL</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#c49a2f" }} />COL</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#f87171" }} />DUE</span>
             </div>
           </div>
@@ -626,7 +626,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
   const [editData, setEditData]       = useState<Partial<Loan>>({});
   const [showNewClient, setShowNewClient] = useState(false);
 
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   const grouped = useMemo(() => groupByBorrower(loans), [loans]);
 
   const clients = useMemo(() => {
@@ -717,7 +717,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             <button
               onClick={() => setShowNewClient(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
-              style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+              style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
               <UserPlus className="w-3.5 h-3.5" />
               NEW
             </button>
@@ -744,8 +744,8 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border whitespace-nowrap text-[10px] font-bold transition-all shrink-0"
                 style={{
                   fontFamily: mono, minHeight: "28px",
-                  background:  filterFlag === f ? (f === "All" ? "#5b7cfa" : FLAG_META[f as ClientFlag].bg)     : t.bgCard,
-                  borderColor: filterFlag === f ? (f === "All" ? "#5b7cfa" : FLAG_META[f as ClientFlag].border) : t.border,
+                  background:  filterFlag === f ? (f === "All" ? "#c49a2f" : FLAG_META[f as ClientFlag].bg)     : t.bgCard,
+                  borderColor: filterFlag === f ? (f === "All" ? "#c49a2f" : FLAG_META[f as ClientFlag].border) : t.border,
                   color:       filterFlag === f ? (f === "All" ? "#fff"    : FLAG_META[f as ClientFlag].color)  : t.textMuted,
                 }}>
                 {f !== "All" && FLAG_META[f as ClientFlag].icon}
@@ -773,7 +773,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   style={{
                     background:  isActive ? t.bgActive : "transparent",
                     borderColor: t.border,
-                    borderLeft:  isActive ? "3px solid #5b7cfa" : "3px solid transparent",
+                    borderLeft:  isActive ? "3px solid #c49a2f" : "3px solid transparent",
                   }}>
 
                   {/* Avatar  show photo if available */}
@@ -804,7 +804,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                     <p className="text-[10px] truncate" style={{ color: t.textFaint, fontFamily: mono }}>
                       {c.latest.borrowerPhone}  {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
                     </p>
-                    <p className="text-[10px]" style={{ color: "#5b7cfa", fontFamily: mono }}>
+                    <p className="text-[10px]" style={{ color: "#c49a2f", fontFamily: mono }}>
                       {formatCompactCurrency(c.stats.totalLent)} lent
                     </p>
                   </div>
@@ -886,7 +886,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   </button>
                   <button onClick={handleSave}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold"
-                    style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+                    style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
                     <Save className="w-3.5 h-3.5" />SAVE
                   </button>
                 </>
@@ -913,7 +913,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 <div key={s.label} className="rounded-2xl p-4 border"
                   style={{ background: t.bgActive, borderColor: t.border }}>
                   <p className="text-[9px] uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
-                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "#5b7cfa" }}>{s.value}</p>
+                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "#c49a2f" }}>{s.value}</p>
                 </div>
               ))}
             </div>
@@ -980,9 +980,9 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                       <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
                         style={{
                           fontFamily: mono,
-                          color:       l.status === "Active" ? "#5b7cfa" : l.status === "Overdue" ? "#f87171" : "#4ade80",
-                          background:  l.status === "Active" ? "rgba(91,124,250,0.1)" : l.status === "Overdue" ? "rgba(248,113,113,0.1)" : "rgba(74,222,128,0.1)",
-                          borderColor: l.status === "Active" ? "rgba(91,124,250,0.3)" : l.status === "Overdue" ? "rgba(248,113,113,0.3)" : "rgba(74,222,128,0.3)",
+                          color:       l.status === "Active" ? "#c49a2f" : l.status === "Overdue" ? "#f87171" : "#4ade80",
+                          background:  l.status === "Active" ? "rgba(196,154,47,0.1)" : l.status === "Overdue" ? "rgba(248,113,113,0.1)" : "rgba(74,222,128,0.1)",
+                          borderColor: l.status === "Active" ? "rgba(196,154,47,0.3)" : l.status === "Overdue" ? "rgba(248,113,113,0.3)" : "rgba(74,222,128,0.3)",
                         }}>
                         {l.status.toUpperCase()}
                       </span>

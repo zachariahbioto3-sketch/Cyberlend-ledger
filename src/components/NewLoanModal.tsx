@@ -24,7 +24,7 @@ export const NewLoanModal: React.FC<NewLoanModalProps> = ({
 }) => {
 if (!isOpen) return null;
 
-  const mono     = "'Space Mono', monospace";
+  const mono     = "var(--font-mono)";
 
   // Escape key ? must be before any early return (Rules of Hooks)
   React.useEffect(() => {
@@ -145,13 +145,13 @@ if (!isOpen) return null;
             {/* Returning client profile banner */}
             {isReturning && latestLoan && (
               <div className="rounded-2xl border p-4 flex items-center gap-4"
-                style={{ background: "rgba(91,124,250,0.08)", borderColor: "rgba(91,124,250,0.3)" }}>
+                style={{ background: "rgba(196,154,47,0.08)", borderColor: "rgba(196,154,47,0.3)" }}>
                 <div className="w-14 h-14 rounded-2xl border overflow-hidden shrink-0 flex items-center justify-center"
-                  style={{ borderColor: "rgba(91,124,250,0.4)", background: "rgba(91,124,250,0.12)" }}>
+                  style={{ borderColor: "rgba(196,154,47,0.4)", background: "rgba(196,154,47,0.12)" }}>
                   {latestLoan.borrowerPhoto ? (
                     <img src={latestLoan.borrowerPhoto} alt={latestLoan.borrowerName} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xl font-bold" style={{ fontFamily: mono, color: "#5b7cfa" }}>
+                    <span className="text-xl font-bold" style={{ fontFamily: mono, color: "#c49a2f" }}>
                       {latestLoan.borrowerName.charAt(0).toUpperCase()}
                     </span>
                   )}
@@ -160,7 +160,7 @@ if (!isOpen) return null;
                   <p className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>{latestLoan.borrowerName}</p>
                   <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{latestLoan.borrowerPhone}</p>
                   <div className="flex gap-3 mt-1.5 flex-wrap">
-                    <span className="text-[10px]" style={{ fontFamily: mono, color: "#5b7cfa" }}>
+                    <span className="text-[10px]" style={{ fontFamily: mono, color: "#c49a2f" }}>
                       {returningClientLoans.length} loan(s)
                     </span>
                     {outstandingBalance > 0 && (
@@ -197,8 +197,8 @@ if (!isOpen) return null;
                         <span className="text-[9px] px-2 py-0.5 rounded-full"
                           style={{
                             fontFamily: mono,
-                            color:      l.status === "Active" ? "#5b7cfa" : l.status === "Overdue" ? "#f87171" : l.status === "Completed" ? "#4ade80" : "#f87171",
-                            background: l.status === "Active" ? "rgba(91,124,250,0.12)" : l.status === "Overdue" ? "rgba(248,113,113,0.12)" : l.status === "Completed" ? "rgba(74,222,128,0.12)" : "rgba(248,113,113,0.12)",
+                            color:      l.status === "Active" ? "#c49a2f" : l.status === "Overdue" ? "#f87171" : l.status === "Completed" ? "#4ade80" : "#f87171",
+                            background: l.status === "Active" ? "rgba(196,154,47,0.12)" : l.status === "Overdue" ? "rgba(248,113,113,0.12)" : l.status === "Completed" ? "rgba(74,222,128,0.12)" : "rgba(248,113,113,0.12)",
                           }}>
                           {l.status.toUpperCase()}
                         </span>
@@ -213,7 +213,7 @@ if (!isOpen) return null;
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>
-                  PHONE * <span style={{ color: "#5b7cfa" }}>(used to detect returning client)</span>
+                  PHONE * <span style={{ color: "#c49a2f" }}>(used to detect returning client)</span>
                 </label>
                 <input required type="tel" value={borrowerPhone}
                   onChange={(e) => setBorrowerPhone(e.target.value)}

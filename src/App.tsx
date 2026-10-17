@@ -20,6 +20,7 @@ import { GoalDrawer }   from "./components/GoalDrawer";
 import { TrackerBar } from './components/TrackerBar';
 import { ClientProfilePanel } from './components/ClientProfilePanel';
 import { AgreementsPage } from './components/AgreementsPage';
+import { FaqGrid } from "./components/FaqGrid";
 import { LayoutDashboard, Users, TrendingUp, Download, RotateCcw, PlusCircle, Bell, Sun, Moon, FileText, Clock, Trash2, ScrollText } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
@@ -53,6 +54,8 @@ function AppInner() {
   };
 
   // theme: dark-only, tokens via CSS variables
+  const isDark = true;
+  const toggleTheme = () => {};
 
 
 
@@ -90,27 +93,27 @@ function AppInner() {
   const handleResetData = () => { if (confirm("Clear all data?")) { setLoans([]); } };
 
   const t = isDark ? {
-    bg:           "#0f1117",
-    bgCard:       "#1a1d27",
-    bgCardHover:  "#1f2235",
-    bgSidebar:    "#13151f",
-    bgNav:        "rgba(19,21,31,0.95)",
-    bgInput:      "#12141e",
-    bgModal:      "#1a1d27",
-    bgBtn:        "#22253a",
-    bgActive:     "#2a2d42",
+    bg:           "#0a0a0a",
+    bgCard:       "#141414",
+    bgCardHover:  "#1c1c1c",
+    bgSidebar:    "#141414",
+    bgNav:        "rgba(20,20,20,0.95)",
+    bgInput:      "#0f0f0f",
+    bgModal:      "#141414",
+    bgBtn:        "#1c1c1c",
+    bgActive:     "#262626",
     border:       "rgba(255,255,255,0.08)",
     borderMid:    "rgba(255,255,255,0.14)",
     borderStrong: "rgba(255,255,255,0.25)",
-    text:         "#e8eaf0",
-    textMuted:    "rgba(232,234,240,0.55)",
-    textFaint:    "rgba(232,234,240,0.30)",
-    btnPrimary:   "#5b7cfa",
-    btnPrimaryTx: "#ffffff",
+    text:         "#f3ead8",
+    textMuted:    "rgba(243,234,216,0.55)",
+    textFaint:    "rgba(243,234,216,0.30)",
+    btnPrimary:   "#c49a2f",
+    btnPrimaryTx: "#0a0a0a",
     rowAlt:       "rgba(255,255,255,0.02)",
     rowHover:     "rgba(255,255,255,0.04)",
     progressBg:   "rgba(255,255,255,0.10)",
-    progressFill: "#5b7cfa",
+    progressFill: "#c49a2f",
   } : {
     bg:           "#f0f2f8",
     bgCard:       "#ffffff",
@@ -124,22 +127,22 @@ function AppInner() {
     border:       "rgba(0,0,0,0.08)",
     borderMid:    "rgba(0,0,0,0.13)",
     borderStrong: "rgba(0,0,0,0.22)",
-    text:         "#0f1117",
-    textMuted:    "rgba(15,17,23,0.55)",
-    textFaint:    "rgba(15,17,23,0.35)",
-    btnPrimary:   "#5b7cfa",
-    btnPrimaryTx: "#ffffff",
+    text:         "#0a0a0a",
+    textMuted:    "rgba(10,10,10,0.55)",
+    textFaint:    "rgba(10,10,10,0.35)",
+    btnPrimary:   "#c49a2f",
+    btnPrimaryTx: "#0a0a0a",
     rowAlt:       "rgba(0,0,0,0.02)",
     rowHover:     "rgba(0,0,0,0.04)",
     progressBg:   "rgba(0,0,0,0.08)",
-    progressFill: "#5b7cfa",
+    progressFill: "#c49a2f",
   };
 
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
 
   const statusStyle = (status: string) => {
     const map: Record<string, { bg: string; color: string; border: string }> = {
-      Active:    { bg: isDark ? "rgba(91,124,250,0.15)" : "rgba(91,124,250,0.10)", color: "#5b7cfa",  border: "rgba(91,124,250,0.25)" },
+      Active:    { bg: isDark ? "rgba(196,154,47,0.15)" : "rgba(196,154,47,0.10)", color: "#c49a2f",  border: "rgba(196,154,47,0.25)" },
       Overdue:   { bg: "rgba(239,68,68,0.12)",  color: "#f87171",  border: "rgba(239,68,68,0.25)" },
       Completed: { bg: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: t.textMuted, border: t.border },
       Defaulted: { bg: "rgba(180,20,20,0.12)",  color: "#fca5a5",  border: "rgba(180,20,20,0.25)" },
@@ -271,7 +274,7 @@ function AppInner() {
               <button onClick={() => setPdfOpen(true)}
                 className="w-8 h-8 rounded-full border flex items-center justify-center"
                 style={{ borderColor: t.border, background: t.bgBtn }}>
-                <FileText className="w-4 h-4" style={{ color: "#5b7cfa" }} />
+                <FileText className="w-4 h-4" style={{ color: "#c49a2f" }} />
               </button>
               <button className="w-8 h-8 rounded-full border flex items-center justify-center"
                 style={{ borderColor: t.border, background: t.bgBtn }}>
@@ -282,7 +285,7 @@ function AppInner() {
 
           {/* -- HERO KPI CARD -- */}
           <div className="mx-4 rounded-3xl p-6 mb-4 border relative overflow-hidden"
-            style={{ background: isDark ? "#1e2235" : "#1a1d27", borderColor: "rgba(91,124,250,0.25)" }}>
+            style={{ background: isDark ? "#1c1c1c" : "#141414", borderColor: "rgba(196,154,47,0.25)" }}>
             <div className="absolute -bottom-6 -right-6 w-36 h-36 opacity-10">
               <img src="/logo.png" alt="" className="w-full h-full object-contain" />
             </div>
@@ -307,8 +310,8 @@ function AppInner() {
           <div className="px-4 grid grid-cols-3 gap-2 mb-4">
             {[
               { label: "AVAILABLE", value: formatCompactCurrency(metrics.availableCapital), color: "#4ade80", border: "rgba(74,222,128,0.30)", hasAction: true },
-              { label: "LENDABLE",  value: formatCompactCurrency(metrics.lendableAmount),   color: "#5b7cfa", border: "rgba(91,124,250,0.30)", hasAction: false },
-              { label: "RETURNS",   value: formatCompactCurrency(metrics.returnsFromPreviousLoans), color: "#a78bfa", border: "rgba(167,139,250,0.30)", hasAction: false },
+              { label: "LENDABLE",  value: formatCompactCurrency(metrics.lendableAmount),   color: "#c49a2f", border: "rgba(196,154,47,0.30)", hasAction: false },
+              { label: "RETURNS",   value: formatCompactCurrency(metrics.returnsFromPreviousLoans), color: "#d4a843", border: "rgba(212,168,67,0.30)", hasAction: false },
             ].map((c) => (
               <div key={c.label}
                 onClick={() => { if (c.hasAction) { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); } }}
@@ -357,7 +360,7 @@ function AppInner() {
               <button key={btn.label} onClick={btn.action}
                 className="flex flex-col items-center gap-2 py-3 rounded-2xl border transition-all active:scale-95"
                 style={{ background: t.bgCard, borderColor: t.border }}>
-                <div style={{ color: btn.label === "PDF" ? "#5b7cfa" : t.textMuted }}>{btn.icon}</div>
+                <div style={{ color: btn.label === "PDF" ? "#c49a2f" : t.textMuted }}>{btn.icon}</div>
                 <span className="text-[8px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{btn.label}</span>
               </button>
             ))}
@@ -484,7 +487,7 @@ function AppInner() {
               backgroundSize: "420px",
             }}>
             <div className="absolute inset-0 pointer-events-none"
-              style={{ background: isDark ? "rgba(15,17,23,0.92)" : "rgba(240,242,248,0.93)" }} />
+              style={{ background: isDark ? "rgba(10,10,10,0.92)" : "rgba(240,242,248,0.93)" }} />
             <div className="relative z-10 space-y-5 max-w-[1600px] mx-auto">
               <div>
                 <h1 className="text-lg font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h1>
@@ -516,10 +519,10 @@ function AppInner() {
               <div className="grid grid-cols-3 gap-3 w-full min-w-0">
                 {[
                   { label: "AVAILABLE CAPITAL", value: formatCompactCurrency(metrics.availableCapital), sub: totalCapital > 0 ? ("Total pool: " + formatCompactCurrency(totalCapital)) : "Set total capital", color: "#4ade80", borderColor: "rgba(74,222,128,0.30)", hasAction: true },
-                  { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#5b7cfa", borderColor: "rgba(91,124,250,0.30)", hasAction: false },
-                  { label: "RETURNS  PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#a78bfa", borderColor: "rgba(167,139,250,0.30)", hasAction: false },
+                  { label: "LENDABLE NOW", value: formatCompactCurrency(metrics.lendableAmount), sub: "80% of available capital", color: "#c49a2f", borderColor: "rgba(196,154,47,0.30)", hasAction: false },
+                  { label: "RETURNS  PREV LOANS", value: formatCompactCurrency(metrics.returnsFromPreviousLoans), sub: metrics.completedLoansCount + " completed loans", color: "#d4a843", borderColor: "rgba(212,168,67,0.30)", hasAction: false },
                 ].map((card) => (
-                  <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#1a1d27" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
+                  <div key={card.label} className="rounded-2xl p-5 border transition-all" style={{ background: isDark ? "#141414" : "#ffffff", borderColor: card.borderColor, borderLeftWidth: "3px" }}>
                     <div className="flex items-start justify-between">
                       <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>{card.label}</p>
                       {card.hasAction && (
@@ -551,11 +554,11 @@ function AppInner() {
                 ].map((card, i) => (
                   <div key={card.label} className="rounded-2xl p-5 border transition-all"
                     style={{
-                      background:  i === 0 ? (isDark ? "#1e2235" : "#e8ebf8") : t.bgCard,
-                      borderColor: i === 0 ? "rgba(91,124,250,0.30)" : t.border,
+                      background:  i === 0 ? (isDark ? "#1c1c1c" : "#e8ebf8") : t.bgCard,
+                      borderColor: i === 0 ? "rgba(196,154,47,0.30)" : t.border,
                     }}>
                     <p className="text-[9px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>{card.label}</p>
-                    <p className="text-xl font-bold" style={{ fontFamily: mono, color: i === 0 ? "#5b7cfa" : t.text }}>{card.value}</p>
+                    <p className="text-xl font-bold" style={{ fontFamily: mono, color: i === 0 ? "#c49a2f" : t.text }}>{card.value}</p>
                     <p className="text-[10px] mt-1" style={{ color: t.textFaint }}>{card.sub}</p>
                   </div>
                 ))}
@@ -608,6 +611,8 @@ function AppInner() {
                 onOpenNewLoan={() => setNewLoanOpen(true)}
                 theme={t}
               />
+
+              <FaqGrid />
             </div>
           </main>
         )}
@@ -670,7 +675,7 @@ function AppInner() {
                   if (!isNaN(val) && val > 0) { setTotalCapital(val); setCapitalModalOpen(false); }
                 }}
                 className="flex-1 py-2.5 rounded-xl text-xs font-bold"
-                style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+                style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
                 SAVE
               </button>
             </div>

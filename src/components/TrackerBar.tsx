@@ -11,7 +11,7 @@ interface TrackerBarProps {
 }
 
 export const TrackerBar: React.FC<TrackerBarProps> = ({ metrics, theme: t, selectedClient, onClose }) => {
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   return (
     <div
       className="flex items-center justify-between px-6 py-3 border-b gap-4 shrink-0"
@@ -23,10 +23,10 @@ export const TrackerBar: React.FC<TrackerBarProps> = ({ metrics, theme: t, selec
     >
       <div className="flex items-center gap-6 flex-1 flex-wrap">
         {[
-          { label: "TOTAL LENT",  value: formatCompactCurrency(metrics.totalPrincipalLent), color: "#5b7cfa" },
+          { label: "TOTAL LENT",  value: formatCompactCurrency(metrics.totalPrincipalLent), color: "#c49a2f" },
           { label: "OUTSTANDING", value: formatCompactCurrency(metrics.totalOutstanding),   color: "#f59e0b" },
           { label: "COLLECTED",   value: formatCompactCurrency(metrics.totalCollected),     color: "#4ade80" },
-          { label: "PROFIT",      value: formatCompactCurrency(metrics.totalProfit),        color: "#a78bfa" },
+          { label: "PROFIT",      value: formatCompactCurrency(metrics.totalProfit),        color: "#d4a843" },
         ].map((stat, i) => (
           <React.Fragment key={stat.label}>
             {i > 0 && <div className="w-px h-5 shrink-0" style={{ background: t.border }} />}

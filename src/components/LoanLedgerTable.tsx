@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { ExportMenu } from "./ExportMenu";
 import { Loan } from "../types";
 import { formatCurrency, formatDate } from "../utils/loanCalculations";
 import { ChevronRight, Plus, Trash2, Search } from "lucide-react";
@@ -18,7 +19,7 @@ interface LoanLedgerTableProps {
 export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelectLoan, onRecordPayment, onDeleteLoan, onOpenNewLoan, onEditClient, theme: t }) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
 
   const filtered = useMemo(() => loans.filter((l) => {
     const q = search.toLowerCase();
@@ -28,7 +29,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
 
   const statusStyle = (status: string) => {
     const map: Record<string, { bg: string; color: string; border: string }> = {
-      Active:    { bg: 'rgba(91,124,250,0.15)',  color: '#5b7cfa',  border: 'rgba(91,124,250,0.30)' },
+      Active:    { bg: 'rgba(196,154,47,0.15)',  color: '#c49a2f',  border: 'rgba(196,154,47,0.30)' },
       Overdue:   { bg: 'rgba(239,68,68,0.12)',   color: '#f87171',  border: 'rgba(239,68,68,0.25)' },
       Completed: { bg: 'rgba(255,255,255,0.06)', color: t.textMuted, border: t.border },
       Defaulted: { bg: 'rgba(127,29,29,0.20)',   color: '#fca5a5',  border: 'rgba(127,29,29,0.35)' },
@@ -43,9 +44,10 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: t.text }}>MASTER LEDGER</h2>
-            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS</p>
+            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS - {formatCurrency(loans.reduce((s, l) => s + (l.status === "Active" || l.status === "Overdue" ? l.remainingBalance : 0), 0))} OUTSTANDING</p>
           </div>
           <div className="flex items-center gap-2">
+            <ExportMenu loans={loans} />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3" style={{ color: t.textFaint }} />
               <input

@@ -11,7 +11,7 @@ interface GoalsModalProps {
 }
 
 export const GoalsModal: React.FC<GoalsModalProps> = ({ isOpen, onClose, goals, onSave, theme: t }) => {
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   const [form, setForm] = useState<Goals>(goals);
 
   useEffect(() => { if (isOpen) setForm(goals); }, [isOpen, goals]);
@@ -46,8 +46,8 @@ export const GoalsModal: React.FC<GoalsModalProps> = ({ isOpen, onClose, goals, 
 
         <div className="flex items-center justify-between px-6 py-5 border-b" style={{ borderColor: t.border }}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(91,124,250,0.15)" }}>
-              <Target className="w-4 h-4" style={{ color: "#5b7cfa" }} />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(196,154,47,0.15)" }}>
+              <Target className="w-4 h-4" style={{ color: "#c49a2f" }} />
             </div>
             <div>
               <h2 className="text-xs font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>EDIT GOALS</h2>
@@ -89,7 +89,7 @@ export const GoalsModal: React.FC<GoalsModalProps> = ({ isOpen, onClose, goals, 
             CANCEL
           </button>
           <button onClick={handleSave} className="px-5 py-2 rounded-xl text-xs font-bold"
-            style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+            style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
             SAVE GOALS
           </button>
         </div>

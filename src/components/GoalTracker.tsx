@@ -13,8 +13,8 @@ interface GoalTrackerProps {
 }
 
 export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans, theme: t, onEdit }) => {
-  const mono = "'Space Mono', monospace";
-  const isDark = t.text !== "#0f1117";
+  const mono = "var(--font-mono)";
+  const isDark = t.text !== "#0a0a0a";
 
   const activeLoans     = loans.filter((l) => l.status === "Active" || l.status === "Overdue");
   const uniqueClients   = new Set(activeLoans.map((l) => l.borrowerPhone)).size;
@@ -66,13 +66,13 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
 
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <Target className="w-4 h-4" style={{ color: "#5b7cfa" }} />
+          <Target className="w-4 h-4" style={{ color: "#c49a2f" }} />
           <p className="text-[10px] font-bold uppercase tracking-widest"
             style={{ fontFamily: mono, color: t.textFaint }}>GOAL TRACKER</p>
         </div>
         <button onClick={onEdit}
           className="text-[9px] font-bold px-3 py-1 rounded-lg border"
-          style={{ fontFamily: mono, borderColor: "rgba(91,124,250,0.30)", color: "#5b7cfa", background: "rgba(91,124,250,0.10)" }}>
+          style={{ fontFamily: mono, borderColor: "rgba(196,154,47,0.30)", color: "#c49a2f", background: "rgba(196,154,47,0.10)" }}>
           EDIT GOALS
         </button>
       </div>

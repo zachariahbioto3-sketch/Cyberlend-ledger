@@ -190,7 +190,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
   const cardSx   = { background: t.bgCard, borderColor: t.border };
   const modalSx  = { background: t.bgModal, borderColor: t.borderMid };
   const headSx   = { borderColor: t.border };
-  const shSx     = { color: "#5b7cfa", borderColor: t.border };
+  const shSx     = { color: "#c49a2f", borderColor: t.border };
 
   const stepTitles = ["Lender Details","Borrower Details","Guarantor Details","Loan Facility","Interest & Fees","Disbursement","Review & Confirm"];
 
@@ -477,7 +477,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
                             <td className="px-2 py-1.5" style={{ color: t.textMuted }}>{row.dueDate}</td>
                             <td className="px-2 py-1.5" style={{ color: t.text }}>{formatCurrency(row.principal)}</td>
                             <td className="px-2 py-1.5" style={{ color: t.text }}>{formatCurrency(row.interest)}</td>
-                            <td className="px-2 py-1.5 font-medium" style={{ color: "#5b7cfa" }}>{formatCurrency(row.totalDue)}</td>
+                            <td className="px-2 py-1.5 font-medium" style={{ color: "#c49a2f" }}>{formatCurrency(row.totalDue)}</td>
                             <td className="px-2 py-1.5" style={{ color: t.textMuted }}>{formatCurrency(row.balance)}</td>
                           </tr>
                         ))}
@@ -500,7 +500,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
           {step < TOTAL_STEPS ? (
             <button onClick={next}
               className="px-5 py-2 text-sm rounded-lg font-medium transition"
-              style={{ background: "#5b7cfa", color: "#ffffff" }}>
+              style={{ background: "#c49a2f", color: "#ffffff" }}>
               Next →
             </button>
           ) : (

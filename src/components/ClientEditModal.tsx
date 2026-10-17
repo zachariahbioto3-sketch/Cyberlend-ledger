@@ -13,7 +13,7 @@ interface ClientEditModalProps {
 const FLAG_OPTIONS: ClientFlag[] = ["VIP", "Risk", "Blacklisted", "Defaulter", "New", "Regular"];
 
 export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClose, loan, onSave, theme: t }) => {
-  const mono = "'Space Mono', monospace";
+  const mono = "var(--font-mono)";
   const [form, setForm] = useState<Partial<Loan>>({});
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   const labelStyle = { fontFamily: mono, color: t.textFaint };
 
   const FLAG_COLORS: Record<ClientFlag, string> = {
-    VIP: "#f59e0b", Risk: "#fb923c", Blacklisted: "#f87171", Defaulter: "#ef4444", New: "#5b7cfa", Regular: "#4ade80",
+    VIP: "#f59e0b", Risk: "#fb923c", Blacklisted: "#f87171", Defaulter: "#ef4444", New: "#c49a2f", Regular: "#4ade80",
   };
 
   return (
@@ -83,7 +83,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderColor: t.border }}>
           <div className="flex items-center gap-3">
-            <Edit3 className="w-4 h-4" style={{ color: "#5b7cfa" }} />
+            <Edit3 className="w-4 h-4" style={{ color: "#c49a2f" }} />
             <div>
               <p className="text-xs font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>EDIT CLIENT</p>
               <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{loan.borrowerName}</p>
@@ -181,7 +181,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
             CANCEL
           </button>
           <button onClick={handleSave} className="px-5 py-2 rounded-xl text-xs font-bold"
-            style={{ fontFamily: mono, background: "#5b7cfa", color: "#fff" }}>
+            style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
             SAVE CHANGES
           </button>
         </div>

@@ -21,7 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({ metrics, onOpenNewLoanModal, onE
           <TrendingUp className="w-4 h-4 text-white" />
         </div>
         <div>
-          <span className="font-bold text-sm text-white tracking-widest uppercase" style={{ fontFamily: "'Space Mono', monospace" }}>
+          <span className="font-bold text-sm text-white tracking-widest uppercase" style={{ fontFamily: "var(--font-mono)" }}>
             CYBERLEND
           </span>
           <p className="text-[8px] text-white/30 tracking-widest uppercase">Fast Honest Reliable</p>
@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ metrics, onOpenNewLoanModal, onE
           type="text"
           placeholder="Search loans, borrowers..."
           className="w-full pl-8 pr-4 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-white/30 transition-colors text-white placeholder-white/20"
-          style={{ fontFamily: "'Space Mono', monospace" }}
+          style={{ fontFamily: "var(--font-mono)" }}
         />
       </div>
 
@@ -50,8 +50,8 @@ export const Navbar: React.FC<NavbarProps> = ({ metrics, onOpenNewLoanModal, onE
           <React.Fragment key={m.label}>
             {i > 0 && <div className="w-px h-5 bg-white/10" />}
             <div>
-              <p className="text-[9px] text-white/30 uppercase tracking-widest" style={{ fontFamily: "'Space Mono', monospace" }}>{m.label}</p>
-              <p className="font-bold text-white text-xs" style={{ fontFamily: "'Space Mono', monospace" }}>{m.value}</p>
+              <p className="text-[9px] text-white/30 uppercase tracking-widest" style={{ fontFamily: "var(--font-mono)" }}>{m.label}</p>
+              <p className="font-bold text-white text-xs" style={{ fontFamily: "var(--font-mono)" }}>{m.value}</p>
             </div>
           </React.Fragment>
         ))}
@@ -70,12 +70,12 @@ export const Navbar: React.FC<NavbarProps> = ({ metrics, onOpenNewLoanModal, onE
         </button>
         <button onClick={onOpenNewLoanModal}
           className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-black hover:bg-white/90 transition-all shadow-lg"
-          style={{ fontFamily: "'Space Mono', monospace" }}>
+          style={{ fontFamily: "var(--font-mono)" }}>
           <PlusCircle className="w-3.5 h-3.5" />
           NEW LOAN
         </button>
         <div className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center ml-1">
-          <span className="text-white text-[9px] font-bold" style={{ fontFamily: "'Space Mono', monospace" }}>CL</span>
+          <span className="text-white text-[9px] font-bold" style={{ fontFamily: "var(--font-mono)" }}>CL</span>
         </div>
       </div>
     </header>

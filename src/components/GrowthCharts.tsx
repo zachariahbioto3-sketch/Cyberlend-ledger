@@ -22,7 +22,7 @@ function formatMonthLabel(key: string) {
 }
 
 export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) => {
-  const mono = "\x27Space Mono\x27, monospace";
+  const mono = "var(--font-mono)";
 
   const allMonths = [...new Set(loans.map(l => getMonthKey(l.originationDate)))].filter(Boolean).sort();
 
@@ -102,16 +102,16 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
             <XAxis dataKey="month" tick={axisStyle} />
             <YAxis tick={axisStyle} tickFormatter={(v) => v >= 1000 ? (v / 1000).toFixed(0) + "k" : v} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => ["KES " + Number(v).toLocaleString(), ""]} />
-            <Line type="monotone" dataKey="assets" stroke="#5b7cfa" strokeWidth={2} dot={false} name="Actual" connectNulls={false} />
-            <Line type="monotone" dataKey="projected" stroke="#a78bfa" strokeWidth={2} strokeDasharray="5 4" dot={false} name="Projected" connectNulls={false} />
+            <Line type="monotone" dataKey="assets" stroke="#c49a2f" strokeWidth={2} dot={false} name="Actual" connectNulls={false} />
+            <Line type="monotone" dataKey="projected" stroke="#d4a843" strokeWidth={2} strokeDasharray="5 4" dot={false} name="Projected" connectNulls={false} />
           </LineChart>
         </ResponsiveContainer>
         <div className="flex gap-4 mt-2">
           <span className="flex items-center gap-1.5 text-[9px]" style={{ fontFamily: mono, color: t.textFaint }}>
-            <span style={{ display: "inline-block", width: 16, height: 2, background: "#5b7cfa" }} />ACTUAL
+            <span style={{ display: "inline-block", width: 16, height: 2, background: "#c49a2f" }} />ACTUAL
           </span>
           <span className="flex items-center gap-1.5 text-[9px]" style={{ fontFamily: mono, color: t.textFaint }}>
-            <span style={{ display: "inline-block", width: 16, height: 2, background: "#a78bfa" }} />PROJECTED
+            <span style={{ display: "inline-block", width: 16, height: 2, background: "#d4a843" }} />PROJECTED
           </span>
         </div>
       </div>

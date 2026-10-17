@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useLoanStore } from "../store/loanStore";
 import { AgreementForm } from "./AgreementForm";
 import { generateAgreementPdf } from "../utils/pdfReportGenerator";
@@ -27,7 +27,7 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
 
   const statusStyle = (s: AgreementStatus) => ({
     Draft:     { background: "rgba(234,179,8,0.12)",   color: "#eab308", border: "rgba(234,179,8,0.25)" },
-    Active:    { background: "rgba(91,124,250,0.12)",  color: "#5b7cfa", border: "rgba(91,124,250,0.25)" },
+    Active:    { background: "rgba(196,154,47,0.12)",  color: "#c49a2f", border: "rgba(196,154,47,0.25)" },
     Completed: { background: "rgba(74,222,128,0.12)",  color: "#4ade80", border: "rgba(74,222,128,0.25)" },
   }[s]);
 
@@ -62,7 +62,7 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-medium transition"
-          style={{ background: "#5b7cfa", color: "#ffffff" }}>
+          style={{ background: "#c49a2f", color: "#ffffff" }}>
           + New Agreement
         </button>
       </div>
@@ -135,7 +135,7 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
                         background: selected?.id === a.id ? t.bgActive : "transparent",
                       }}
                       onClick={() => setSelected(selected?.id === a.id ? null : a)}>
-                      <td className="px-4 py-3 font-mono font-medium whitespace-nowrap" style={{ color: "#5b7cfa" }}>{a.agreementNumber}</td>
+                      <td className="px-4 py-3 font-mono font-medium whitespace-nowrap" style={{ color: "#c49a2f" }}>{a.agreementNumber}</td>
                       <td className="px-4 py-3 whitespace-nowrap" style={{ color: t.textMuted }}>{formatDate(a.date)}</td>
                       <td className="px-4 py-3 font-medium" style={{ color: t.text }}>{a.borrower.fullName}</td>
                       <td className="px-4 py-3" style={{ color: t.textMuted }}>{a.lender.fullName}</td>
@@ -157,7 +157,7 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
                         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                           <button onClick={() => handlePdf(a)}
                             className="px-2 py-1 text-xs rounded transition"
-                            style={{ background: "rgba(91,124,250,0.15)", color: "#5b7cfa" }}>
+                            style={{ background: "rgba(196,154,47,0.15)", color: "#c49a2f" }}>
                             PDF
                           </button>
                           <button onClick={() => handleDelete(a.id)}
@@ -186,19 +186,19 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-sm">
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#5b7cfa" }}>Parties</p>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#c49a2f" }}>Parties</p>
               {[["Lender", selected.lender.fullName],["Lender ID", selected.lender.idNumber],["Lender Phone", selected.lender.phone],["Borrower", selected.borrower.fullName],["Borrower ID", selected.borrower.idNumber],["Borrower Phone", selected.borrower.phone],["Guarantor", selected.guarantor.fullName],["Guarantor ID", selected.guarantor.idNumber],["Guarantor Phone", selected.guarantor.phone]].map(([l, v]) => (
                 <DetailItem key={l} label={l} value={v} t={t} />
               ))}
             </div>
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#5b7cfa" }}>Loan Terms</p>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#c49a2f" }}>Loan Terms</p>
               {[["Requested", formatCurrency(selected.facility.requestedAmount)],["Approved", formatCurrency(selected.facility.approvedAmount)],["Net Disbursed", formatCurrency(selected.netDisbursed)],["Term", `${selected.facility.term} month(s)`],["Purpose", selected.facility.purpose],["Interest Rate", `${selected.interest.rate}%`],["Basis", selected.interest.basis],["Total Interest", formatCurrency(selected.interest.totalInterestPayable || 0)],["Disbursement", `${selected.disbursement.method} — ${selected.disbursement.accountOrPhone}`]].map(([l, v]) => (
                 <DetailItem key={l} label={l} value={v} t={t} />
               ))}
             </div>
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#5b7cfa" }}>Schedule</p>
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#c49a2f" }}>Schedule</p>
               {[["Instalments", String(selected.repaymentSchedule.length)],["First Payment", formatDate(selected.repayment.firstPaymentDate)],["Final Payment", formatDate(selected.repayment.finalPaymentDate)],["Per Instalment", formatCurrency(selected.repayment.amountPerInstalment)],["Frequency", selected.repayment.frequency],["Pay Method", selected.repayment.paymentMethod],["Pay Account", selected.repayment.paymentAccount]].map(([l, v]) => (
                 <DetailItem key={l} label={l} value={v} t={t} />
               ))}
@@ -223,7 +223,7 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
                       <td className="px-3 py-1.5" style={{ color: t.text }}>{formatCurrency(row.principal)}</td>
                       <td className="px-3 py-1.5" style={{ color: t.text }}>{formatCurrency(row.interest)}</td>
                       <td className="px-3 py-1.5" style={{ color: t.text }}>{formatCurrency(row.fees)}</td>
-                      <td className="px-3 py-1.5 font-medium" style={{ color: "#5b7cfa" }}>{formatCurrency(row.totalDue)}</td>
+                      <td className="px-3 py-1.5 font-medium" style={{ color: "#c49a2f" }}>{formatCurrency(row.totalDue)}</td>
                       <td className="px-3 py-1.5" style={{ color: t.textMuted }}>{formatCurrency(row.balance)}</td>
                     </tr>
                   ))}
@@ -234,7 +234,7 @@ export function AgreementsPage({ theme: t }: AgreementsPageProps) {
 
           <button onClick={() => handlePdf(selected)}
             className="w-full py-2.5 text-sm rounded-lg font-medium transition"
-            style={{ background: "#5b7cfa", color: "#ffffff" }}>
+            style={{ background: "#c49a2f", color: "#ffffff" }}>
             📄 Download Agreement PDF
           </button>
         </div>

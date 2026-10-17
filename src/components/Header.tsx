@@ -16,7 +16,7 @@ export function Header({ onSearch, className }: HeaderProps) {
       "pt-[calc(env(safe-area-inset-top,0px)+12px)]",
       className
     )}>
-      {/* Logo — mobile only */}
+      {/* Logo â€” mobile only */}
       <span className="font-brand text-[var(--gold-500)] text-xl md:hidden">Cyberlend</span>
 
       {/* Search */}
@@ -24,7 +24,7 @@ export function Header({ onSearch, className }: HeaderProps) {
         <Search className="h-4 w-4 text-[var(--text-muted)] shrink-0" />
         <input
           type="text"
-          placeholder="Search loans, clients…"
+          placeholder="Search loans, clientsâ€¦"
           onChange={(e) => onSearch?.(e.target.value)}
           className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
         />
