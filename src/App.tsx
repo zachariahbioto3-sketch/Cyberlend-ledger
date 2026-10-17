@@ -43,8 +43,7 @@ function AppInner() {
   const [desktopTab, setDesktopTab] = useState<"dashboard" | "clients" | "waitlist" | "agreements">("dashboard");
   const [pdfOpen, setPdfOpen] = useState(false);
   const handleUpdateLoan = (id: string, updates: Partial<any>) => {
-    const updated = loans.map((l) => l.id === id ? { ...l, ...updates } : l);
-    setLoans(updated);
+    useLoanStore.getState().updateLoan(id, updates);
    };
 
   const handleSaveClientEdit = (id: string, updates: Partial<Loan>) => {
@@ -54,8 +53,9 @@ function AppInner() {
   };
 
   // theme: dark-only, tokens via CSS variables
-  const isDark = true;
-  const toggleTheme = () => {};
+  const [isDark, setIsDark] = useState(() => localStorage.getItem("cyberlend-theme") !== "light");
+  useEffect(() => { document.documentElement.classList.toggle("dark", isDark); localStorage.setItem("cyberlend-theme", isDark ? "dark" : "light"); }, [isDark]);
+  const toggleTheme = () => setIsDark((d) => !d);
 
 
 
@@ -115,15 +115,15 @@ function AppInner() {
     progressBg:   "rgba(255,255,255,0.10)",
     progressFill: "#c49a2f",
   } : {
-    bg:           "#f0f2f8",
+    bg:           "#f6f1e6",
     bgCard:       "#ffffff",
-    bgCardHover:  "#f7f8fc",
+    bgCardHover:  "#fbf7ee",
     bgSidebar:    "#ffffff",
     bgNav:        "rgba(255,255,255,0.95)",
-    bgInput:      "#f0f2f8",
+    bgInput:      "#f6f1e6",
     bgModal:      "#ffffff",
-    bgBtn:        "#f0f2f8",
-    bgActive:     "#e4e7f5",
+    bgBtn:        "#f6f1e6",
+    bgActive:     "#e6dcc4",
     border:       "rgba(0,0,0,0.08)",
     borderMid:    "rgba(0,0,0,0.13)",
     borderStrong: "rgba(0,0,0,0.22)",
@@ -142,7 +142,7 @@ function AppInner() {
 
   const statusStyle = (status: string) => {
     const map: Record<string, { bg: string; color: string; border: string }> = {
-      Active:    { bg: isDark ? "rgba(196,154,47,0.15)" : "rgba(196,154,47,0.10)", color: "#c49a2f",  border: "rgba(196,154,47,0.25)" },
+      Active:    { bg: isDark ? "rgba(196,154,47,0.15)" : "rgba(196,154,47,0.10)", color: isDark ? "#c49a2f" : "#7a5a10",  border: "rgba(196,154,47,0.25)" },
       Overdue:   { bg: "rgba(239,68,68,0.12)",  color: "#f87171",  border: "rgba(239,68,68,0.25)" },
       Completed: { bg: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: t.textMuted, border: t.border },
       Defaulted: { bg: "rgba(180,20,20,0.12)",  color: "#fca5a5",  border: "rgba(180,20,20,0.25)" },
@@ -283,6 +283,7 @@ function AppInner() {
             </div>
           </div>
 
+          {mobileTab === "loans" && (<>
           {/* -- HERO KPI CARD -- */}
           <div className="mx-4 rounded-3xl p-6 mb-4 border relative overflow-hidden"
             style={{ background: isDark ? "#1c1c1c" : "#141414", borderColor: "rgba(196,154,47,0.25)" }}>
@@ -335,13 +336,13 @@ function AppInner() {
               <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#f87171" }}>
-                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE ï¿½ COLLECT NOW
+                  {loans.filter((l) => l.status === "Overdue").length} OVERDUE - COLLECT NOW
                 </p>
                 <div className="mt-1 flex flex-col gap-0.5">
                   {loans.filter((l) => l.status === "Overdue").map((l) => (
                     <p key={l.id} className="text-[10px]" style={{ color: t.textMuted }}>
                       <span style={{ color: t.text, fontWeight: 700 }}>{l.borrowerName}</span>
-                      {" ï¿½ "}{formatCompactCurrency(l.monthlyInterest)} due
+                      {" - "}{formatCompactCurrency(l.monthlyInterest)} due
                     </p>
                   ))}
                 </div>
@@ -365,6 +366,8 @@ function AppInner() {
               </button>
             ))}
           </div>
+
+          </>)}
 
           {mobileTab === "loans" && (
             <div className="px-4 pb-24">
@@ -577,7 +580,7 @@ function AppInner() {
                       {loans.filter((l) => l.status === "Overdue").map((l) => (
                         <span key={l.id}>
                           <span className="font-semibold" style={{ color: t.text }}>{l.borrowerName}</span>
-                          {" ï¿½ "}{formatCompactCurrency(l.monthlyPayment)} overdue
+                          {" - "}{formatCompactCurrency(l.monthlyPayment)} overdue
                         </span>
                       ))}
                     </div>

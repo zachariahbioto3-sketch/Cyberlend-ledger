@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useLoanStore } from "../store/loanStore";
+import { ClientInfoCard } from "./ClientInfoCard";
 import { Loan, ClientFlag, LoanPurpose } from "../types";
 import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
 
@@ -653,8 +654,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
 
   const handleEdit = () => {
     if (!selectedLatest) return;
-    setEditData({
-      borrowerAddress:  selectedLatest.borrowerAddress  || "",
+    setEditData({ borrowerName: selectedLatest.borrowerName || "", borrowerPhone: selectedLatest.borrowerPhone || "", occupation: selectedLatest.occupation || "", kraPin: selectedLatest.kraPin || "", borrowerAddress:  selectedLatest.borrowerAddress  || "",
       borrowerIdNumber: selectedLatest.borrowerIdNumber || "",
       borrowerEmail:    selectedLatest.borrowerEmail    || "",
       clientNotes:      selectedLatest.clientNotes      || "",
@@ -666,7 +666,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
 
   const handleSave = () => {
     if (!selected || !onUpdateLoan) return;
-    selected.forEach(l => onUpdateLoan(l.id, editData));
+    const nm = (editData.borrowerName || "").trim(); const ph = (editData.borrowerPhone || "").trim(); if (!nm || !ph) { alert("Name and phone are required"); return; } const next = { ...editData, borrowerName: nm, borrowerPhone: ph }; selected.forEach(l => onUpdateLoan(l.id, next)); setSelectedKey(ph); if (selectedLatest) setSelectedClient({ ...selectedLatest, ...next });
     setEditMode(false);
   };
 
@@ -825,7 +825,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
 
       {/* RIGHT  CLIENT DETAIL (client selected)  FIXED: no longer absolute */}
       {selected && selectedLatest && selectedStats && (
-        <div className="flex flex-col flex-1 overflow-hidden w-full" style={{ background: t.bgCard }}>
+        <div className="flex flex-col flex-1 w-full lg:overflow-hidden" style={{ background: t.bgCard }}>
 
           {/* Detail header */}
           <div className="flex flex-col px-3 py-3 border-b shrink-0 gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 sm:gap-3"
@@ -870,7 +870,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+            <div className="hidden lg:flex items-center gap-2 shrink-0">
               {!editMode ? (
                 <button onClick={handleEdit}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold"
@@ -900,7 +900,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
           </div>
 
           {/* Detail body */}
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 sm:px-5 sm:py-5 sm:space-y-4">
+          <div className="flex-1 px-3 py-3 space-y-3 sm:px-5 sm:py-5 sm:space-y-4 lg:overflow-y-auto">
 
             {/* Stats row */}
             <div className="grid grid-cols-2 gap-2">
@@ -927,38 +927,17 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             )}
 
             {/* Contact & Profile */}
-            <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ fontFamily: mono, color: t.textFaint }}>CONTACT & PROFILE</p>
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                  {[
-                    { label: "Email",      value: selectedLatest.borrowerEmail    || "", icon: <Mail className="w-3.5 h-3.5" /> },
-                    { label: "Address",    value: selectedLatest.borrowerAddress  || "", icon: <MapPin className="w-3.5 h-3.5" /> },
-                    { label: "ID No.",     value: selectedLatest.borrowerIdNumber || "", icon: <CreditCard className="w-3.5 h-3.5" /> },
-                    { label: "Referral",   value: selectedLatest.referralSource   || "", icon: <TrendingUp className="w-3.5 h-3.5" /> },
-                    { label: "Occupation", value: selectedLatest.occupation       || "", icon: <Activity className="w-3.5 h-3.5" /> },
-                    { label: "Purpose",    value: selectedLatest.loanPurpose      || "", icon: <FileText className="w-3.5 h-3.5" /> },
-                  ].map(f => (
-                    <div key={f.label} className="flex items-start gap-2 p-3 rounded-xl border"
-                      style={{ background: t.bgActive, borderColor: t.border }}>
-                      <span style={{ color: t.textFaint }}>{f.icon}</span>
-                      <div>
-                        <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{f.label}</p>
-                        <p className="text-xs mt-0.5 break-all" style={{ color: t.text }}>{f.value}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {selectedLatest.clientNotes && (
-                    <div className="sm:col-span-2 flex items-start gap-2 p-3 rounded-xl border"
-                      style={{ background: t.bgActive, borderColor: t.border }}>
-                      <FileText className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: t.textFaint }} />
-                      <div>
-                        <p className="text-[9px] uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>NOTES</p>
-                        <p className="text-xs" style={{ color: t.text }}>{selectedLatest.clientNotes}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-            </div>
+            <ClientInfoCard
+              client={selectedLatest}
+              editMode={editMode}
+              editData={editData}
+              onChange={(k, v) => setEditData((p) => ({ ...p, [k]: v } as Partial<Loan>))}
+              onToggleFlag={toggleFlag}
+              onEdit={handleEdit}
+              onCancel={() => setEditMode(false)}
+              onSave={handleSave}
+              flagMeta={FLAG_META}
+            />
 
             {/* Loan history */}
             <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
