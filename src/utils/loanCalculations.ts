@@ -172,11 +172,16 @@ export function nextDueAfter(originationDate: string, monthsCompleted: number): 
 }
 
 export function updateLoanAfterInterest(loan: Loan, amount: number = loan.monthlyInterest): Loan {
-  const monthsCompleted = loan.monthsCompleted + 1;
+  const previousBalance = loan.carryForward || 0;
+  const amountDue = previousBalance + loan.monthlyInterest;
+  const paid = Math.max(0, Math.min(amount, amountDue));
+  const fullyPaid = paid >= amountDue;
+  const monthsCompleted = fullyPaid ? loan.monthsCompleted + 1 : loan.monthsCompleted;
   return {
     ...loan,
-    interestCollected: loan.interestCollected + amount,
-    amountPaid:        loan.amountPaid + amount,
+    interestCollected: loan.interestCollected + paid,
+    amountPaid:        loan.amountPaid + paid,
+    carryForward:      fullyPaid ? 0 : amountDue - paid,
     monthsCompleted,
     monthsRemaining:   Math.max(0, loan.term - monthsCompleted),
     nextDueDate:       nextDueAfter(loan.originationDate, monthsCompleted),

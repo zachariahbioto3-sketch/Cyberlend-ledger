@@ -43,9 +43,13 @@ export const TrackerBar: React.FC<TrackerBarProps> = ({ metrics, theme: t, selec
             className="w-7 h-7 rounded-full border flex items-center justify-center shrink-0"
             style={{ background: t.bgActive, borderColor: t.borderMid }}
           >
-            <span className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
-              {selectedClient.borrowerName.charAt(0).toUpperCase()}
-            </span>
+            {selectedClient.borrowerPhoto ? (
+              <img src={selectedClient.borrowerPhoto} alt={selectedClient.borrowerName} className="w-full h-full rounded-full object-cover" />
+            ) : (
+              <span className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
+                {selectedClient.borrowerName.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
           <div>
             <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{selectedClient.borrowerName}</p>

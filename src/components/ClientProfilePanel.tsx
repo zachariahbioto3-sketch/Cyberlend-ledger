@@ -50,7 +50,9 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({ client, 
           className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 border text-xl font-bold"
           style={{ background: t.bgActive, borderColor: t.borderMid, color: t.text }}
         >
-          {client.borrowerName.charAt(0).toUpperCase()}
+          {client.borrowerPhoto ? (
+            <img src={client.borrowerPhoto} alt={client.borrowerName} className="w-full h-full rounded-full object-cover" />
+          ) : client.borrowerName.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-base font-bold truncate" style={{ color: t.text }}>{client.borrowerName}</p>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clock, UserPlus, CheckCircle, XCircle, Trash2, ChevronDown, DollarSign, ArrowRight } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Trash2, ChevronDown, DollarSign, ArrowRight } from "lucide-react";
 import { useLoanStore } from "../store/loanStore";
 import { WishlistEntry, LoanPurpose } from "../types";
 import { formatCompactCurrency } from "../utils/loanCalculations";
@@ -76,11 +76,13 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {/* Top row */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-full border flex items-center justify-center shrink-0"
+            <div className="w-10 h-10 rounded-full border flex items-center justify-center shrink-0 overflow-hidden"
               style={{ background: meta.bg, borderColor: meta.border }}>
-              <span className="text-sm font-bold" style={{ fontFamily: mono, color: meta.color }}>
-                {entry.name.charAt(0).toUpperCase()}
-              </span>
+              {entry.borrowerPhoto ? <img src={entry.borrowerPhoto} alt={entry.name} className="w-full h-full object-cover" /> : (
+                <span className="text-sm font-bold" style={{ fontFamily: mono, color: meta.color }}>
+                  {entry.name.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold truncate" style={{ fontFamily: mono, color: t.text }}>{entry.name}</p>
@@ -217,11 +219,6 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
             {enquiries.length} ENQUIRY - {pending.length} PENDING - {approved.length} APPROVED
           </p>
         </div>
-        <button onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold"
-          style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
-          <UserPlus className="w-3.5 h-3.5" /> ADD CLIENT
-        </button>
       </div>
 
       {/* Add form - no amount field, client hasn't said yet */}

@@ -1,9 +1,10 @@
 import * as React from "react"
-import { Edit3, Save } from "lucide-react"
+import { Edit3, Save, Camera } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input, fieldClassName, fieldViewClassName } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Loan, ClientFlag } from "../types"
+import { compressImage } from "../utils/imageUtils"
 
 type FlagMeta = { color: string; bg: string; border: string; icon: React.ReactNode }
 type FieldDef = { key: keyof Loan; label: string; type?: string; placeholder?: string; readOnly?: boolean; wide?: boolean }
@@ -100,6 +101,29 @@ export const ClientInfoCard: React.FC<ClientInfoCardProps> = ({
       </div>
 
       <div className="flex flex-col gap-3 p-3 sm:p-4">
+        <Group title="Profile photo">
+          <label className={cn(
+            "flex min-h-24 cursor-pointer items-center gap-4 rounded-xl border border-dashed p-3",
+            editMode ? "border-foreground/20" : "cursor-default border-foreground/10"
+          )}>
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-foreground/15 bg-muted">
+              {source.borrowerPhoto ? (
+                <img src={String(source.borrowerPhoto)} alt={String(source.borrowerName || "Client")} className="h-full w-full object-cover" />
+              ) : <Camera className="h-5 w-5 text-muted-fg" />}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium">{editMode ? "Change profile photo" : "Client profile photo"}</p>
+              <p className="mt-1 text-xs text-muted-fg">{editMode ? "Upload a new image to update every related loan." : "Used across the client profile and loan records."}</p>
+              {editMode && source.borrowerPhoto && <button type="button" onClick={(e) => { e.preventDefault(); onChange("borrowerPhoto", ""); }} className="mt-2 text-xs text-red-400">Remove photo</button>}
+            </div>
+            {editMode && <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              compressImage(file).then((image) => onChange("borrowerPhoto", image));
+            }} />}
+          </label>
+        </Group>
+
         <Group title="Identity">
           <FieldGrid defs={IDENTITY} source={source} editMode={editMode} onChange={onChange} />
         </Group>

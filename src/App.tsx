@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
@@ -32,7 +32,7 @@ import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
-// CSS-variable shim — keeps old child components working without modifying them
+// CSS-variable shim â€” keeps old child components working without modifying them
 const t = {
   bg:           "var(--background)",
   bgCard:       "var(--card)",
@@ -44,16 +44,16 @@ const t = {
   bgBtn:        "var(--bg-raised)",
   bgActive:     "var(--bg-raised)",
   border:       "var(--border)",
-  borderMid:    "rgba(243,234,216,0.14)",
-  borderStrong: "rgba(243,234,216,0.25)",
+  borderMid:    "var(--border-mid)",
+  borderStrong: "var(--border-strong)",
   text:         "var(--foreground)",
   textMuted:    "var(--muted-foreground)",
-  textFaint:    "rgba(243,234,216,0.30)",
+  textFaint:    "var(--text-faint)",
   btnPrimary:   "var(--primary)",
   btnPrimaryTx: "var(--primary-foreground)",
-  rowAlt:       "rgba(255,255,255,0.02)",
-  rowHover:     "rgba(255,255,255,0.04)",
-  progressBg:   "rgba(255,255,255,0.10)",
+  rowAlt:       "var(--row-alt)",
+  rowHover:     "var(--row-hover)",
+  progressBg:   "var(--progress-bg)",
   progressFill: "var(--primary)",
 };
 
@@ -74,6 +74,7 @@ function AppInner() {
   const [promotedEntry,    setPromotedEntry]    = useState<any>(null);
   const [paymentLoan,      setPaymentLoan]      = useState<Loan | null>(null);
   const [detailLoan,       setDetailLoan]       = useState<Loan | null>(null);
+  const [mobileBorrowerLoans, setMobileBorrowerLoans] = useState<Loan[] | null>(null);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
   const toggleTheme = () => { const d = !isDark; setIsDark(d); document.documentElement.classList.toggle("dark", d); localStorage.setItem("cyberlend-theme", d ? "dark" : "light"); };
   const [confirmReset,     setConfirmReset]     = useState(false);
@@ -91,7 +92,7 @@ function AppInner() {
   const handleSavePayment = (loanId: string, txs: any[]) => {
     txs.forEach((tx) => tx.paymentType === "Principal" ? closeLoan(loanId, tx) : recordPayment(loanId, tx));
     setPaymentLoan(null);
-    showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded – loan rolled over", "success");
+    showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded â€“ loan rolled over", "success");
   };
   const handleExportCSV = async () => {
     if (!loans.length) { showToast("No loans to export", "error"); return; }
@@ -111,6 +112,13 @@ function AppInner() {
   const handleResetData = () => { setLoans([]); setConfirmReset(false); showToast("All data cleared", "info"); };
 
   const overdueLoans = loans.filter((l) => l.status === "Overdue");
+  const mobileLoanGroups = useMemo(() => {
+    const q = mSearch.trim().toLowerCase();
+    const matches = loans.filter((l) => (!q || l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q)) && (mStatus === "ALL" || l.status === mStatus));
+    const groups = new Map<string, Loan[]>();
+    matches.forEach((loan) => { const key = loan.borrowerPhone || loan.borrowerName; groups.set(key, [...(groups.get(key) || []), loan]); });
+    return [...groups.values()].map((group) => group.sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()));
+  }, [loans, mSearch, mStatus]);
 
   const statusStyle = (status: string) => ({
     Active:    { bg: "rgba(196,154,47,0.15)", color: "var(--gold-500)",        border: "rgba(196,154,47,0.25)" },
@@ -139,7 +147,7 @@ function AppInner() {
             <main className="flex-1 p-6 space-y-5 max-w-[1600px] mx-auto w-full">
               <div>
                 <h1 className="cl-mono text-lg font-bold tracking-widest" style={{ color:"var(--foreground)" }}>PORTFOLIO OVERVIEW</h1>
-                <p className="cl-mono text-[11px] tracking-widest mt-0.5" style={{ color:"rgba(243,234,216,0.3)" }}>BUILDING WEALTH TOGETHER</p>
+              <p className="cl-mono text-[11px] tracking-widest mt-0.5" style={{ color:"var(--text-faint)" }}>BUILDING WEALTH TOGETHER</p>
               </div>
 
               {selectedClient && <TrackerBar metrics={metrics} theme={t} selectedClient={selectedClient} onClose={() => setSelectedClient(null)} />}
@@ -160,7 +168,7 @@ function AppInner() {
                 ].map((card) => (
                   <div key={card.label} className="rounded-[12px] p-5 border" style={{ background:"var(--card)", borderColor:card.border, borderLeftWidth:"3px" }}>
                     <div className="flex items-start justify-between">
-                      <p className="cl-mono text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color:"rgba(243,234,216,0.3)" }}>{card.label}</p>
+                      <p className="cl-mono text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color:"var(--text-faint)" }}>{card.label}</p>
                       {card.action && (
                         <button onClick={() => { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); }}
                           className="cl-mono text-[9px] font-bold px-2 py-0.5 rounded-lg border"
@@ -168,7 +176,7 @@ function AppInner() {
                       )}
                     </div>
                     <AnimatedAmount value={card.value} className="cl-mono text-xl font-bold block mb-1" style={{ color:card.color }} />
-                    <p className="cl-mono text-[10px]" style={{ color:"rgba(243,234,216,0.3)" }}>{card.sub}</p>
+                      <p className="cl-mono text-[10px]" style={{ color:"var(--text-faint)" }}>{card.sub}</p>
                   </div>
                 ))}
               </div>
@@ -188,10 +196,10 @@ function AppInner() {
                     <Bell className="w-4 h-4 text-red-400" />
                   </div>
                   <div>
-                    <h4 className="cl-mono text-sm font-bold" style={{ color:"var(--foreground)" }}>{overdueLoans.length} OVERDUE — COLLECT NOW</h4>
+                    <h4 className="cl-mono text-sm font-bold" style={{ color:"var(--foreground)" }}>{overdueLoans.length} OVERDUE â€” COLLECT NOW</h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color:"var(--muted-foreground)" }}>
                       {overdueLoans.map((l) => (
-                        <span key={l.id}><span className="font-semibold" style={{ color:"var(--foreground)" }}>{l.borrowerName}</span> — {formatCompactCurrency(l.monthlyPayment)} overdue</span>
+                        <span key={l.id}><span className="font-semibold" style={{ color:"var(--foreground)" }}>{l.borrowerName}</span> â€” {formatCompactCurrency(l.monthlyPayment)} overdue</span>
                       ))}
                     </div>
                   </div>
@@ -226,9 +234,7 @@ function AppInner() {
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b" style={{ borderColor:"var(--border)", paddingTop:"max(1rem, env(safe-area-inset-top))" }}>
           <span className="font-brand text-xl" style={{ color:"var(--gold-500)" }}>Cyberlend</span>
           <div className="flex gap-2">
-            <button onClick={() => setPdfOpen(true)} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
-              <FileText className="w-4 h-4" style={{ color:"var(--gold-500)" }} />
-            </button>
+            <ExportMenu loans={loans} />
             <button onClick={toggleTheme} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
               {isDark ? <Sun className="w-4 h-4" style={{ color:"var(--gold-500)" }} /> : <Moon className="w-4 h-4" style={{ color:"var(--gold-500)" }} />}
             </button>
@@ -290,10 +296,10 @@ function AppInner() {
               <div className="mx-4 mt-3 rounded-[10px] p-3 border flex items-start gap-2" style={{ background:"rgba(239,68,68,0.07)", borderColor:"rgba(239,68,68,0.20)" }}>
                 <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="cl-mono text-xs font-bold" style={{ color:"#f87171" }}>{overdueLoans.length} OVERDUE — COLLECT NOW</p>
+                  <p className="cl-mono text-xs font-bold" style={{ color:"#f87171" }}>{overdueLoans.length} OVERDUE â€” COLLECT NOW</p>
                   {overdueLoans.map((l) => (
                     <p key={l.id} className="cl-mono text-[10px] mt-0.5" style={{ color:"var(--muted-foreground)" }}>
-                      <span style={{ color:"var(--foreground)", fontWeight:700 }}>{l.borrowerName}</span> — {formatCompactCurrency(l.monthlyInterest)} due
+                      <span style={{ color:"var(--foreground)", fontWeight:700 }}>{l.borrowerName}</span> â€” {formatCompactCurrency(l.monthlyInterest)} due
                     </p>
                   ))}
                 </div>
@@ -301,12 +307,9 @@ function AppInner() {
             )}
 
             {/* Quick actions */}
-            <div className="px-4 mt-3 grid grid-cols-3 gap-2 mb-4">
+            <div className="px-4 mt-3 grid grid-cols-1 gap-2 mb-4">
               {[
                 { label:"NEW",    icon:<PlusCircle className="w-5 h-5"/>, action:() => setNewLoanOpen(true), gold:true },
-                { label:"PDF",    icon:<FileText className="w-5 h-5"/>,   action:() => setPdfOpen(true),      gold:false },
-                { label:"EXPORT", icon:<Download className="w-5 h-5"/>,   action:handleExportCSV,             gold:false },
-
               ].map((btn) => (
                 <button key={btn.label} onClick={btn.action}
                   className="flex flex-col items-center gap-2 py-3 rounded-[10px] border transition-all active:scale-95"
@@ -338,33 +341,33 @@ function AppInner() {
                 </div>
               </div>
               <div className="space-y-2">
-                {[...loans]
-                  .filter((l) => {
-                    const q = mSearch.trim().toLowerCase();
-                    return (!q || l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q)) && (mStatus==="ALL" || l.status===mStatus);
-                  })
-                  .sort((a,b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime())
-                  .map((loan) => {
-                    const ss = statusStyle(loan.status);
+                {mobileLoanGroups.map((group) => {
+                    const loan = group[0];
+                    const ss = statusStyle(group.some((item) => item.status === "Overdue") ? "Overdue" : loan.status);
+                    const remaining = group.reduce((sum, item) => sum + item.remainingBalance, 0);
                     return (
-                      <div key={loan.id}
+                      <div key={loan.borrowerPhone || loan.borrowerName}
                         className="rounded-[10px] p-4 border flex items-center justify-between cursor-pointer transition-all active:scale-99"
                         style={{ background:"var(--card)", borderColor:"var(--border)" }}>
-                        <div className="flex items-center gap-3 flex-1" onClick={() => setDetailLoan(loan)}>
+                        <div className="flex items-center gap-3 flex-1" onClick={() => setMobileBorrowerLoans(group)}>
                           <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0" style={{ background:"var(--bg-raised)", borderColor:"rgba(243,234,216,0.14)" }}>
-                            <span className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{loan.borrowerName.charAt(0)}</span>
+                            {loan.borrowerPhoto ? (
+                              <img src={loan.borrowerPhoto} alt={loan.borrowerName} className="w-full h-full rounded-full object-cover" />
+                            ) : (
+                              <span className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{loan.borrowerName.charAt(0)}</span>
+                            )}
                           </div>
                           <div>
                             <p className="text-xs font-bold" style={{ color:"var(--foreground)" }}>{loan.borrowerName}</p>
-                            <p className="cl-mono text-[10px]" style={{ color:"rgba(243,234,216,0.3)" }}>{loan.category} · {loan.monthsRemaining} mo left</p>
+                            <p className="cl-mono text-[10px]" style={{ color:"var(--text-faint)" }}>{group.length} LOAN{group.length === 1 ? "" : "S"} Â· {loan.category}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="text-right" onClick={() => setDetailLoan(loan)}>
-                            <p className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{formatCompactCurrency(loan.remainingBalance)}</p>
+                          <div className="text-right" onClick={() => setMobileBorrowerLoans(group)}>
+                            <p className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{formatCompactCurrency(remaining)}</p>
                             <span className="cl-mono text-[9px] font-bold border rounded-full px-1.5 py-0.5" style={{ background:ss.bg, color:ss.color, borderColor:ss.border }}>{loan.status.toUpperCase()}</span>
                           </div>
-                          <button onClick={(e) => { e.stopPropagation(); if (confirm(`Delete ${loan.borrowerName}?`)) deleteLoan(loan.id); }}
+                          <button onClick={(e) => { e.stopPropagation(); setMobileBorrowerLoans(group); }}
                             className="p-2 rounded-[8px] border" style={{ background:"var(--bg-raised)", borderColor:"var(--border)" }}>
                             <Trash2 className="w-4 h-4 text-red-400" />
                           </button>
@@ -382,6 +385,15 @@ function AppInner() {
         {mobileTab === "clients"    && <div className="pb-28"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
         {mobileTab === "waitlist"   && <div className="pb-28"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
         {mobileTab === "agreements" && <div className="pb-28"><AgreementsPage theme={t} /></div>}
+
+        {mobileBorrowerLoans && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setMobileBorrowerLoans(null)}>
+            <div className="w-full max-w-sm rounded-2xl border p-5" style={{ background: "var(--card)", borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
+              <div className="mb-4 flex items-center justify-between"><div><p className="cl-mono text-sm font-bold" style={{ color: "var(--foreground)" }}>{mobileBorrowerLoans[0].borrowerName}</p><p className="cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{mobileBorrowerLoans.length} LOANS</p></div><button onClick={() => setMobileBorrowerLoans(null)} style={{ color: "var(--text-faint)" }}>CLOSE</button></div>
+              <div className="space-y-2">{mobileBorrowerLoans.map((loan) => <button key={loan.id} onClick={() => { setMobileBorrowerLoans(null); setDetailLoan(loan); }} className="flex w-full items-center justify-between rounded-xl border p-3 text-left" style={{ borderColor: "var(--border)" }}><span><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{loan.loanNumber}</span><span className="block cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{loan.category}</span></span><span className="text-right"><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{formatCompactCurrency(loan.remainingBalance)}</span><span className="block cl-mono text-[9px]" style={{ color: "var(--gold-500)" }}>{loan.status.toUpperCase()}</span></span></button>)}</div>
+            </div>
+          </div>
+        )}
 
         <BottomTabBar active={mobileTab} onChange={setMobileTab} />
       </div>
@@ -408,7 +420,7 @@ function AppInner() {
       <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
       <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
-      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if(promotedEntry?.id){removeFromWaitlist(promotedEntry.id);showToast("Client promoted to active borrower","success");}else{showToast("Loan created successfully","success");} setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName:promotedEntry.name, borrowerPhone:promotedEntry.phone, borrowerEmail:promotedEntry.email||"", occupation:promotedEntry.occupation, loanPurpose:promotedEntry.purpose, borrowerIdNumber:promotedEntry.idNumber||"", borrowerAddress:promotedEntry.address||"", kraPin:promotedEntry.kraPin||"", referralSource:promotedEntry.referralSource||"", clientNotes:promotedEntry.notes||"", clientFlags:["New"] } as any : null} />
+      <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if(promotedEntry?.id){removeFromWaitlist(promotedEntry.id);showToast("Client promoted to active borrower","success");}else{showToast("Loan created successfully","success");} setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName:promotedEntry.name, borrowerPhone:promotedEntry.phone, borrowerEmail:promotedEntry.email||"", borrowerPhoto:promotedEntry.borrowerPhoto||"", occupation:promotedEntry.occupation, loanPurpose:promotedEntry.purpose, borrowerIdNumber:promotedEntry.idNumber||"", borrowerAddress:promotedEntry.address||"", kraPin:promotedEntry.kraPin||"", referralSource:promotedEntry.referralSource||"", clientNotes:promotedEntry.notes||"", clientFlags:["New"] } as any : null} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
       <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} onDeleteLoan={deleteLoan} onDeleteTransaction={deleteTransaction} theme={t} />
     </>

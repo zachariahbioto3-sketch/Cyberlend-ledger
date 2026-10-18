@@ -11,6 +11,7 @@ import { useLoanStore } from "../store/loanStore";
 import { ClientInfoCard } from "./ClientInfoCard";
 import { Loan, ClientFlag, LoanPurpose } from "../types";
 import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
+import { compressImage } from "../utils/imageUtils";
 
 interface ClientsPageProps {
   loans: Loan[];
@@ -24,8 +25,6 @@ const FLAG_META: Record<ClientFlag, { color: string; bg: string; border: string;
   VIP:         { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
   New:         { color: "#c49a2f", bg: "rgba(196,154,47,0.12)",  border: "rgba(196,154,47,0.3)",  icon: <Plus className="w-3 h-3" /> },
   Regular:     { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
-  Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
-  Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
   Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
   Defaulter:   { color: "#f87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", icon: <AlertTriangle className="w-3 h-3" /> },
   Blacklisted: { color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.3)",   icon: <UserX className="w-3 h-3" /> },
@@ -82,18 +81,9 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
-  const toBase64 = (file: File): Promise<string> =>
-    new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.onerror = rej;
-      r.readAsDataURL(file);
-    });
-
   const handleImage = async (key: "borrowerPhoto" | "borrowerIdPhoto", file: File | undefined) => {
     if (!file) return;
-    const b64 = await toBase64(file);
-    set(key, b64);
+    try { set(key, await compressImage(file)); } catch { setErrors({ photo: "Unable to load image" }); }
   };
 
   const validate = () => {
@@ -114,6 +104,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
     addToWaitlist({
       name:         form.borrowerName.trim(),
       phone:        form.borrowerPhone.trim(),
+      borrowerPhoto: form.borrowerPhoto,
       email:        form.borrowerEmail.trim(),
       occupation:   form.occupation.trim(),
       amountNeeded: Number(form.amountNeeded) || 0,
@@ -138,7 +129,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}>
-      <div className="relative w-full max-w-2xl rounded-3xl border flex flex-col"
+      <div className="cl-form-modal relative w-full max-w-2xl rounded-3xl border flex flex-col"
         style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
 
         {/* Header */}
@@ -562,8 +553,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
           {monthlyCollections.length === 0 ? (
             <p className="text-xs text-center py-4" style={{ color: t.textFaint, fontFamily: mono }}>NO DATA YET</p>
           ) : (
-            <div style={{ width: "100%", height: 120, display: "block" }}>
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <div style={{ width: "100%", minWidth: 1, height: 120, display: "block" }}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={120}>
                 <BarChart data={monthlyCollections} barGap={3} barCategoryGap="30%">
                   <XAxis dataKey="month" tick={{ fontSize: 9, fill: "rgba(243,234,216,0.35)", fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} />
                   <YAxis hide />
@@ -695,16 +686,13 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
         <NewClientModal
           theme={t}
           onClose={() => setShowNewClient(false)}
-          onSave={(data) => {
-            console.log("New client registered:", data);
-            setShowNewClient(false);
-          }}
+          onSave={() => setShowNewClient(false)}
         />
       )}
 
       {/* LEFT  CLIENT LIST */}
       <div
-        className={`flex flex-col border-r shrink-0 ${isMobileDetail ? "hidden lg:flex" : "flex"} w-full lg:w-[300px] lg:min-w-[260px] lg:max-w-[300px]`}
+        className={`flex flex-col border-r shrink-0 ${isMobileDetail ? "hidden lg:flex" : "flex"} w-full lg:w-[340px] lg:min-w-[300px] lg:max-w-[360px]`}
         style={{ borderColor: t.border, background: t.bg }}>
 
         <div className="px-4 pt-5 pb-4 border-b" style={{ borderColor: t.border }}>
@@ -767,7 +755,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               return (
                 <button key={c.key}
                   onClick={() => { setSelectedKey(c.key); setEditMode(false); setSelectedClient(c.latest); }}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left transition-all cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left transition-colors cursor-pointer hover:bg-[var(--bg-active)]"
                   style={{
                     background:  isActive ? t.bgActive : "transparent",
                     borderColor: t.border,
@@ -794,8 +782,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="text-xs font-bold truncate" style={{ color: t.text }}>{c.latest.borrowerName}</p>
                       {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "#f59e0b" }} />}
-                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
-                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
                       {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
                       {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#dc2626" }} />}
                     </div>
@@ -868,7 +854,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               {!editMode ? (
                 <button onClick={handleEdit}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold"
@@ -890,7 +876,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 </>
               )}
               <button onClick={() => { setSelectedKey(null); setEditMode(false); setSelectedClient(null); }}
-                className="hidden lg:flex items-center justify-center p-2 rounded-xl border"
+                className="flex items-center justify-center p-2 rounded-xl border"
                 style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
                 <X className="w-4 h-4" />
               </button>

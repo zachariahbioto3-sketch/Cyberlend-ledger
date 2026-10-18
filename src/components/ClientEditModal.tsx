@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Edit3, Camera } from "lucide-react";
 import { Loan, ClientFlag } from "../types";
+import { compressImage } from "../utils/imageUtils";
 
 interface ClientEditModalProps {
   isOpen:  boolean;
@@ -54,9 +55,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   const handlePhoto = (key: "borrowerPhoto" | "borrowerIdPhoto", e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => set(key, reader.result as string);
-    reader.readAsDataURL(file);
+    compressImage(file).then((image) => set(key, image)).catch(() => alert("Unable to load image"));
   };
 
   const handleSave = () => {
@@ -77,7 +76,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.70)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="w-full max-w-lg rounded-3xl border overflow-hidden flex flex-col"
+      <div className="cl-form-modal w-full max-w-lg rounded-3xl border overflow-hidden flex flex-col"
         style={{ background: t.bgModal, borderColor: t.border, maxHeight: "90vh" }}>
 
         {/* Header */}
@@ -116,6 +115,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
                   )}
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhoto(key, e)} />
                 </label>
+                {key === "borrowerPhoto" && form[key] && <button type="button" onClick={() => set(key, "")} className="mt-1 text-[9px] text-red-400">REMOVE PHOTO</button>}
               </div>
             ))}
           </div>

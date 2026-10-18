@@ -62,6 +62,7 @@ export interface Loan {
   monthlyInterest: number;
   totalRepayable: number;
   monthlyPayment: number;
+  carryForward?: number;
   term: number;
   category: LoanCategory;
   status: LoanStatus;
@@ -116,6 +117,7 @@ export interface WishlistEntry {
   id: string;
   name: string;
   phone: string;
+  borrowerPhoto?: string;
   email?: string;
   occupation: string;
   amountNeeded: number;

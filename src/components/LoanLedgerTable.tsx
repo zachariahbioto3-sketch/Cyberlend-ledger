@@ -3,6 +3,7 @@ import React, { useState, useMemo } from "react";
 import { Loan } from "../types";
 import { formatCurrency, formatDate } from "../utils/loanCalculations";
 import { ChevronRight, Plus, Trash2, Search } from "lucide-react";
+import { ProfileAvatar } from "./ProfileAvatar";
 
 interface ThemeTokens { bg: string; bgCard: string; bgCardHover: string; bgActive: string; bgBtn: string; border: string; borderMid: string; borderStrong: string; text: string; textMuted: string; textFaint: string; btnPrimary: string; btnPrimaryTx: string; rowAlt: string; rowHover: string; progressBg: string; progressFill: string; [key: string]: string; }
 
@@ -19,6 +20,7 @@ interface LoanLedgerTableProps {
 export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelectLoan, onRecordPayment, onDeleteLoan, onOpenNewLoan, onEditClient, theme: t }) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [selectedBorrower, setSelectedBorrower] = useState<Loan[] | null>(null);
   const mono = "var(--font-mono)";
 
   const filtered = useMemo(() => loans.filter((l) => {
@@ -26,6 +28,15 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
     return (l.borrowerName.toLowerCase().includes(q) || l.borrowerPhone.includes(q) || l.loanNumber.toLowerCase().includes(q))
       && (statusFilter === "ALL" || l.status === statusFilter);
   }), [loans, search, statusFilter]);
+
+  const borrowerGroups = useMemo(() => {
+    const groups = new Map<string, Loan[]>();
+    filtered.forEach((loan) => {
+      const key = loan.borrowerPhone || loan.borrowerName;
+      groups.set(key, [...(groups.get(key) || []), loan]);
+    });
+    return [...groups.values()].map((group) => group.sort((a, b) => new Date(b.originationDate).getTime() - new Date(a.originationDate).getTime()));
+  }, [filtered]);
 
   const statusStyle = (status: string) => {
     const map: Record<string, { bg: string; color: string; border: string }> = {
@@ -44,7 +55,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: t.text }}>MASTER LEDGER</h2>
-            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{loans.length} RECORDS - {formatCurrency(loans.reduce((s, l) => s + (l.status === "Active" || l.status === "Overdue" ? l.remainingBalance : 0), 0))} OUTSTANDING</p>
+            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{borrowerGroups.length} BORROWERS · {loans.length} LOANS - {formatCurrency(loans.reduce((s, l) => s + (l.status === "Active" || l.status === "Overdue" ? l.remainingBalance : 0), 0))} OUTSTANDING</p>
           </div>
           <div className="flex items-center gap-2">
             <ExportMenu loans={loans} />
@@ -91,20 +102,27 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {borrowerGroups.length === 0 ? (
               <tr>
                 <td colSpan={11} className="text-center py-16 text-xs" style={{ fontFamily: mono, color: t.textFaint }}>
                   NO RECORDS.{" "}
                   <button onClick={onOpenNewLoan} style={{ color: t.text, textDecoration: "underline" }}>ADD ONE</button>
                 </td>
               </tr>
-            ) : filtered.map((loan, idx) => {
-              const pct = Math.round((loan.amountPaid / loan.totalRepayable) * 100);
-              const ss = statusStyle(loan.status);
+            ) : borrowerGroups.map((group, idx) => {
+              const loan = group[0];
+              const totalLent = group.reduce((sum, item) => sum + item.loanAmount, 0);
+              const totalDue = group.reduce((sum, item) => sum + item.totalRepayable, 0);
+              const totalPaid = group.reduce((sum, item) => sum + item.amountPaid, 0);
+              const remaining = group.reduce((sum, item) => sum + item.remainingBalance, 0);
+              const pct = totalDue ? Math.round((totalPaid / totalDue) * 100) : 0;
+              const hasOverdue = group.some((item) => item.status === "Overdue");
+              const groupStatus = hasOverdue ? "Overdue" : group.some((item) => item.status === "Active") ? "Active" : group.every((item) => item.status === "Completed") ? "Completed" : loan.status;
+              const ss = statusStyle(groupStatus);
               return (
                 <tr
-                  key={loan.id}
-                  onClick={() => onSelectLoan(loan)}
+                  key={loan.borrowerPhone || loan.borrowerName}
+                  onClick={() => setSelectedBorrower(group)}
                   className="border-b transition-colors cursor-pointer"
                   style={{ borderColor: t.border, background: idx % 2 !== 0 ? t.rowAlt : "transparent" }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = t.rowHover)}
@@ -115,25 +133,20 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full border flex items-center justify-center shrink-0"
-                        style={{ background: t.bgActive, borderColor: t.borderMid }}>
-                        <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>
-                          {loan.borrowerName.charAt(0)}
-                        </span>
-                      </div>
+                      <ProfileAvatar name={loan.borrowerName} photo={loan.borrowerPhoto} className="h-7 w-7" textClassName="text-[10px]" />
                       <div>
-                        <p className="font-semibold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                        <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerPhone}</p>
+                      <p className="font-semibold" style={{ color: t.text }}>{loan.borrowerName}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerPhone} · {group.length} LOAN{group.length === 1 ? "" : "S"}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3.5" style={{ color: t.textMuted }}>{loan.category}</td>
-                  <td className="px-4 py-3.5 font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.loanAmount)}</td>
-                  <td className="px-4 py-3.5" style={{ fontFamily: mono, color: t.textMuted }}>{formatCurrency(loan.totalRepayable)}</td>
-                  <td className="px-4 py-3.5 font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.monthlyPayment)}</td>
+                  <td className="px-4 py-3.5" style={{ color: t.textMuted }}>{group.length > 1 ? "MULTIPLE" : loan.category}</td>
+                  <td className="px-4 py-3.5 font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(totalLent)}</td>
+                  <td className="px-4 py-3.5" style={{ fontFamily: mono, color: t.textMuted }}>{formatCurrency(totalDue)}</td>
+                  <td className="px-4 py-3.5 font-bold" style={{ fontFamily: mono, color: t.text }}>{group.length > 1 ? "VIEW LOANS" : formatCurrency(loan.monthlyPayment)}</td>
                   <td className="px-4 py-3.5">
-                    <span className="font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.remainingBalance)}</span>
-                    <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.monthsRemaining} mo left</p>
+                    <span className="font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(remaining)}</span>
+                    <p className="text-[10px]" style={{ color: t.textFaint }}>{group.length} loan{group.length === 1 ? "" : "s"}</p>
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2">
@@ -152,9 +165,9 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
                   <td className="px-4 py-3.5 text-[10px]" style={{ color: t.textMuted }}>{formatDate(loan.nextDueDate)}</td>
                   <td className="px-4 py-3.5 text-right">
                     <div className="flex justify-end gap-1">
-                      {loan.status !== "Completed" && (
+                      {group.some((item) => item.status !== "Completed") && (
                         <button
-                          onClick={(e) => { e.stopPropagation(); onRecordPayment(loan); }}
+                          onClick={(e) => { e.stopPropagation(); setSelectedBorrower(group); }}
                           className="p-1.5 rounded-lg transition-colors"
                           style={{ color: t.textFaint }}
                           onMouseEnter={(e) => { e.currentTarget.style.background = t.bgActive; e.currentTarget.style.color = t.text; }}
@@ -164,7 +177,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
                         </button>
                       )}
                       <button
-                        onClick={(e) => { e.stopPropagation(); onSelectLoan(loan); }}
+                        onClick={(e) => { e.stopPropagation(); setSelectedBorrower(group); }}
                         className="p-1.5 rounded-lg transition-colors"
                         style={{ color: t.textFaint }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = t.bgActive; e.currentTarget.style.color = t.text; }}
@@ -173,7 +186,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); if (confirm(`Delete ${loan.borrowerName}?`)) onDeleteLoan(loan.id); }}
+                        onClick={(e) => { e.stopPropagation(); setSelectedBorrower(group); }}
                         className="p-1.5 rounded-lg transition-colors"
                         style={{ color: t.textFaint }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(220,50,50,0.1)"; e.currentTarget.style.color = "#f87171"; }}
@@ -189,6 +202,29 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
           </tbody>
         </table>
       </div>
+
+      {selectedBorrower && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedBorrower(null)}>
+          <div className="w-full max-w-xl rounded-2xl border p-5 shadow-2xl" style={{ background: t.bgModal, borderColor: t.border }} onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.text }}>{selectedBorrower[0].borrowerName}</h3>
+                <p className="text-[10px]" style={{ color: t.textFaint }}>{selectedBorrower[0].borrowerPhone} · {selectedBorrower.length} LOANS</p>
+              </div>
+              <button onClick={() => setSelectedBorrower(null)} className="rounded-lg px-2 py-1 text-xs" style={{ color: t.textFaint }}>CLOSE</button>
+            </div>
+            <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+              {selectedBorrower.map((loan) => {
+                const ss = statusStyle(loan.status);
+                return <button key={loan.id} onClick={() => { setSelectedBorrower(null); onSelectLoan(loan); }} className="flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors hover:bg-[var(--bg-active)]" style={{ borderColor: t.border }}>
+                  <div><p className="text-xs font-bold" style={{ color: t.text }}>{loan.loanNumber}</p><p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {formatDate(loan.originationDate)}</p></div>
+                  <div className="text-right"><p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.remainingBalance)}</p><span className="text-[9px] font-bold" style={{ color: ss.color }}>{loan.status.toUpperCase()}</span></div>
+                </button>;
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

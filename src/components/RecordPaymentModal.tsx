@@ -24,6 +24,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('M-Pesa');
   const [referenceNumber, setReferenceNumber] = useState('');
   const [notes, setNotes] = useState(NOTE_INTEREST);
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -38,12 +39,13 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
     setPaymentMethod('M-Pesa');
     setReferenceNumber('REF-' + Date.now().toString().slice(-6));
     setNotes(NOTE_INTEREST);
+    setPaymentAmount(loan ? loan.monthlyInterest + (loan.carryForward || 0) : 0);
   }, [isOpen, loan?.id]);
 
   if (!isOpen || !loan) return null;
 
-  const interestDue = loan.monthlyInterest;
-  const amount = mode === 'interest' ? interestDue : loan.loanAmount + interestDue;
+  const interestDue = loan.monthlyInterest + (loan.carryForward || 0);
+  const amount = mode === 'interest' ? paymentAmount : interestDue;
   const nextMonth = loan.monthsCompleted + 1;
   const pastTerm = nextMonth > loan.term;
   const nextDue = nextDueAfter(loan.originationDate, nextMonth);
@@ -61,7 +63,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
     if (isCompleted) return;
     const ref = referenceNumber.trim() || ('REF-' + Date.now().toString().slice(-6));
     const txs: Omit<RepaymentTransaction, 'id'>[] = [
-      { loanId: loan.id, date, amount: interestDue, paymentMethod, referenceNumber: ref, status: 'Completed', paymentType: 'Interest', notes: notes || undefined },
+      { loanId: loan.id, date, amount: paymentAmount, paymentMethod, referenceNumber: ref, status: 'Completed', paymentType: 'Interest', notes: notes || undefined },
     ];
     if (mode === 'settle') {
       txs.push({ loanId: loan.id, date, amount: loan.loanAmount, paymentMethod, referenceNumber: ref + '-P', status: 'Completed', paymentType: 'Principal', notes: 'Principal returned - loan settled' });
@@ -137,9 +139,14 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
             </div>
             <div>
               <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>AMOUNT DUE (KES)</label>
-              <div className="w-full px-3 py-2 rounded-xl text-xs border font-bold" style={{ ...inputStyle, fontFamily: mono }}>{formatCurrency(amount)}</div>
+              {mode === 'interest' ? (
+                <input type="number" min="0" value={paymentAmount} onChange={(e) => setPaymentAmount(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-full px-3 py-2 rounded-xl text-xs border font-bold focus:outline-none" style={{ ...inputStyle, fontFamily: mono }} />
+              ) : (
+                <div className="w-full px-3 py-2 rounded-xl text-xs border font-bold" style={{ ...inputStyle, fontFamily: mono }}>{formatCurrency(amount)}</div>
+              )}
               <span className="block text-[9px] mt-1" style={{ fontFamily: mono, color: t.textFaint }}>
-                {mode === 'interest' ? 'Interest only' : formatCurrency(loan.loanAmount) + ' principal + ' + formatCurrency(interestDue) + ' interest'}
+                {mode === 'interest' ? `Due includes ${formatCurrency(loan.carryForward || 0)} carried forward` : formatCurrency(loan.loanAmount) + ' principal + ' + formatCurrency(interestDue) + ' interest'}
               </span>
             </div>
           </div>

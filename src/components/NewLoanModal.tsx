@@ -116,7 +116,7 @@ if (!isOpen) return null;
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(20px)" }}>
 
-      <div className="w-full flex flex-col rounded-2xl border overflow-hidden shadow-2xl"
+      <div className="cl-form-modal w-full flex flex-col rounded-3xl border overflow-hidden shadow-2xl"
         style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", maxWidth: "620px", maxHeight: "88vh" }}>
 
         {/* Header */}
