@@ -244,7 +244,7 @@ if (!isOpen) return null;
             <div>
               <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>LOAN PURPOSE</label>
               <div className="relative">
-                <select value={loanPurpose} onChange={(e) => setLoanPurpose(e.target.value as LoanPurpose)}
+                <select className="cl-select" value={loanPurpose} onChange={(e) => setLoanPurpose(e.target.value as LoanPurpose)}
                   className="w-full px-3 py-2 pr-8 rounded-xl text-xs border focus:outline-none appearance-none"
                   style={inputStyle}>
                   <option value="">-- Select purpose --</option>
@@ -267,7 +267,7 @@ if (!isOpen) return null;
               <div>
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>TERM</label>
                 <div className="relative">
-                  <select value={term} onChange={(e) => setTerm(Number(e.target.value))}
+                  <select className="cl-select" value={term} onChange={(e) => setTerm(Number(e.target.value))}
                     className="w-full px-3 py-2 pr-8 rounded-xl text-xs border focus:outline-none appearance-none"
                     style={inputStyle}>
                     {[3,4,5,6].map((n) => <option key={n} value={n} style={optionStyle}>{n} Months</option>)}
@@ -278,7 +278,7 @@ if (!isOpen) return null;
               <div>
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>CATEGORY</label>
                 <div className="relative">
-                  <select value={category} onChange={(e) => setCategory(e.target.value as LoanCategory)}
+                  <select className="cl-select" value={category} onChange={(e) => setCategory(e.target.value as LoanCategory)}
                     className="w-full px-3 py-2 pr-8 rounded-xl text-xs border focus:outline-none appearance-none"
                     style={inputStyle}>
                     {["Personal","Business","Emergency","Agriculture","Education","Medical","Other"].map((c) => (
@@ -361,3 +361,5 @@ if (!isOpen) return null;
     </div>
   );
 };
+
+

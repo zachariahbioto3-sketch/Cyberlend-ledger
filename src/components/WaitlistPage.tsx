@@ -248,7 +248,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
             <div>
               <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>PURPOSE (OPTIONAL)</label>
               <div className="relative">
-                <select value={form.purpose} onChange={(e) => set("purpose", e.target.value)}
+                <select className="cl-select" value={form.purpose} onChange={(e) => set("purpose", e.target.value)}
                   className="w-full px-3 py-2 pr-8 rounded-xl text-xs border focus:outline-none appearance-none"
                   style={inputStyle}>
                   <option value="">-- Select if known --</option>
@@ -337,3 +337,5 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
     </div>
   );
 };
+
+

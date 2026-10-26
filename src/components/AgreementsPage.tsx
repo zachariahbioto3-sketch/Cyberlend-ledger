@@ -253,3 +253,5 @@ function DetailItem({ label, value, t }: { label: string; value: string; t: any 
     </div>
   );
 }
+
+

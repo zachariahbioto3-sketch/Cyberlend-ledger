@@ -302,7 +302,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
                   <input className={input} style={inputSx} type="number" value={facility.approvedAmount || ""} onChange={(e) => upd(setFacility, "approvedAmount", Number(e.target.value))} />
                 </Field>
                 <Field label="Loan Purpose">
-                  <select className={input} style={inputSx} value={facility.purpose} onChange={(e) => upd(setFacility, "purpose", e.target.value as LoanPurpose)}>
+                  <select className={`cl-select ${input}`} style={inputSx} value={facility.purpose} onChange={(e) => upd(setFacility, "purpose", e.target.value as LoanPurpose)}>
                     {LOAN_PURPOSES.map((p) => <option key={p}>{p}</option>)}
                   </select>
                 </Field>
@@ -328,7 +328,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
                   <input className={input} style={inputSx} type="number" step="0.1" value={interest.rate} onChange={(e) => upd(setInterest, "rate", Number(e.target.value))} />
                 </Field>
                 <Field label="Interest Basis">
-                  <select className={input} style={inputSx} value={interest.basis} onChange={(e) => upd(setInterest, "basis", e.target.value as InterestBasis)}>
+                  <select className={`cl-select ${input}`} style={inputSx} value={interest.basis} onChange={(e) => upd(setInterest, "basis", e.target.value as InterestBasis)}>
                     <option>Flat Rate</option>
                     <option>Reducing Balance</option>
                     <option>Other</option>
@@ -351,7 +351,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
               <SectionHeading>Fees & Charges</SectionHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Processing Fee Type">
-                  <select className={input} style={inputSx} value={fees.processingFeeType} onChange={(e) => upd(setFees, "processingFeeType", e.target.value as any)}>
+                  <select className={`cl-select ${input}`} style={inputSx} value={fees.processingFeeType} onChange={(e) => upd(setFees, "processingFeeType", e.target.value as any)}>
                     <option>None</option>
                     <option>Percentage</option>
                     <option>Fixed</option>
@@ -393,7 +393,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
               <SectionHeading>6. Disbursement</SectionHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Disbursement Method">
-                  <select className={input} style={inputSx} value={disbursement.method} onChange={(e) => upd(setDisbursement, "method", e.target.value as DisbursementMethod)}>
+                  <select className={`cl-select ${input}`} style={inputSx} value={disbursement.method} onChange={(e) => upd(setDisbursement, "method", e.target.value as DisbursementMethod)}>
                     <option>Mobile Money</option><option>Bank Transfer</option>
                     <option>Cheque</option><option>Cash</option><option>Other</option>
                   </select>
@@ -414,13 +414,13 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
               <SectionHeading>Repayment</SectionHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Repayment Frequency">
-                  <select className={input} style={inputSx} value={repayment.frequency} onChange={(e) => upd(setRepayment, "frequency", e.target.value as RepaymentFrequency)}>
+                  <select className={`cl-select ${input}`} style={inputSx} value={repayment.frequency} onChange={(e) => upd(setRepayment, "frequency", e.target.value as RepaymentFrequency)}>
                     <option>Daily</option><option>Weekly</option><option>Bi-weekly</option>
                     <option>Monthly</option><option>Other</option>
                   </select>
                 </Field>
                 <Field label="Payment Method">
-                  <select className={input} style={inputSx} value={repayment.paymentMethod} onChange={(e) => upd(setRepayment, "paymentMethod", e.target.value as PaymentMethod)}>
+                  <select className={`cl-select ${input}`} style={inputSx} value={repayment.paymentMethod} onChange={(e) => upd(setRepayment, "paymentMethod", e.target.value as PaymentMethod)}>
                     <option>M-Pesa</option><option>Bank Transfer</option>
                   </select>
                 </Field>
@@ -515,3 +515,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
     </div>
   );
 }
+
+
+
+

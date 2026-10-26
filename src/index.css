@@ -282,3 +282,36 @@ html:not(.dark) body::before {
     background-position: center bottom;
   }
 }
+
+/* -- Native <select> unified style -- */
+.cl-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--bg-raised);
+  color: var(--foreground);
+  border: 1px solid rgba(243,234,216,0.12);
+  border-radius: 6px;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  min-height: 44px;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.15s ease-out;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c49a2f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  outline: none;
+}
+.cl-select:focus {
+  border-color: var(--gold-500);
+  box-shadow: 0 0 0 1px var(--gold-500);
+}
+.cl-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.cl-select option {
+  background-color: var(--bg-surface);
+  color: var(--foreground);
+}
