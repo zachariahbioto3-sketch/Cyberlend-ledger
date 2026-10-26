@@ -11,16 +11,16 @@ export function Header({ onSearch, className }: HeaderProps) {
     <header className={cn(
       "flex items-center justify-between gap-4",
       "px-4 md:px-6 py-3 min-h-[64px]",
-      "bg-[var(--bg-base)] border-b border-[rgba(243,234,216,0.08)]",
+      "bg-[var(--bg-surface)]/80 border-b border-[var(--border)] backdrop-blur-md",
       "sticky top-0 z-30",
       "pt-[calc(env(safe-area-inset-top,0px)+12px)]",
       className
     )}>
       {/* Logo — mobile only */}
-      <span className="font-brand text-[var(--gold-500)] text-xl md:hidden">Cyberlend</span>
+      <span className="font-brand text-[var(--foreground)] text-xl md:hidden">Cyberlend</span>
 
       {/* Search */}
-      <div className="flex-1 max-w-sm hidden md:flex items-center gap-2 bg-[var(--bg-raised)] border border-[rgba(243,234,216,0.1)] rounded-[6px] px-3 h-10">
+      <div className="flex-1 max-w-sm hidden md:flex items-center gap-2 bg-white/70 border border-[var(--border)] rounded-[var(--radius-pill)] px-4 h-10 backdrop-blur-sm">
         <Search className="h-4 w-4 text-[var(--text-muted)] shrink-0" />
         <input
           type="text"
@@ -32,13 +32,18 @@ export function Header({ onSearch, className }: HeaderProps) {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        <button className="h-10 w-10 flex items-center justify-center rounded-[6px] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-raised)] transition-colors duration-150">
+        <button className="h-10 w-10 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--bg-raised)] transition-colors duration-150">
           <Bell className="h-5 w-5" />
         </button>
-        <button className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--bg-raised)] border border-[rgba(243,234,216,0.1)] text-[var(--text-muted)] hover:text-[var(--gold-500)] transition-colors duration-150">
+        <button className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] transition-colors duration-150">
           <User className="h-4 w-4" />
         </button>
       </div>
     </header>
   )
 }
+
+
+
+
+

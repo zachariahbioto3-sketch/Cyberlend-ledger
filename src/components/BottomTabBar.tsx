@@ -20,7 +20,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
   return (
     <nav className={cn(
       "fixed bottom-0 left-0 right-0 z-50",
-      "bg-[var(--bg-surface)] border-t border-[rgba(243,234,216,0.08)]",
+      "bg-white/80 border-t border-[var(--border)] backdrop-blur-md",
       "flex items-stretch",
       "pb-[env(safe-area-inset-bottom,0px)]",
       "md:hidden"
@@ -36,19 +36,19 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
               "text-[10px] font-medium transition-colors duration-150",
               "focus:outline-none",
               isActive
-                ? "text-[var(--gold-500)]"
+                ? "text-[var(--primary)]"
                 : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             )}
           >
             <span className={cn(
-              "transition-colors duration-150",
-              isActive && "text-[var(--gold-500)]"
+              "transition-colors duration-150 relative",
+              isActive && "text-[var(--primary)]"
             )}>
               {tab.icon}
             </span>
             {tab.label}
             {isActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--gold-500)] rounded-full" />
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--primary)]" />
             )}
           </button>
         )
@@ -56,3 +56,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
     </nav>
   )
 }
+
+
+
+

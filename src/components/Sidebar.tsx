@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, Users, TrendingUp, ScrollText, Clock, ChevronLeft, ChevronRight } from "lucide-react"
-import { GoldDivider } from "@/components/GoldDivider"
 
 type Tab = "dashboard" | "clients" | "waitlist" | "agreements"
 
@@ -23,22 +22,21 @@ export function Sidebar({ active, onChange }: SidebarProps) {
   return (
     <aside className={cn(
       "hidden md:flex flex-col",
-      "bg-[var(--bg-surface)] border-r border-[rgba(243,234,216,0.08)]",
+      "bg-[var(--bg-surface)] border-r border-[var(--border)]",
       "transition-all duration-200 ease-out",
       "h-screen sticky top-0 z-40",
       collapsed ? "w-[64px]" : "w-[220px]"
     )}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-5 min-h-[64px]">
-        <span className="font-brand text-[var(--gold-500)] text-xl shrink-0">CL</span>
+        <span className="font-brand text-[var(--primary)] text-xl shrink-0">CL</span>
         {!collapsed && (
-          <span className="font-brand text-[var(--text-primary)] text-base leading-tight">
+          <span className="font-brand text-[var(--foreground)] text-base leading-tight">
             Cyberlend
           </span>
         )}
       </div>
 
-      <GoldDivider className="px-4 opacity-50" />
 
       {/* Nav */}
       <nav className="flex flex-col gap-1 px-2 pt-4 flex-1">
@@ -52,8 +50,8 @@ export function Sidebar({ active, onChange }: SidebarProps) {
                 "flex items-center gap-3 px-3 py-2.5 rounded-[8px] w-full text-left",
                 "text-sm font-medium transition-colors duration-150 min-h-[44px]",
                 isActive
-                  ? "bg-[var(--bg-raised)] text-[var(--gold-500)]"
-                  : "text-[var(--text-muted)] hover:bg-[var(--bg-raised)] hover:text-[var(--text-primary)]"
+                  ? "bg-[var(--primary)] text-[var(--primary-foreground)] rounded-[8px]"
+                  : "text-[var(--muted-foreground)] hover:bg-[var(--bg-raised)] hover:text-[var(--foreground)]"
               )}
             >
               <span className="shrink-0">{item.icon}</span>
@@ -66,10 +64,16 @@ export function Sidebar({ active, onChange }: SidebarProps) {
       {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center justify-center h-11 w-full border-t border-[rgba(243,234,216,0.08)] text-[var(--text-muted)] hover:text-[var(--gold-500)] transition-colors duration-150"
+        className="flex items-center justify-center h-11 w-full border-t border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-150"
       >
         {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
     </aside>
   )
 }
+
+
+
+
+
+

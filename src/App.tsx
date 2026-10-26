@@ -121,8 +121,8 @@ function AppInner() {
   }, [loans, mSearch, mStatus]);
 
   const statusStyle = (status: string) => ({
-    Active:    { bg: "rgba(196,154,47,0.15)", color: "var(--gold-500)",        border: "rgba(196,154,47,0.25)" },
-    Overdue:   { bg: "rgba(239,68,68,0.12)",  color: "#f87171",                border: "rgba(239,68,68,0.25)" },
+    Active:    { bg: "#DCE7FB", color: "#2552B0", border: "transparent" },
+    Overdue:   { bg: "#F9DADA", color: "#A82F2F", border: "transparent" },
     Completed: { bg: "rgba(255,255,255,0.06)", color: "var(--muted-foreground)", border: "var(--border)" },
     Defaulted: { bg: "rgba(180,20,20,0.12)",  color: "#fca5a5",                border: "rgba(180,20,20,0.25)" },
   } as Record<string,{bg:string;color:string;border:string}>)[status] ?? { bg:"rgba(255,255,255,0.06)", color:"var(--muted-foreground)", border:"var(--border)" };
@@ -138,7 +138,7 @@ function AppInner() {
           <div className="flex items-center justify-end gap-2 px-6 py-2 border-b" style={{ borderColor:"var(--border)" }}>
             <ExportMenu loans={loans} />
             <Button variant="ghost" size="sm" onClick={() => setPdfOpen(true)}><FileText className="w-3 h-3 mr-1"/>PDF</Button>
-            <Button variant="ghost" size="sm" onClick={toggleTheme}>{isDark ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}</Button>
+            
             <Button size="sm" onClick={() => setNewLoanOpen(true)}><PlusCircle className="w-3.5 h-3.5 mr-1"/>NEW LOAN</Button>
           </div>
 
@@ -162,13 +162,13 @@ function AppInner() {
               {/* Capital cards */}
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label:"AVAILABLE CAPITAL", value: metrics.availableCapital, sub: totalCapital > 0 ? `Total pool: ${formatCompactCurrency(totalCapital)}` : "Set total capital", color:"#4ade80", border:"rgba(74,222,128,0.30)", action:true },
-                  { label:"LENDABLE NOW",       value: metrics.lendableAmount,   sub:"80% of available capital", color:"var(--gold-500)", border:"rgba(196,154,47,0.30)", action:false },
-                  { label:"RETURNS PREV LOANS", value: metrics.returnsFromPreviousLoans, sub:`${metrics.completedLoansCount} completed loans`, color:"var(--gold-400)", border:"rgba(212,168,67,0.30)", action:false },
+                  { label:"AVAILABLE CAPITAL", value: metrics.availableCapital, sub: totalCapital > 0 ? `Total pool: ${formatCompactCurrency(totalCapital)}` : "Set total capital", color:"#14703F", border:"rgba(20,112,63,0.30)", action:true },
+                  { label:"LENDABLE NOW",       value: metrics.lendableAmount,   sub:"80% of available capital", color:"#111214", border:"rgba(17,18,20,0.14)", action:false },
+                  { label:"RETURNS PREV LOANS", value: metrics.returnsFromPreviousLoans, sub:`${metrics.completedLoansCount} completed loans`, color:"#111214", border:"rgba(17,18,20,0.14)", action:false },
                 ].map((card) => (
                   <div key={card.label} className="rounded-[12px] p-5 border" style={{ background:"var(--card)", borderColor:card.border, borderLeftWidth:"3px" }}>
                     <div className="flex items-start justify-between">
-                      <p className="cl-mono text-[9px] font-bold uppercase tracking-widest mb-3" style={{ color:"var(--text-faint)" }}>{card.label}</p>
+                      <p className="cl-mono text-xs font-bold uppercase tracking-widest mb-3" style={{ color:"var(--text-faint)" }}>{card.label}</p>
                       {card.action && (
                         <button onClick={() => { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); }}
                           className="cl-mono text-[9px] font-bold px-2 py-0.5 rounded-lg border"
@@ -176,7 +176,7 @@ function AppInner() {
                       )}
                     </div>
                     <AnimatedAmount value={card.value} className="cl-mono text-xl font-bold block mb-1" style={{ color:card.color }} />
-                      <p className="cl-mono text-[10px]" style={{ color:"var(--text-faint)" }}>{card.sub}</p>
+                      <p className="cl-mono text-xs" style={{ color:"var(--text-faint)" }}>{card.sub}</p>
                   </div>
                 ))}
               </div>
@@ -232,11 +232,11 @@ function AppInner() {
       {/* -- MOBILE -- */}
       <div className="lg:hidden min-h-screen" style={{ background:"var(--background)" }}>
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b" style={{ borderColor:"var(--border)", paddingTop:"max(1rem, env(safe-area-inset-top))" }}>
-          <span className="font-brand text-xl" style={{ color:"var(--gold-500)" }}>Cyberlend</span>
+          <span className="font-brand text-xl" style={{ color:"var(--foreground)" }}>Cyberlend</span>
           <div className="flex gap-2">
             <ExportMenu loans={loans} />
             <button onClick={toggleTheme} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
-              {isDark ? <Sun className="w-4 h-4" style={{ color:"var(--gold-500)" }} /> : <Moon className="w-4 h-4" style={{ color:"var(--gold-500)" }} />}
+              {isDark ? <Sun className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} /> : <Moon className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />}
             </button>
             <button className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
               <Bell className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />
@@ -250,9 +250,9 @@ function AppInner() {
         {mobileTab === "loans" && (
           <>
             {/* Hero KPI */}
-            <div className="mx-4 mt-4 rounded-[12px] p-5 border relative overflow-hidden" style={{ background:"var(--bg-raised)", borderColor:"rgba(196,154,47,0.25)" }}>
+            <div className="mx-4 mt-4 rounded-[12px] p-5 border relative overflow-hidden" style={{ background:"var(--bg-raised)", borderColor:"var(--border)" }}>
               <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-5"><img src="/logo.png" alt="" className="w-full h-full object-contain" /></div>
-              <p className="cl-mono text-[10px] uppercase tracking-widest mb-1" style={{ color:"rgba(243,234,216,0.4)" }}>TOTAL OUTSTANDING</p>
+              <p className="cl-mono text-[10px] uppercase tracking-widest mb-1" style={{ color:"var(--muted-foreground)" }}>Total outstanding</p>
               <AnimatedAmount value={metrics.totalOutstanding} className="cl-mono text-4xl font-bold block mb-4" style={{ color:"var(--foreground)" }} />
               <div className="grid grid-cols-2 gap-2 pt-4 border-t" style={{ borderColor:"var(--border)" }}>
                 {[
@@ -262,7 +262,7 @@ function AppInner() {
                   { label:"ACTIVE",    value: metrics.activeLoansCount,   raw:true  },
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="cl-mono text-[8px] uppercase tracking-widest mb-0.5" style={{ color:"rgba(243,234,216,0.3)" }}>{s.label}</p>
+                    <p className="cl-mono text-[8px] uppercase tracking-widest mb-0.5" style={{ color:"#5F6472" }}>{s.label}</p>
                     {s.raw
                       ? <p className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }}>{s.value}</p>
                       : <AnimatedAmount value={s.value as number} className="cl-mono text-xs font-bold" style={{ color:"var(--foreground)" }} />
@@ -275,15 +275,15 @@ function AppInner() {
             {/* Capital mini-cards */}
             <div className="px-4 mt-3 grid grid-cols-3 gap-2">
               {[
-                { label:"AVAILABLE", value: metrics.availableCapital, color:"#4ade80", border:"rgba(74,222,128,0.30)", action:true },
-                { label:"LENDABLE",  value: metrics.lendableAmount,   color:"var(--gold-500)", border:"rgba(196,154,47,0.30)", action:false },
-                { label:"RETURNS",   value: metrics.returnsFromPreviousLoans, color:"var(--gold-400)", border:"rgba(212,168,67,0.30)", action:false },
+                { label:"AVAILABLE", value: metrics.availableCapital, color:"#14703F", border:"rgba(20,112,63,0.30)", action:true },
+                { label:"LENDABLE",  value: metrics.lendableAmount,   color:"#111214", border:"rgba(17,18,20,0.14)", action:false },
+                { label:"RETURNS",   value: metrics.returnsFromPreviousLoans, color:"#111214", border:"rgba(17,18,20,0.14)", action:false },
               ].map((c) => (
                 <div key={c.label} onClick={() => { if (c.action) { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); } }}
                   className={`rounded-[10px] p-3 border ${c.action ? "cursor-pointer" : ""}`}
                   style={{ background:"var(--card)", borderColor:c.border, borderLeftWidth:"3px" }}>
                   <div className="flex items-start justify-between gap-1">
-                    <p className="cl-mono text-[8px] font-bold uppercase tracking-widest mb-1" style={{ color:"rgba(243,234,216,0.3)" }}>{c.label}</p>
+                    <p className="cl-mono text-[8px] font-bold uppercase tracking-widest mb-1" style={{ color:"#5F6472" }}>{c.label}</p>
                     {c.action && <span className="cl-mono text-[8px] font-bold px-1 py-0.5 rounded border" style={{ borderColor:c.border, color:c.color }}>SET</span>}
                   </div>
                   <AnimatedAmount value={c.value} className="cl-mono text-xs font-bold" style={{ color:c.color }} />
@@ -313,9 +313,9 @@ function AppInner() {
               ].map((btn) => (
                 <button key={btn.label} onClick={btn.action}
                   className="flex flex-col items-center gap-2 py-3 rounded-[10px] border transition-all active:scale-95"
-                  style={{ background:"var(--card)", borderColor:btn.gold ? "rgba(196,154,47,0.30)" : "var(--border)" }}>
-                  <div style={{ color:btn.gold ? "var(--gold-500)" : "var(--muted-foreground)" }}>{btn.icon}</div>
-                  <span className="cl-mono text-[8px] font-bold uppercase tracking-widest" style={{ color:"rgba(243,234,216,0.3)" }}>{btn.label}</span>
+                  style={{ background:"var(--card)", borderColor:"var(--border)" }}>
+                  <div style={{ color:"var(--foreground)" }}>{btn.icon}</div>
+                  <span className="cl-mono text-[8px] font-bold uppercase tracking-widest" style={{ color:"#5F6472" }}>{btn.label}</span>
                 </button>
               ))}
             </div>
@@ -323,8 +323,8 @@ function AppInner() {
             {/* Loan list */}
             <div className="px-4 pb-28">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="cl-mono text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(243,234,216,0.3)" }}>LOANS</h2>
-                <span className="cl-mono text-[10px]" style={{ color:"rgba(243,234,216,0.3)" }}>{loans.length} RECORDS</span>
+                <h2 className="cl-mono text-[10px] font-bold uppercase tracking-widest" style={{ color:"#5F6472" }}>LOANS</h2>
+                <span className="cl-mono text-[10px]" style={{ color:"#5F6472" }}>{loans.length} RECORDS</span>
               </div>
               <div className="mb-3 space-y-2">
                 <input type="text" value={mSearch} onChange={(e) => setMSearch(e.target.value)} placeholder="Search name, phone, loan no..."
@@ -350,7 +350,7 @@ function AppInner() {
                         className="rounded-[10px] p-4 border flex items-center justify-between cursor-pointer transition-all active:scale-99"
                         style={{ background:"var(--card)", borderColor:"var(--border)" }}>
                         <div className="flex items-center gap-3 flex-1" onClick={() => setMobileBorrowerLoans(group)}>
-                          <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0" style={{ background:"var(--bg-raised)", borderColor:"rgba(243,234,216,0.14)" }}>
+                          <div className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0" style={{ background:"var(--bg-raised)", borderColor:"var(--border)" }}>
                             {loan.borrowerPhoto ? (
                               <img src={loan.borrowerPhoto} alt={loan.borrowerName} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -390,7 +390,7 @@ function AppInner() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setMobileBorrowerLoans(null)}>
             <div className="w-full max-w-sm rounded-2xl border p-5" style={{ background: "var(--card)", borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
               <div className="mb-4 flex items-center justify-between"><div><p className="cl-mono text-sm font-bold" style={{ color: "var(--foreground)" }}>{mobileBorrowerLoans[0].borrowerName}</p><p className="cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{mobileBorrowerLoans.length} LOANS</p></div><button onClick={() => setMobileBorrowerLoans(null)} style={{ color: "var(--text-faint)" }}>CLOSE</button></div>
-              <div className="space-y-2">{mobileBorrowerLoans.map((loan) => <button key={loan.id} onClick={() => { setMobileBorrowerLoans(null); setDetailLoan(loan); }} className="flex w-full items-center justify-between rounded-xl border p-3 text-left" style={{ borderColor: "var(--border)" }}><span><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{loan.loanNumber}</span><span className="block cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{loan.category}</span></span><span className="text-right"><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{formatCompactCurrency(loan.remainingBalance)}</span><span className="block cl-mono text-[9px]" style={{ color: "var(--gold-500)" }}>{loan.status.toUpperCase()}</span></span></button>)}</div>
+              <div className="space-y-2">{mobileBorrowerLoans.map((loan) => <button key={loan.id} onClick={() => { setMobileBorrowerLoans(null); setDetailLoan(loan); }} className="flex w-full items-center justify-between rounded-xl border p-3 text-left" style={{ borderColor: "var(--border)" }}><span><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{loan.loanNumber}</span><span className="block cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{loan.category}</span></span><span className="text-right"><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{formatCompactCurrency(loan.remainingBalance)}</span><span className="block cl-mono text-[9px]" style={{ color: "var(--muted-foreground)" }}>{loan.status}</span></span></button>)}</div>
             </div>
           </div>
         )}
@@ -401,12 +401,12 @@ function AppInner() {
       {/* -- MODALS -- */}
       {capitalModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)" }}>
-          <div className="rounded-[12px] p-6 border w-full max-w-sm" style={{ background:"var(--card)", borderColor:"rgba(243,234,216,0.14)" }}>
+          <div className="rounded-[12px] p-6 border w-full max-w-sm" style={{ background:"var(--card)", borderColor:"var(--border)" }}>
             <p className="cl-mono text-sm font-bold tracking-widest mb-1" style={{ color:"var(--foreground)" }}>SET TOTAL CAPITAL</p>
-            <p className="cl-mono text-[10px] mb-4" style={{ color:"rgba(243,234,216,0.3)" }}>Total pool of money available to the lending business.</p>
+            <p className="cl-mono text-[10px] mb-4" style={{ color:"#5F6472" }}>Total pool of money available to the lending business.</p>
             <input type="number" value={capitalInput} onChange={(e) => setCapitalInput(e.target.value)} placeholder="e.g. 500000"
-              className="w-full px-4 py-3 rounded-[8px] border cl-mono text-sm mb-4 outline-none focus:border-[var(--gold-500)]"
-              style={{ background:"var(--input)", borderColor:"rgba(243,234,216,0.14)", color:"var(--foreground)" }} />
+              className="w-full px-4 py-3 rounded-[8px] border cl-mono text-sm mb-4 outline-none focus:border-[var(--primary)]"
+              style={{ background:"var(--input)", borderColor:"var(--border)", color:"var(--foreground)" }} />
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={() => setCapitalModalOpen(false)}>CANCEL</Button>
               <Button className="flex-1" onClick={() => { const v=parseFloat(capitalInput); if(!isNaN(v)&&v>0){setTotalCapital(v);setCapitalModalOpen(false);} }}>SAVE</Button>
@@ -428,6 +428,24 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
