@@ -52,10 +52,10 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
   };
 
   const stageMeta = {
-    Enquiry:  { color: "#d4a843", bg: "rgba(212,168,67,0.12)", border: "rgba(212,168,67,0.30)", label: "ENQUIRY"  },
-    Pending:  { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.30)",  label: "PENDING"  },
-    Approved: { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.30)",  label: "APPROVED" },
-    Rejected: { color: "#f87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.30)", label: "REJECTED" },
+    Enquiry:  { color: "#111214", bg: "#F4F5FC", border: "transparent", label: "ENQUIRY"  },
+    Pending:  { color: "#8A5B00", bg: "#FBEFC9",  border: "transparent",  label: "PENDING"  },
+    Approved: { color: "#1E9E5A", bg: "#DDF3E6",  border: "transparent",  label: "APPROVED" },
+    Rejected: { color: "#A82F2F", bg: "#F9DADA", border: "transparent", label: "REJECTED" },
   };
 
   const enquiries = waitlist.filter((e) => e.status === "Enquiry");
@@ -108,7 +108,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
               style={{ background: t.bgActive, borderColor: t.border }}>
               <p className="text-[9px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
               <p className="text-[10px] font-bold mt-0.5 truncate"
-                style={{ fontFamily: mono, color: s.label === "AMOUNT" && entry.amountNeeded === 0 ? "#f87171" : t.text }}>
+                style={{ fontFamily: mono, color: s.label === "AMOUNT" && entry.amountNeeded === 0 ? "#A82F2F" : t.text }}>
                 {s.value}
               </p>
             </div>
@@ -123,7 +123,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {entry.status === "Enquiry" && (
           <div className="mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <p className="text-[9px] font-bold uppercase tracking-widest mb-2"
-              style={{ fontFamily: mono, color: "#d4a843" }}>
+              style={{ fontFamily: mono, color: "#111214" }}>
               WAITING FOR CLIENT TO STATE AMOUNT
             </p>
             {isRecordingAmount ? (
@@ -139,7 +139,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
                 />
                 <button onClick={() => handleRecordAmount(entry.id)}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold"
-                  style={{ fontFamily: mono, background: "#d4a843", color: "#fff" }}>
+                  style={{ fontFamily: mono, background: "#111214", color: "#fff" }}>
                   <ArrowRight className="w-3 h-3" /> CONFIRM
                 </button>
                 <button onClick={() => setAmountEntry(null)}
@@ -151,7 +151,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
             ) : (
               <button onClick={() => setAmountEntry({ id: entry.id, value: "" })}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
-                style={{ fontFamily: mono, background: "rgba(212,168,67,0.12)", color: "#d4a843", border: "1px solid rgba(212,168,67,0.3)" }}>
+                style={{ fontFamily: mono, background: "#F4F5FC", color: "#111214", border: "1px solid transparent" }}>
                 <DollarSign className="w-3 h-3" /> RECORD AMOUNT
               </button>
             )}
@@ -163,12 +163,12 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
           <div className="flex items-center gap-2 mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <button onClick={() => updateWaitlistStatus(entry.id, "Approved")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
-              style={{ fontFamily: mono, background: "rgba(74,222,128,0.12)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.3)" }}>
+              style={{ fontFamily: mono, background: "#DDF3E6", color: "#1E9E5A", border: "1px solid rgba(74,222,128,0.3)" }}>
               <CheckCircle className="w-3 h-3" /> APPROVE
             </button>
             <button onClick={() => updateWaitlistStatus(entry.id, "Rejected")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
-              style={{ fontFamily: mono, background: "rgba(248,113,113,0.12)", color: "#f87171", border: "1px solid rgba(248,113,113,0.3)" }}>
+              style={{ fontFamily: mono, background: "#F9DADA", color: "#A82F2F", border: "1px solid rgba(248,113,113,0.3)" }}>
               <XCircle className="w-3 h-3" /> REJECT
             </button>
             <button onClick={() => removeFromWaitlist(entry.id)}
@@ -184,7 +184,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
           <div className="flex items-center gap-2 mt-4 pt-3 border-t" style={{ borderColor: t.border }}>
             <button onClick={() => { onPromoteToLoan(entry); removeFromWaitlist(entry.id); }}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-bold"
-              style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
+              style={{ fontFamily: mono, background: "#111214", color: "#fff" }}>
               <ArrowRight className="w-3 h-3" /> ISSUE LOAN - MOVE TO BORROWERS
             </button>
             <button onClick={() => removeFromWaitlist(entry.id)}
@@ -226,7 +226,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         <div className="px-6 py-5 border-b" style={{ borderColor: t.border, background: t.bgCard }}>
           <p className="text-[10px] font-bold uppercase tracking-widest mb-1"
             style={{ fontFamily: mono, color: t.textFaint }}>NEW ENQUIRY</p>
-          <p className="text-[10px] mb-4" style={{ fontFamily: mono, color: "#d4a843" }}>
+          <p className="text-[10px] mb-4" style={{ fontFamily: mono, color: "#111214" }}>
             Register the client first. Amount will be recorded once they confirm what they need.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
@@ -272,7 +272,7 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
             </button>
             <button onClick={handleAdd}
               className="px-4 py-2 rounded-xl text-xs font-bold"
-              style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
+              style={{ fontFamily: mono, background: "#111214", color: "#fff" }}>
               REGISTER CLIENT
             </button>
           </div>
@@ -286,9 +286,9 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {enquiries.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#d4a843" }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: "#111214" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ fontFamily: mono, color: "#d4a843" }}>
+                style={{ fontFamily: mono, color: "#111214" }}>
                 STAGE 1 - ENQUIRY ({enquiries.length}) - AWAITING AMOUNT
               </p>
             </div>
@@ -300,9 +300,9 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {pending.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#f59e0b" }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: "#8A5B00" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ fontFamily: mono, color: "#f59e0b" }}>
+                style={{ fontFamily: mono, color: "#8A5B00" }}>
                 STAGE 2 - PENDING APPROVAL ({pending.length})
               </p>
             </div>
@@ -314,9 +314,9 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
         {approved.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#4ade80" }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: "#1E9E5A" }} />
               <p className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ fontFamily: mono, color: "#4ade80" }}>
+                style={{ fontFamily: mono, color: "#1E9E5A" }}>
                 STAGE 3 - APPROVED - READY TO ISSUE ({approved.length})
               </p>
             </div>
@@ -337,5 +337,6 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ theme: t, onPromoteT
     </div>
   );
 };
+
 
 

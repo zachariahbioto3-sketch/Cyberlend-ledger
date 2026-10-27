@@ -46,7 +46,7 @@
   --foreground: #111214;
   --card: rgba(255,255,255,0.72);
   --card-foreground: #111214;
-  --popover: rgba(255,255,255,0.96);
+  --popover: var(--card);
   --popover-foreground: #111214;
   --primary: #111214;
   --primary-foreground: #FFFFFF;
@@ -254,3 +254,4 @@ select option { background-color: #FFFFFF; color: var(--text-primary); }
 .cl-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(17,18,20,0.10); }
 .cl-select:disabled { opacity: 0.4; cursor: not-allowed; }
 .cl-select option { background-color: #FFFFFF; color: var(--foreground); }
+

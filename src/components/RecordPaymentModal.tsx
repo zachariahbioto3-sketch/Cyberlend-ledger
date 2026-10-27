@@ -73,7 +73,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(20px)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(17,18,20,0.45)', backdropFilter: 'blur(8px)' }}>
       <div className="rounded-2xl border overflow-hidden shadow-2xl" style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", maxWidth: "560px", maxHeight: "88vh", display: "flex", flexDirection: "column" }}>
         <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: t.border }}>
           <div className="flex items-center gap-2.5">
@@ -209,3 +209,4 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
     </div>
   );
 };
+

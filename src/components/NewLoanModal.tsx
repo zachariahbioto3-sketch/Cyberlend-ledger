@@ -114,7 +114,7 @@ if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(20px)" }}>
+      style={{ background: "rgba(17,18,20,0.45)", backdropFilter: "blur(8px)" }}>
 
       <div className="cl-form-modal w-full flex flex-col rounded-3xl border overflow-hidden shadow-2xl"
         style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", maxWidth: "620px", maxHeight: "88vh" }}>
@@ -151,7 +151,7 @@ if (!isOpen) return null;
                   {latestLoan.borrowerPhoto ? (
                     <img src={latestLoan.borrowerPhoto} alt={latestLoan.borrowerName} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xl font-bold" style={{ fontFamily: mono, color: "#c49a2f" }}>
+                    <span className="text-xl font-bold" style={{ fontFamily: mono, color: "#111214" }}>
                       {latestLoan.borrowerName.charAt(0).toUpperCase()}
                     </span>
                   )}
@@ -160,11 +160,11 @@ if (!isOpen) return null;
                   <p className="text-sm font-bold" style={{ fontFamily: mono, color: t.text }}>{latestLoan.borrowerName}</p>
                   <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{latestLoan.borrowerPhone}</p>
                   <div className="flex gap-3 mt-1.5 flex-wrap">
-                    <span className="text-[10px]" style={{ fontFamily: mono, color: "#c49a2f" }}>
+                    <span className="text-[10px]" style={{ fontFamily: mono, color: "#111214" }}>
                       {returningClientLoans.length} loan(s)
                     </span>
                     {outstandingBalance > 0 && (
-                      <span className="flex items-center gap-1 text-[10px]" style={{ fontFamily: mono, color: "#f59e0b" }}>
+                      <span className="flex items-center gap-1 text-xs" style={{ fontFamily: mono, color: "#8A5B00" }}>
                         <AlertTriangle className="w-3 h-3" />
                         {formatCompactCurrency(outstandingBalance)} outstanding â€” rolled into new loan
                       </span>
@@ -197,7 +197,7 @@ if (!isOpen) return null;
                         <span className="text-[9px] px-2 py-0.5 rounded-full"
                           style={{
                             fontFamily: mono,
-                            color:      l.status === "Active" ? "#c49a2f" : l.status === "Overdue" ? "#f87171" : l.status === "Completed" ? "#4ade80" : "#f87171",
+                            color:      l.status === "Active" ? "#2552B0" : l.status === "Overdue" ? "#A82F2F" : l.status === "Completed" ? "#14703F" : "#A82F2F",
                             background: l.status === "Active" ? "rgba(196,154,47,0.12)" : l.status === "Overdue" ? "rgba(248,113,113,0.12)" : l.status === "Completed" ? "rgba(74,222,128,0.12)" : "rgba(248,113,113,0.12)",
                           }}>
                           {l.status.toUpperCase()}
@@ -213,7 +213,7 @@ if (!isOpen) return null;
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>
-                  PHONE * <span style={{ color: "#c49a2f" }}>(used to detect returning client)</span>
+                  PHONE * <span style={{ color: "#5F6472" }}>(used to detect returning client)</span>
                 </label>
                 <input required type="tel" value={borrowerPhone}
                   onChange={(e) => setBorrowerPhone(e.target.value)}
@@ -313,8 +313,8 @@ if (!isOpen) return null;
               </p>
               {outstandingBalance > 0 && (
                 <div className="flex justify-between mb-2 pb-2 border-b" style={{ borderColor: t.border }}>
-                  <span className="text-[10px]" style={{ fontFamily: mono, color: "#f59e0b" }}>Outstanding rolled in</span>
-                  <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: "#f59e0b" }}>+ {formatCurrency(outstandingBalance)}</span>
+                  <span className="text-xs" style={{ fontFamily: mono, color: "#8A5B00" }}>Outstanding rolled in</span>
+                  <span className="text-xs font-bold" style={{ fontFamily: mono, color: "#8A5B00" }}>+ {formatCurrency(outstandingBalance)}</span>
                 </div>
               )}
               <div className="grid grid-cols-3 gap-3">
@@ -338,7 +338,7 @@ if (!isOpen) return null;
             <button type="button"
               onClick={() => { if (!borrowerName.trim() || !borrowerPhone.trim()) { alert("Enter the borrower name and phone first"); return; } setShowAgreement(true); }}
               className="mr-auto flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold"
-              style={{ fontFamily: mono, background: agreementRef ? "rgba(74,222,128,0.12)" : t.bgBtn, borderColor: agreementRef ? "rgba(74,222,128,0.3)" : t.border, color: agreementRef ? "#4ade80" : t.textMuted }}>
+              style={{ fontFamily: mono, background: agreementRef ? "#DDF3E6" : t.bgBtn, borderColor: agreementRef ? "rgba(20,112,63,0.25)" : t.border, color: agreementRef ? "#14703F" : t.textMuted }}>
               {agreementRef ? <Check className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
               {agreementRef ? "AGREEMENT " + agreementRef.number : "CREATE AGREEMENT"}
             </button>
@@ -361,5 +361,13 @@ if (!isOpen) return null;
     </div>
   );
 };
+
+
+
+
+
+
+
+
 
 

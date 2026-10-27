@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
+import { AnimatedSplash } from "./components/AnimatedSplash";
 import { useLoanStore } from "./store/loanStore";
 import { Loan } from "./types";
 import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal, WaitlistPage } from "./components";
@@ -66,6 +67,7 @@ function AppInner() {
   } = useLoanStore();
   const { showToast } = useToast();
 
+  const [showSplash, setShowSplash] = useState(true);
   const [capitalModalOpen, setCapitalModalOpen] = useState(false);
   const [goalsModalOpen,   setGoalsModalOpen]   = useState(false);
   const [clientEditTarget, setClientEditTarget] = useState<Loan | null>(null);
@@ -369,7 +371,7 @@ function AppInner() {
                           </div>
                           <button onClick={(e) => { e.stopPropagation(); setMobileBorrowerLoans(group); }}
                             className="p-2 rounded-[8px] border" style={{ background:"var(--bg-raised)", borderColor:"var(--border)" }}>
-                            <Trash2 className="w-4 h-4 text-red-400" />
+                            <Trash2 className="w-4 h-4" style={{ color:"#A82F2F" }} />
                           </button>
                         </div>
                       </div>
@@ -428,6 +430,13 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
+
+
+
+
+
+
 
 
 

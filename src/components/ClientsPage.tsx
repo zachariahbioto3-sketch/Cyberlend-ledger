@@ -22,12 +22,12 @@ interface ClientsPageProps {
 }
 
 const FLAG_META: Record<ClientFlag, { color: string; bg: string; border: string; icon: React.ReactNode }> = {
-  VIP:         { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
-  New:         { color: "#c49a2f", bg: "rgba(196,154,47,0.12)",  border: "rgba(196,154,47,0.3)",  icon: <Plus className="w-3 h-3" /> },
-  Regular:     { color: "#4ade80", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
-  Risk:        { color: "#fb923c", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
-  Defaulter:   { color: "#f87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", icon: <AlertTriangle className="w-3 h-3" /> },
-  Blacklisted: { color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.3)",   icon: <UserX className="w-3 h-3" /> },
+  VIP:         { color: "#8A5B00", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
+  New:         { color: "#111214", bg: "rgba(196,154,47,0.12)",  border: "rgba(196,154,47,0.3)",  icon: <Plus className="w-3 h-3" /> },
+  Regular:     { color: "#1E9E5A", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
+  Risk:        { color: "#9A3412", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
+  Defaulter:   { color: "#A82F2F", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", icon: <AlertTriangle className="w-3 h-3" /> },
+  Blacklisted: { color: "#7A1F1F", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.3)",   icon: <UserX className="w-3 h-3" /> },
 };
 
 const LOAN_PURPOSES: LoanPurpose[] = [
@@ -138,13 +138,13 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
               style={{ background: "rgba(196,154,47,0.15)" }}>
-              <UserPlus className="w-4 h-4" style={{ color: "#c49a2f" }} />
+              <UserPlus className="w-4 h-4" style={{ color: "#111214" }} />
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>
                 NEW CLIENT REGISTRATION
               </h2>
-              <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>
+              <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
                 CLIENT A  FIRST TIME BORROWER
               </p>
             </div>
@@ -159,25 +159,25 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
           {/* Photo uploads */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+            <p className="text-xs font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>PHOTO DOCUMENTS</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               {/* Passport photo */}
               <div>
-                <p className="text-[10px] mb-2 font-bold uppercase" style={labelStyle}>Passport Photo</p>
+                <p className="text-xs mb-2 font-bold uppercase" style={labelStyle}>Passport Photo</p>
                 <input ref={passportRef} type="file" accept="image/*" className="hidden"
                   onChange={e => handleImage("borrowerPhoto", e.target.files?.[0])} />
                 <button onClick={() => passportRef.current?.click()}
                   className="w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                  style={{ borderColor: form.borrowerPhoto ? "#c49a2f" : t.border, background: t.bgActive }}>
+                  style={{ borderColor: form.borrowerPhoto ? "#111214" : t.border, background: t.bgActive }}>
                   {form.borrowerPhoto ? (
                     <img src={form.borrowerPhoto} alt="passport"
                       className="w-full h-full object-cover rounded-2xl" />
                   ) : (
                     <>
                       <Camera className="w-6 h-6" style={{ color: t.textFaint }} />
-                      <span className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>
+                      <span className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
                         UPLOAD PHOTO
                       </span>
                     </>
@@ -187,19 +187,19 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
               {/* ID card */}
               <div>
-                <p className="text-[10px] mb-2 font-bold uppercase" style={labelStyle}>ID Card Photo</p>
+                <p className="text-xs mb-2 font-bold uppercase" style={labelStyle}>ID Card Photo</p>
                 <input ref={idRef} type="file" accept="image/*" className="hidden"
                   onChange={e => handleImage("borrowerIdPhoto", e.target.files?.[0])} />
                 <button onClick={() => idRef.current?.click()}
                   className="w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                  style={{ borderColor: form.borrowerIdPhoto ? "#c49a2f" : t.border, background: t.bgActive }}>
+                  style={{ borderColor: form.borrowerIdPhoto ? "#111214" : t.border, background: t.bgActive }}>
                   {form.borrowerIdPhoto ? (
                     <img src={form.borrowerIdPhoto} alt="id"
                       className="w-full h-full object-cover rounded-2xl" />
                   ) : (
                     <>
                       <Upload className="w-6 h-6" style={{ color: t.textFaint }} />
-                      <span className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>
+                      <span className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
                         UPLOAD ID
                       </span>
                     </>
@@ -211,7 +211,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
           {/* Personal Info */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+            <p className="text-xs font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>PERSONAL INFORMATION</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
@@ -225,7 +225,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                 { label: "Referral Source",key: "referralSource",   icon: <TrendingUp className="w-3.5 h-3.5" />, type: "text"},
               ].map(f => (
                 <div key={f.key}>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={labelStyle}>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={labelStyle}>
                     {f.label}
                   </label>
                   <div className="relative">
@@ -237,11 +237,11 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                       value={(form as any)[f.key]}
                       onChange={e => set(f.key, e.target.value)}
                       className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs outline-none border"
-                      style={{ ...inputStyle, borderColor: errors[f.key] ? "#f87171" : t.borderMid }}
+                      style={{ ...inputStyle, borderColor: errors[f.key] ? "#A82F2F" : t.borderMid }}
                     />
                   </div>
                   {errors[f.key] && (
-                    <p className="text-[10px] mt-1" style={{ color: "#f87171", fontFamily: mono }}>
+                    <p className="text-xs mt-1" style={{ color: "#A82F2F", fontFamily: mono }}>
                       {errors[f.key]}
                     </p>
                   )}
@@ -250,7 +250,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
               {/* Address  full width */}
               <div className="sm:col-span-2">
-                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={labelStyle}>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={labelStyle}>
                   Address
                 </label>
                 <div className="relative">
@@ -270,31 +270,31 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
           {/* Loan Purpose */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+            <p className="text-xs font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>LOAN PURPOSE</p>
             <select
               value={form.loanPurpose}
               onChange={e => set("loanPurpose", e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl text-xs outline-none border"
-              style={{ ...inputStyle, borderColor: errors.loanPurpose ? "#f87171" : t.borderMid }}>
+              style={{ ...inputStyle, borderColor: errors.loanPurpose ? "#A82F2F" : t.borderMid }}>
               <option value="">-- Select purpose (required for credit scoring) --</option>
               {LOAN_PURPOSES.map(p => (
                 <option key={p} value={p}>{p}</option>
               ))}
             </select>
             {errors.loanPurpose && (
-              <p className="text-[10px] mt-1" style={{ color: "#f87171", fontFamily: mono }}>
+              <p className="text-xs mt-1" style={{ color: "#A82F2F", fontFamily: mono }}>
                 {errors.loanPurpose}
               </p>
             )}
-            <p className="text-[10px] mt-1.5" style={{ color: t.textFaint, fontFamily: mono }}>
+            <p className="text-xs mt-1.5" style={{ color: t.textFaint, fontFamily: mono }}>
               ? This is used in the credit scoring system
             </p>
           </div>
 
           {/* Notes */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+            <p className="text-xs font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>CLIENT NOTES</p>
             <textarea
               rows={3}
@@ -308,11 +308,11 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
           {/* Waitlist Fields */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+            <p className="text-xs font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>WAITLIST DETAILS</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ fontFamily: mono, color: t.textMuted }}>Date Needed</label>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ fontFamily: mono, color: t.textMuted }}>Date Needed</label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: t.textFaint }} />
                   <input type="date" value={form.dateNeeded} onChange={e => set("dateNeeded", e.target.value)}
@@ -321,7 +321,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ fontFamily: mono, color: t.textMuted }}>Amount Needed (KES)</label>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ fontFamily: mono, color: t.textMuted }}>Amount Needed (KES)</label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: t.textFaint }} />
                   <input type="number" value={form.amountNeeded} onChange={e => set("amountNeeded", e.target.value)}
@@ -334,7 +334,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 
           {/* Client Flags */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+            <p className="text-xs font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: mono, color: t.textFaint }}>CLIENT FLAGS</p>
             <div className="flex gap-2 flex-wrap">
               {(Object.keys(FLAG_META) as ClientFlag[]).map(f => {
@@ -345,7 +345,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                       ? form.clientFlags.filter(x => x !== f)
                       : [...form.clientFlags, f]
                     )}
-                    className="flex items-center gap-1 px-3 py-2 rounded-full border text-[10px] font-bold transition-all"
+                    className="flex items-center gap-1 px-3 py-2 rounded-full border text-xs font-bold transition-all"
                     style={{
                       fontFamily: mono, minHeight: "32px",
                       background:  active ? FLAG_META[f].bg     : t.bgBtn,
@@ -448,12 +448,12 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   }, [loans]);
 
   const portfolioStats = [
-    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#c49a2f" },
-    { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "#4ade80" },
-    { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "#f59e0b" },
-    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "#c49a2f" },
-    { label: "OVERDUE",         value: String(metrics.overdueCount),                      icon: <Clock className="w-4 h-4" />,       color: metrics.overdueCount > 0 ? "#f87171" : "#4ade80" },
-    { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "#4ade80" },
+    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#111214" },
+    { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "#1E9E5A" },
+    { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "#8A5B00" },
+    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "#111214" },
+    { label: "OVERDUE",         value: String(metrics.overdueCount),                      icon: <Clock className="w-4 h-4" />,       color: metrics.overdueCount > 0 ? "#A82F2F" : "#1E9E5A" },
+    { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "#1E9E5A" },
   ];
 
   return (
@@ -462,14 +462,14 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
       <div className="flex flex-col px-4 py-4 gap-4 flex-1 min-w-0 lg:border-r" style={{ borderColor: t.border }}>
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
-          <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>SELECT A CLIENT TO VIEW THEIR PROFILE</p>
+          <p className="text-xs mt-1" style={{ color: t.textFaint, fontFamily: mono }}>SELECT A CLIENT TO VIEW THEIR PROFILE</p>
         </div>
         <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">
           {portfolioStats.map(s => (
             <div key={s.label} className="rounded-2xl border p-4 flex flex-col gap-2"
               style={{ background: t.bg, borderColor: t.border }}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[9px] uppercase tracking-widest truncate min-w-0" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
+                <p className="text-xs uppercase tracking-widest truncate min-w-0" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
                 <span className="shrink-0" style={{ color: s.color }}>{s.icon}</span>
               </div>
               <p className="text-lg font-bold" style={{ fontFamily: mono, color: s.color }}>{s.value}</p>
@@ -479,11 +479,11 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
 
         {flagSummary.length > 0 && (
           <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CLIENT SEGMENTS</p>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CLIENT SEGMENTS</p>
             <div className="flex gap-2 flex-wrap">
               {flagSummary.map(({ flag, count }) => (
                 <div key={flag}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-[10px] font-bold"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-bold"
                   style={{ fontFamily: mono, background: FLAG_META[flag].bg, borderColor: FLAG_META[flag].border, color: FLAG_META[flag].color }}>
                   {FLAG_META[flag].icon}{flag} <span className="opacity-70">({count})</span>
                 </div>
@@ -493,7 +493,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         )}
 
         <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>TOP BORROWERS</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>TOP BORROWERS</p>
           <div className="space-y-2">
             {topBorrowers.map((b, i) => (
               <div key={b.phone} className="flex items-center gap-3 p-3 rounded-xl border"
@@ -503,15 +503,15 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
                     background:  b.hasOverdue ? "rgba(248,113,113,0.15)" : "rgba(196,154,47,0.12)",
                     borderColor: b.hasOverdue ? "rgba(248,113,113,0.4)"  : "rgba(196,154,47,0.3)",
                   }}>
-                  <span className="text-[10px] font-bold" style={{ fontFamily: mono, color: b.hasOverdue ? "#f87171" : "#c49a2f" }}>{i + 1}</span>
+                  <span className="text-xs font-bold" style={{ fontFamily: mono, color: b.hasOverdue ? "#A82F2F" : "#111214" }}>{i + 1}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold truncate" style={{ color: t.text }}>{b.name}</p>
-                  <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{b.phone}</p>
+                  <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>{b.phone}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#c49a2f" }}>{formatCompactCurrency(b.totalLent)}</p>
-                  {b.hasOverdue && <p className="text-[9px]" style={{ color: "#f87171", fontFamily: mono }}>OVERDUE</p>}
+                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#111214" }}>{formatCompactCurrency(b.totalLent)}</p>
+                  {b.hasOverdue && <p className="text-xs" style={{ color: "#A82F2F", fontFamily: mono }}>OVERDUE</p>}
                 </div>
               </div>
             ))}
@@ -523,31 +523,31 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
       <div className="flex flex-col px-4 py-4 gap-4 w-full lg:w-[320px] xl:w-[360px] lg:shrink-0">
         <div>
           <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
-          <p className="text-[10px] mt-1" style={{ color: t.textFaint, fontFamily: mono }}>COLLECTION METRICS & RISK</p>
+          <p className="text-xs mt-1" style={{ color: t.textFaint, fontFamily: mono }}>COLLECTION METRICS & RISK</p>
         </div>
 
         <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
-            <BarChart2 className="w-3.5 h-3.5" style={{ color: "#c49a2f" }} />
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
+            <BarChart2 className="w-3.5 h-3.5" style={{ color: "#111214" }} />
           </div>
           <div className="flex items-end gap-3 mb-3">
-            <p className="text-3xl font-bold" style={{ fontFamily: mono, color: collectionRate >= 80 ? "#4ade80" : collectionRate >= 50 ? "#f59e0b" : "#f87171" }}>
+            <p className="text-3xl font-bold" style={{ fontFamily: mono, color: collectionRate >= 80 ? "#1E9E5A" : collectionRate >= 50 ? "#8A5B00" : "#A82F2F" }}>
               {collectionRate}%
             </p>
           </div>
           <div className="h-2 rounded-full overflow-hidden" style={{ background: t.bgActive }}>
             <div className="h-full rounded-full transition-all"
-              style={{ width: `${collectionRate}%`, background: collectionRate >= 80 ? "#4ade80" : collectionRate >= 50 ? "#f59e0b" : "#f87171" }} />
+              style={{ width: `${collectionRate}%`, background: collectionRate >= 80 ? "#1E9E5A" : collectionRate >= 50 ? "#8A5B00" : "#A82F2F" }} />
           </div>
         </div>
 
         <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>MONTHLY COLLECTIONS</p>
-            <div className="flex gap-3 text-[9px]" style={{ fontFamily: mono }}>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#c49a2f" }} />COL</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#f87171" }} />DUE</span>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>MONTHLY COLLECTIONS</p>
+            <div className="flex gap-3 text-xs" style={{ fontFamily: mono }}>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#111214" }} />COL</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#A82F2F" }} />DUE</span>
             </div>
           </div>
           {monthlyCollections.length === 0 ? (
@@ -571,26 +571,26 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
 
         <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>AGING DEBT</p>
-            <ShieldAlert className="w-3.5 h-3.5" style={{ color: metrics.overdueCount > 0 ? "#f87171" : t.textFaint }} />
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>AGING DEBT</p>
+            <ShieldAlert className="w-3.5 h-3.5" style={{ color: metrics.overdueCount > 0 ? "#A82F2F" : t.textFaint }} />
           </div>
           {metrics.overdueCount === 0 ? (
             <div className="flex flex-col items-center py-3 gap-1.5">
-              <CheckCircle className="w-6 h-6" style={{ color: "#4ade80" }} />
-              <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#4ade80" }}>ALL CLEAR</p>
+              <CheckCircle className="w-6 h-6" style={{ color: "#1E9E5A" }} />
+              <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#1E9E5A" }}>ALL CLEAR</p>
             </div>
           ) : (
             <div className="space-y-2">
               {agingBuckets.map((bucket, i) => {
-                const colors = ["#f59e0b", "#f87171", "#dc2626"];
+                const colors = ["#8A5B00", "#A82F2F", "#7A1F1F"];
                 return (
                   <div key={bucket.label} className="flex items-center justify-between p-2.5 rounded-xl border"
                     style={{ background: t.bgActive, borderColor: t.border }}>
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-6 rounded-full" style={{ background: colors[i] }} />
                       <div>
-                        <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>{bucket.label}</p>
-                        <p className="text-[9px]" style={{ color: t.textFaint, fontFamily: mono }}>{bucket.count} LOANS</p>
+                        <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{bucket.label}</p>
+                        <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>{bucket.count} LOANS</p>
                       </div>
                     </div>
                     <p className="text-xs font-bold" style={{ fontFamily: mono, color: colors[i] }}>
@@ -699,11 +699,11 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>CLIENTS</h2>
-              <p className="text-[10px] mt-0.5" style={{ color: t.textFaint }}>{clients.length} BORROWERS</p>
+              <p className="text-xs mt-0.5" style={{ color: t.textFaint }}>{clients.length} BORROWERS</p>
             </div>
             <button
               onClick={() => setShowNewClient(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
               style={{ fontFamily: mono, background: "var(--primary)", color: "var(--primary-foreground)" }}><UserPlus className="w-3.5 h-3.5" />
               NEW
             </button>
@@ -727,11 +727,11 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
           <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
             {(["All", ...Object.keys(FLAG_META)] as (ClientFlag | "All")[]).map(f => (
               <button key={f} onClick={() => setFilterFlag(f)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border whitespace-nowrap text-[10px] font-bold transition-all shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border whitespace-nowrap text-xs font-bold transition-all shrink-0"
                 style={{
                   fontFamily: mono, minHeight: "28px",
-                  background:  filterFlag === f ? (f === "All" ? "#c49a2f" : FLAG_META[f as ClientFlag].bg)     : t.bgCard,
-                  borderColor: filterFlag === f ? (f === "All" ? "#c49a2f" : FLAG_META[f as ClientFlag].border) : t.border,
+                  background:  filterFlag === f ? (f === "All" ? "#111214" : FLAG_META[f as ClientFlag].bg)     : t.bgCard,
+                  borderColor: filterFlag === f ? (f === "All" ? "#111214" : FLAG_META[f as ClientFlag].border) : t.border,
                   color:       filterFlag === f ? (f === "All" ? "#fff"    : FLAG_META[f as ClientFlag].color)  : t.textMuted,
                 }}>
                 {f !== "All" && FLAG_META[f as ClientFlag].icon}
@@ -759,7 +759,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   style={{
                     background:  isActive ? t.bgActive : "transparent",
                     borderColor: t.border,
-                    borderLeft:  isActive ? "3px solid #c49a2f" : "3px solid transparent",
+                    borderLeft:  isActive ? "3px solid #111214" : "3px solid transparent",
                   }}>
 
                   {/* Avatar  show photo if available */}
@@ -772,7 +772,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                       <img src={c.latest.borrowerPhoto} alt={c.latest.borrowerName}
                         className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-sm font-bold" style={{ fontFamily: mono, color: hasOverdue ? "#f87171" : t.text }}>
+                      <span className="text-sm font-bold" style={{ fontFamily: mono, color: hasOverdue ? "#A82F2F" : t.text }}>
                         {c.latest.borrowerName.charAt(0).toUpperCase()}
                       </span>
                     )}
@@ -781,14 +781,14 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="text-xs font-bold truncate" style={{ color: t.text }}>{c.latest.borrowerName}</p>
-                      {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "#f59e0b" }} />}
-                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#fb923c" }} />}
-                      {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#dc2626" }} />}
+                      {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "#8A5B00" }} />}
+                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#9A3412" }} />}
+                      {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#7A1F1F" }} />}
                     </div>
-                    <p className="text-[10px] truncate" style={{ color: t.textFaint, fontFamily: mono }}>
+                    <p className="text-xs truncate" style={{ color: t.textFaint, fontFamily: mono }}>
                       {c.latest.borrowerPhone}  {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
                     </p>
-                    <p className="text-[10px]" style={{ color: "#c49a2f", fontFamily: mono }}>
+                    <p className="text-xs" style={{ color: "#111214", fontFamily: mono }}>
                       {formatCompactCurrency(c.stats.totalLent)} lent
                     </p>
                   </div>
@@ -838,14 +838,14 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 <h3 className="text-sm font-bold truncate" style={{ fontFamily: mono, color: t.text }}>
                   {selectedLatest.borrowerName}
                 </h3>
-                <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>
+                <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
                   {selectedLatest.borrowerPhone}
                   {selectedLatest.borrowerUsername && `  @${selectedLatest.borrowerUsername}`}
                 </p>
                 <div className="flex gap-1.5 mt-1 flex-wrap">
                   {(selectedLatest.clientFlags || []).map(f => (
                     <span key={f}
-                      className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-bold"
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold"
                       style={{ fontFamily: mono, background: FLAG_META[f].bg, borderColor: FLAG_META[f].border, color: FLAG_META[f].color }}>
                       {FLAG_META[f].icon}{f.toUpperCase()}
                     </span>
@@ -870,7 +870,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   </button>
                   <button onClick={handleSave}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold"
-                    style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
+                    style={{ fontFamily: mono, background: "#111214", color: "#fff" }}>
                     <Save className="w-3.5 h-3.5" />SAVE
                   </button>
                 </>
@@ -896,8 +896,8 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
               ].map(s => (
                 <div key={s.label} className="rounded-2xl p-4 border"
                   style={{ background: t.bgActive, borderColor: t.border }}>
-                  <p className="text-[9px] uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
-                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "#c49a2f" }}>{s.value}</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
+                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "#111214" }}>{s.value}</p>
                 </div>
               ))}
             </div>
@@ -905,7 +905,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             {/* ID photo if available */}
             {selectedLatest.borrowerIdPhoto && (
               <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>ID DOCUMENT</p>
+                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>ID DOCUMENT</p>
                 <img src={selectedLatest.borrowerIdPhoto} alt="ID" className="w-full max-h-48 object-contain rounded-xl" />
               </div>
             )}
@@ -925,7 +925,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
 
             {/* Loan history */}
             <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>
                 LOAN HISTORY ({selected.length})
               </p>
               <div className="space-y-2">
@@ -934,16 +934,16 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                     style={{ background: t.bgActive, borderColor: t.border }}>
                     <div>
                       <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{l.loanNumber}</p>
-                      <p className="text-[10px]" style={{ color: t.textFaint }}>{l.category}  {l.originationDate}</p>
+                      <p className="text-xs" style={{ color: t.textFaint }}>{l.category}  {l.originationDate}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
                         {formatCompactCurrency(l.loanAmount)}
                       </p>
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full border"
                         style={{
                           fontFamily: mono,
-                          color:       l.status === "Active" ? "#c49a2f" : l.status === "Overdue" ? "#f87171" : "#4ade80",
+                          color:       l.status === "Active" ? "#111214" : l.status === "Overdue" ? "#A82F2F" : "#1E9E5A",
                           background:  l.status === "Active" ? "rgba(196,154,47,0.1)" : l.status === "Overdue" ? "rgba(248,113,113,0.1)" : "rgba(74,222,128,0.1)",
                           borderColor: l.status === "Active" ? "rgba(196,154,47,0.3)" : l.status === "Overdue" ? "rgba(248,113,113,0.3)" : "rgba(74,222,128,0.3)",
                         }}>
@@ -960,6 +960,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
 
 
 
