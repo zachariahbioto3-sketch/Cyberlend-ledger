@@ -278,9 +278,9 @@ function AppInner() {
             {/* Capital mini-cards */}
             <div className="px-4 mt-3 grid grid-cols-3 gap-2">
               {[
-                { label:"AVAILABLE", value: metrics.availableCapital, color:"#14703F", border:"rgba(20,112,63,0.30)", action:true },
-                { label:"LENDABLE",  value: metrics.lendableAmount,   color:"#111214", border:"rgba(17,18,20,0.14)", action:false },
-                { label:"RETURNS",   value: metrics.returnsFromPreviousLoans, color:"#111214", border:"rgba(17,18,20,0.14)", action:false },
+                { label:"AVAILABLE", value: metrics.availableCapital, color:"var(--success-fg)", border:"rgba(20,112,63,0.30)", action:true },
+                { label:"LENDABLE",  value: metrics.lendableAmount,   color:"var(--foreground)", border:"var(--border)", action:false },
+                { label:"RETURNS",   value: metrics.returnsFromPreviousLoans, color:"var(--foreground)", border:"var(--border)", action:false },
               ].map((c) => (
                 <div key={c.label} onClick={() => { if (c.action) { setCapitalInput(String(totalCapital)); setCapitalModalOpen(true); } }}
                   className={`rounded-[10px] p-3 border ${c.action ? "cursor-pointer" : ""}`}
@@ -431,6 +431,7 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
 
 
 

@@ -20,7 +20,7 @@ export function Header({ onSearch, className }: HeaderProps) {
       <span className="font-brand text-[var(--foreground)] text-xl md:hidden">Cyberlend</span>
 
       {/* Search */}
-      <div className="flex-1 max-w-sm hidden md:flex items-center gap-2 bg-white/70 border border-[var(--border)] rounded-[var(--radius-pill)] px-4 h-10 backdrop-blur-sm">
+      <div className="flex-1 max-w-sm hidden md:flex items-center gap-2 bg-[var(--bg-raised)] border border-[var(--border)] rounded-[var(--radius-pill)] px-4 h-10">
         <Search className="h-4 w-4 text-[var(--text-muted)] shrink-0" />
         <input
           type="text"
@@ -42,6 +42,7 @@ export function Header({ onSearch, className }: HeaderProps) {
     </header>
   )
 }
+
 
 
 

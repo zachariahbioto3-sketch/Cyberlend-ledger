@@ -22,12 +22,12 @@ interface ClientsPageProps {
 }
 
 const FLAG_META: Record<ClientFlag, { color: string; bg: string; border: string; icon: React.ReactNode }> = {
-  VIP:         { color: "#8A5B00", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
-  New:         { color: "#111214", bg: "rgba(196,154,47,0.12)",  border: "rgba(196,154,47,0.3)",  icon: <Plus className="w-3 h-3" /> },
-  Regular:     { color: "#1E9E5A", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
-  Risk:        { color: "#9A3412", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
-  Defaulter:   { color: "#A82F2F", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", icon: <AlertTriangle className="w-3 h-3" /> },
-  Blacklisted: { color: "#7A1F1F", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.3)",   icon: <UserX className="w-3 h-3" /> },
+  VIP:         { color: "var(--warning-fg)", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: <Star className="w-3 h-3" /> },
+  New:         { color: "var(--foreground)", bg: "rgba(196,154,47,0.12)",  border: "rgba(196,154,47,0.3)",  icon: <Plus className="w-3 h-3" /> },
+  Regular:     { color: "var(--success-fg)", bg: "rgba(74,222,128,0.12)",  border: "rgba(74,222,128,0.3)",  icon: <Users className="w-3 h-3" /> },
+  Risk:        { color: "var(--risk-fg)", bg: "rgba(251,146,60,0.12)",  border: "rgba(251,146,60,0.3)",  icon: <ShieldAlert className="w-3 h-3" /> },
+  Defaulter:   { color: "var(--danger-fg)", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", icon: <AlertTriangle className="w-3 h-3" /> },
+  Blacklisted: { color: "var(--blacklisted-fg)", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.3)",   icon: <UserX className="w-3 h-3" /> },
 };
 
 const LOAN_PURPOSES: LoanPurpose[] = [
@@ -127,8 +127,8 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
   const labelStyle = { fontFamily: mono, color: t.textMuted };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{ background: "rgba(17,18,20,0.45)", backdropFilter: "blur(8px)" }}>
       <div className="cl-form-modal relative w-full max-w-2xl rounded-3xl border flex flex-col"
         style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
 
@@ -137,8 +137,8 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
           style={{ background: t.bgCard, borderColor: t.border, maxHeight: "90vh" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-              style={{ background: "rgba(196,154,47,0.15)" }}>
-              <UserPlus className="w-4 h-4" style={{ color: "#111214" }} />
+              style={{ background: "var(--secondary)" }}>
+              <UserPlus className="w-4 h-4" style={{ color: "var(--foreground)" }} />
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>
@@ -241,7 +241,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
                     />
                   </div>
                   {errors[f.key] && (
-                    <p className="text-xs mt-1" style={{ color: "#A82F2F", fontFamily: mono }}>
+                    <p className="text-xs mt-1" style={{ color: "var(--danger-fg)", fontFamily: mono }}>
                       {errors[f.key]}
                     </p>
                   )}
@@ -283,7 +283,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
               ))}
             </select>
             {errors.loanPurpose && (
-              <p className="text-xs mt-1" style={{ color: "#A82F2F", fontFamily: mono }}>
+              <p className="text-xs mt-1" style={{ color: "var(--danger-fg)", fontFamily: mono }}>
                 {errors.loanPurpose}
               </p>
             )}
@@ -448,12 +448,12 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
   }, [loans]);
 
   const portfolioStats = [
-    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "#111214" },
-    { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "#1E9E5A" },
-    { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "#8A5B00" },
-    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "#111214" },
+    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "var(--foreground)" },
+    { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "var(--success-fg)" },
+    { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "var(--warning-fg)" },
+    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "var(--foreground)" },
     { label: "OVERDUE",         value: String(metrics.overdueCount),                      icon: <Clock className="w-4 h-4" />,       color: metrics.overdueCount > 0 ? "#A82F2F" : "#1E9E5A" },
-    { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "#1E9E5A" },
+    { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "var(--success-fg)" },
   ];
 
   return (
@@ -510,8 +510,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
                   <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>{b.phone}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#111214" }}>{formatCompactCurrency(b.totalLent)}</p>
-                  {b.hasOverdue && <p className="text-xs" style={{ color: "#A82F2F", fontFamily: mono }}>OVERDUE</p>}
+                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "var(--foreground)" }}>{formatCompactCurrency(b.totalLent)}</p>
+                  {b.hasOverdue && <p className="text-xs" style={{ color: "var(--danger-fg)", fontFamily: mono }}>OVERDUE</p>}
                 </div>
               </div>
             ))}
@@ -529,7 +529,7 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
         <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
-            <BarChart2 className="w-3.5 h-3.5" style={{ color: "#111214" }} />
+            <BarChart2 className="w-3.5 h-3.5" style={{ color: "var(--foreground)" }} />
           </div>
           <div className="flex items-end gap-3 mb-3">
             <p className="text-3xl font-bold" style={{ fontFamily: mono, color: collectionRate >= 80 ? "#1E9E5A" : collectionRate >= 50 ? "#8A5B00" : "#A82F2F" }}>
@@ -576,8 +576,8 @@ const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, th
           </div>
           {metrics.overdueCount === 0 ? (
             <div className="flex flex-col items-center py-3 gap-1.5">
-              <CheckCircle className="w-6 h-6" style={{ color: "#1E9E5A" }} />
-              <p className="text-xs font-bold" style={{ fontFamily: mono, color: "#1E9E5A" }}>ALL CLEAR</p>
+              <CheckCircle className="w-6 h-6" style={{ color: "var(--success-fg)" }} />
+              <p className="text-xs font-bold" style={{ fontFamily: mono, color: "var(--success-fg)" }}>ALL CLEAR</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -781,14 +781,14 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                   <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="text-xs font-bold truncate" style={{ color: t.text }}>{c.latest.borrowerName}</p>
-                      {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "#8A5B00" }} />}
-                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "#9A3412" }} />}
-                      {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "#7A1F1F" }} />}
+                      {flags.includes("VIP") && <Star className="w-3 h-3 shrink-0" style={{ color: "var(--warning-fg)" }} />}
+                      {flags.includes("Risk") && <ShieldAlert className="w-3 h-3 shrink-0" style={{ color: "var(--risk-fg)" }} />}
+                      {flags.includes("Blacklisted") && <UserX className="w-3 h-3 shrink-0" style={{ color: "var(--blacklisted-fg)" }} />}
                     </div>
                     <p className="text-xs truncate" style={{ color: t.textFaint, fontFamily: mono }}>
                       {c.latest.borrowerPhone}  {c.loans.length} LOAN{c.loans.length > 1 ? "S" : ""}
                     </p>
-                    <p className="text-xs" style={{ color: "#111214", fontFamily: mono }}>
+                    <p className="text-xs" style={{ color: "var(--foreground)", fontFamily: mono }}>
                       {formatCompactCurrency(c.stats.totalLent)} lent
                     </p>
                   </div>
@@ -897,7 +897,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
                 <div key={s.label} className="rounded-2xl p-4 border"
                   style={{ background: t.bgActive, borderColor: t.border }}>
                   <p className="text-xs uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
-                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "#111214" }}>{s.value}</p>
+                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "var(--foreground)" }}>{s.value}</p>
                 </div>
               ))}
             </div>
@@ -960,6 +960,9 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
     </div>
   );
 };
+
+
+
 
 
 

@@ -82,6 +82,7 @@
   --warning: #FBEFC9;  --warning-fg: #8A5B00;
   --danger:  #F9DADA;  --danger-fg:  #A82F2F;
   --info:    #DCE7FB;  --info-fg:    #2552B0;
+  --risk-fg: #9A3412;  --blacklisted-fg: #7A1F1F;
 
   /* Surfaces */
   --bg-base: #F4F5FC;
@@ -322,3 +323,4 @@ select option { background-color: #FFFFFF; color: var(--text-primary); }
   color: var(--foreground);
   color-scheme: dark;
 }
+

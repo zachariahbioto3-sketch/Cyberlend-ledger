@@ -113,7 +113,7 @@ if (!isOpen) return null;
   const optionStyle = { background: t.bgModal, color: t.text };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       style={{ background: "rgba(17,18,20,0.45)", backdropFilter: "blur(8px)" }}>
 
       <div className="cl-form-modal w-full flex flex-col rounded-3xl border overflow-hidden shadow-2xl"
@@ -361,6 +361,7 @@ if (!isOpen) return null;
     </div>
   );
 };
+
 
 
 

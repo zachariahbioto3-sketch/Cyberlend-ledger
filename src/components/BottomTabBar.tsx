@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, Users, TrendingUp, ScrollText, Clock } from "lucide-react"
+import { motion } from "framer-motion"
 
 type Tab = "loans" | "analytics" | "clients" | "waitlist" | "agreements"
 
@@ -20,7 +21,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
   return (
     <nav className={cn(
       "fixed bottom-0 left-0 right-0 z-50",
-      "bg-white/80 border-t border-[var(--border)] backdrop-blur-md",
+      "bg-[var(--bg-surface)] border-t border-[var(--border)]",
       "flex items-stretch",
       "pb-[env(safe-area-inset-bottom,0px)]",
       "md:hidden"
@@ -31,32 +32,40 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
+            aria-label={tab.label}
             className={cn(
               "flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px]",
               "text-[10px] font-medium transition-colors duration-150",
-              "focus:outline-none",
-              isActive
-                ? "text-[var(--primary)]"
-                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              "focus:outline-none"
             )}
           >
-            <span className={cn(
-              "transition-colors duration-150 relative",
-              isActive && "text-[var(--primary)]"
-            )}>
-              {tab.icon}
+            <span className="relative flex items-center justify-center w-9 h-9">
+              {isActive && (
+                <motion.span
+                  layoutId="nav-pill"
+                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-full"
+                  style={{ background: "var(--primary)", willChange: "transform", transform: "translateZ(0)" }}
+                />
+              )}
+              <span
+                className="relative z-10 transition-colors duration-150"
+                style={{ color: isActive ? "var(--primary-foreground)" : "var(--text-muted)" }}
+              >
+                {tab.icon}
+              </span>
             </span>
-            {tab.label}
-            {isActive && (
-              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--primary)]" />
-            )}
+            <span
+              className="transition-colors duration-150"
+              style={{ color: isActive ? "var(--primary)" : "var(--text-muted)" }}
+            >
+              {tab.label}
+            </span>
           </button>
         )
       })}
     </nav>
   )
 }
-
-
 
 
