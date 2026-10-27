@@ -46,6 +46,7 @@ export function Sidebar({ active, onChange }: SidebarProps) {
             <button
               key={item.id}
               onClick={() => onChange(item.id)}
+              aria-label={item.label}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-[8px] w-full text-left",
                 "text-sm font-medium transition-colors duration-150 min-h-[44px]",
@@ -64,6 +65,7 @@ export function Sidebar({ active, onChange }: SidebarProps) {
       {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         className="flex items-center justify-center h-11 w-full border-t border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-150"
       >
         {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -71,6 +73,7 @@ export function Sidebar({ active, onChange }: SidebarProps) {
     </aside>
   )
 }
+
 
 
 

@@ -141,6 +141,7 @@ function AppInner() {
             <ExportMenu loans={loans} />
             <Button variant="ghost" size="sm" onClick={() => setPdfOpen(true)}><FileText className="w-3 h-3 mr-1"/>PDF</Button>
             
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}>{isDark ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}</Button>
             <Button size="sm" onClick={() => setNewLoanOpen(true)}><PlusCircle className="w-3.5 h-3.5 mr-1"/>NEW LOAN</Button>
           </div>
 
@@ -430,6 +431,7 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
 
 
 

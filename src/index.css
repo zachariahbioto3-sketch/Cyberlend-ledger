@@ -94,6 +94,10 @@
 
   --shadow-soft: 0 12px 32px rgba(40,50,90,0.08);
 
+  --chart-ink: #111214;
+  --chart-inactive: #C3C7D3;
+  --chart-muted: #5F6472;
+
   /* TEMPORARY aliases so old gold references keep working until each screen is redone */
   --gold-400: #2A2D33;
   --gold-500: #111214;
@@ -255,3 +259,66 @@ select option { background-color: #FFFFFF; color: var(--text-primary); }
 .cl-select:disabled { opacity: 0.4; cursor: not-allowed; }
 .cl-select option { background-color: #FFFFFF; color: var(--foreground); }
 
+
+.dark {
+  --background: #0B0C10;
+  --foreground: #F2F3F8;
+  --card: rgba(255,255,255,0.055);
+  --card-foreground: #F2F3F8;
+  --popover: #17181C;
+  --popover-foreground: #F2F3F8;
+  --primary: #CDF27E;
+  --primary-foreground: #111214;
+  --secondary: #1C1E24;
+  --secondary-foreground: #F2F3F8;
+  --muted: #1C1E24;
+  --muted-foreground: #9CA1AF;
+  --accent: #CDF27E;
+  --accent-foreground: #111214;
+  --accent-2: #F3B9B2;
+  --destructive: #D64545;
+  --destructive-foreground: #FFFFFF;
+
+  --text-primary: #F2F3F8;
+  --text-muted: #9CA1AF;
+  --text-faint: #9CA1AF;
+
+  --border: rgba(255,255,255,0.10);
+  --border-mid: rgba(255,255,255,0.16);
+  --border-strong: rgba(255,255,255,0.26);
+  --glass-border: rgba(255,255,255,0.12);
+  --row-alt: rgba(255,255,255,0.025);
+  --row-hover: rgba(205,242,126,0.10);
+  --progress-bg: rgba(255,255,255,0.14);
+  --inactive: rgba(255,255,255,0.16);
+  --input: #15171B;
+  --ring: #CDF27E;
+
+  --bg-base: #0B0C10;
+  --bg-surface: rgba(255,255,255,0.055);
+  --bg-raised: #1C1E24;
+
+  --chart-ink: #F2F3F8;
+  --chart-inactive: rgba(255,255,255,0.16);
+  --chart-muted: #9CA1AF;
+
+  --shadow-soft: 0 12px 32px rgba(0,0,0,0.45);
+}
+
+.dark body::before {
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, rgba(205,242,126,0.10), transparent 60%),
+    radial-gradient(50rem 40rem at 100% 0%, rgba(243,185,178,0.08), transparent 60%),
+    radial-gradient(60rem 50rem at 50% 110%, rgba(59,111,224,0.10), transparent 60%),
+    #0B0C10;
+}
+
+.dark .cl-form-modal {
+  background: #15171B;
+  border: 1px solid var(--glass-border);
+}
+.dark select, .dark .cl-select {
+  background-color: #15171B;
+  color: var(--foreground);
+  color-scheme: dark;
+}

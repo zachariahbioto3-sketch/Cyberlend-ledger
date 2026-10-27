@@ -32,16 +32,17 @@ export function Header({ onSearch, className }: HeaderProps) {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        <button className="h-10 w-10 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--bg-raised)] transition-colors duration-150">
+        <button aria-label="Notifications" className="h-11 w-11 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--bg-raised)] transition-colors duration-150">
           <Bell className="h-5 w-5" />
         </button>
-        <button className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] transition-colors duration-150">
+        <button aria-label="Profile" className="h-11 w-11 flex items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] transition-colors duration-150">
           <User className="h-4 w-4" />
         </button>
       </div>
     </header>
   )
 }
+
 
 
 
