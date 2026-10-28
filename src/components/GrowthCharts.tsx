@@ -22,7 +22,7 @@ function formatMonthLabel(key: string) {
 }
 
 export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) => {
-  const mono = "var(--font-mono)";
+  const FONT = "var(--font-mono)";
 
   const allMonths = [...new Set(loans.map(l => getMonthKey(l.originationDate)))].filter(Boolean).sort();
 
@@ -87,59 +87,59 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
   });
 
   const cardStyle = { background: t.bgCard, borderColor: t.border };
-  const axisStyle = { fontFamily: mono, fontSize: 9, fill: t.textFaint };
-  const tooltipStyle = { background: t.bgModal, border: "1px solid " + t.border, borderRadius: 8, fontFamily: mono, fontSize: 11 };
+  const axisStyle = { fontFamily: FONT, fontSize: 12, fill: "#5F6472" };
+  const tooltipStyle = { background: "#111214", border: "none", borderRadius: 12, fontFamily: FONT, fontSize: 12, color: "#fff", boxShadow: "0 12px 32px rgba(40,50,90,0.18)" };
 
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>GROWTH AND PROJECTIONS</p>
+      <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: FONT, color: "#5F6472" }}>Growth and projections</p>
 
-      <div className="rounded-2xl p-5 border" style={cardStyle}>
-        <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>ASSET GROWTH + 6-MONTH TRAJECTORY</p>
+      <div className="card-surface p-5">
+        <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ fontFamily: FONT, color: "#5F6472" }}>Asset growth + 6-month trajectory</p>
         <ResponsiveContainer width="100%" height={200} minWidth={0}>
           <LineChart data={combinedAsset} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={t.border} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(17,18,20,0.06)" />
             <XAxis dataKey="month" tick={axisStyle} />
             <YAxis tick={axisStyle} tickFormatter={(v) => v >= 1000 ? (v / 1000).toFixed(0) + "k" : v} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => ["KES " + Number(v).toLocaleString(), ""]} />
-            <Line type="monotone" dataKey="assets" stroke="#c49a2f" strokeWidth={2} dot={false} name="Actual" connectNulls={false} />
-            <Line type="monotone" dataKey="projected" stroke="#d4a843" strokeWidth={2} strokeDasharray="5 4" dot={false} name="Projected" connectNulls={false} />
+            <Line type="monotone" dataKey="assets" stroke="#111214" strokeWidth={2} dot={false} name="Actual" connectNulls={false} />
+            <Line type="monotone" dataKey="projected" stroke="#5F6472" strokeWidth={2} strokeDasharray="5 4" dot={false} name="Projected" connectNulls={false} />
           </LineChart>
         </ResponsiveContainer>
         <div className="flex gap-4 mt-2">
-          <span className="flex items-center gap-1.5 text-[9px]" style={{ fontFamily: mono, color: t.textFaint }}>
-            <span style={{ display: "inline-block", width: 16, height: 2, background: "#c49a2f" }} />ACTUAL
+          <span className="flex items-center gap-1.5 text-xs" style={{ fontFamily: FONT, color: "#5F6472" }}>
+            <span style={{ display: "inline-block", width: 16, height: 2, background: "#111214" }} />ACTUAL
           </span>
-          <span className="flex items-center gap-1.5 text-[9px]" style={{ fontFamily: mono, color: t.textFaint }}>
-            <span style={{ display: "inline-block", width: 16, height: 2, background: "#d4a843" }} />PROJECTED
+          <span className="flex items-center gap-1.5 text-xs" style={{ fontFamily: FONT, color: "#5F6472" }}>
+            <span style={{ display: "inline-block", width: 16, height: 2, background: "#5F6472" }} />PROJECTED
           </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-2xl p-5 border" style={cardStyle}>
-          <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>NEW CLIENT FORMATION</p>
+        <div className="card-surface p-5">
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ fontFamily: FONT, color: "#5F6472" }}>New client formation</p>
           <ResponsiveContainer width="100%" height={160} minWidth={0}>
             <BarChart data={clientData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={t.border} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(17,18,20,0.06)" />
               <XAxis dataKey="month" tick={axisStyle} />
               <YAxis tick={axisStyle} allowDecimals={false} />
               <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [v, "New Clients"]} />
-              <Bar dataKey="newClients" fill="#4ade80" radius={[4, 4, 0, 0]} name="New Clients" />
+              <Bar dataKey="newClients" fill="#111214" radius={[4, 4, 0, 0]} name="New Clients" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="rounded-2xl p-5 border" style={cardStyle}>
-          <p className="text-[9px] uppercase tracking-widest font-bold mb-4" style={{ fontFamily: mono, color: t.textFaint }}>RATE OF RETURN (%)</p>
+        <div className="card-surface p-5">
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ fontFamily: FONT, color: "#5F6472" }}>Rate of return (%)</p>
           <ResponsiveContainer width="100%" height={160} minWidth={0}>
             <LineChart data={returnData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={t.border} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(17,18,20,0.06)" />
               <XAxis dataKey="month" tick={axisStyle} />
               <YAxis tick={axisStyle} tickFormatter={(v) => v + "%"} />
               <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [v + "%", "Return Rate"]} />
-              <ReferenceLine y={20} stroke="#f59e0b" strokeDasharray="4 3" label={{ value: "Target 20%", position: "insideTopRight", fontSize: 8, fill: "#f59e0b", fontFamily: mono }} />
-              <Line type="monotone" dataKey="returnRate" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: "#f59e0b" }} name="Return %" />
+              <ReferenceLine y={20} stroke="#E3A008" strokeDasharray="4 3" label={{ value: "Target 20%", position: "insideTopRight", fontSize: 10, fill: "#8A5B00", fontFamily: FONT }} />
+              <Line type="monotone" dataKey="returnRate" stroke="#111214" strokeWidth={2} dot={{ r: 3, fill: "#111214" }} name="Return %" />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -147,3 +147,20 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

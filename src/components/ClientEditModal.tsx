@@ -69,12 +69,12 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
   const labelStyle = { fontFamily: mono, color: t.textFaint };
 
   const FLAG_COLORS: Record<ClientFlag, string> = {
-    VIP: "#f59e0b", Risk: "#fb923c", Blacklisted: "#f87171", Defaulter: "#ef4444", New: "#c49a2f", Regular: "#4ade80",
+    VIP: "var(--warning-fg)", Risk: "var(--risk-fg)", Blacklisted: "var(--blacklisted-fg)", Defaulter: "var(--danger-fg)", New: "var(--foreground)", Regular: "var(--success-fg)",
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.70)" }}
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{ background: "rgba(17,18,20,0.45)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="cl-form-modal w-full max-w-lg rounded-3xl border overflow-hidden flex flex-col"
         style={{ background: t.bgModal, borderColor: t.border, maxHeight: "90vh" }}>
@@ -82,7 +82,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderColor: t.border }}>
           <div className="flex items-center gap-3">
-            <Edit3 className="w-4 h-4" style={{ color: "#c49a2f" }} />
+            <Edit3 className="w-4 h-4" style={{ color: "var(--foreground)" }} />
             <div>
               <p className="text-xs font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>EDIT CLIENT</p>
               <p className="text-[10px]" style={{ color: t.textFaint, fontFamily: mono }}>{loan.borrowerName}</p>
@@ -181,7 +181,7 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
             CANCEL
           </button>
           <button onClick={handleSave} className="px-5 py-2 rounded-xl text-xs font-bold"
-            style={{ fontFamily: mono, background: "#c49a2f", color: "#fff" }}>
+            style={{ fontFamily: mono, background: "var(--primary)", color: "var(--primary-foreground)" }}>
             SAVE CHANGES
           </button>
         </div>
@@ -189,3 +189,8 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
     </div>
   );
 };
+
+
+
+
+
