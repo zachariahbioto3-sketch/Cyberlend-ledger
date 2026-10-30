@@ -12,6 +12,8 @@ import { RepaymentProgress }   from "./components/RepaymentProgress";
 import { FinancialStackedBar } from "./components/FinancialStackedBar";
 import { ClientsPage }         from "./components/ClientsPage";
 import { GrowthCharts }        from "./components/GrowthCharts";
+import { AnalysisPage }        from "./components/AnalysisPage";
+import { MobileAnalysisView }  from "./components/MobileAnalysisView";
 import { GoalsModal }          from "./components/GoalsModal";
 import { ClientEditModal }     from "./components/ClientEditModal";
 import { GoalTracker }         from "./components/GoalTracker";
@@ -217,6 +219,7 @@ function AppInner() {
           {desktopTab === "clients"    && <div className="flex-1 overflow-hidden"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
           {desktopTab === "waitlist"   && <div className="flex-1 overflow-hidden"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
           {desktopTab === "agreements" && <div className="flex-1 overflow-auto"><AgreementsPage theme={t} /></div>}
+          {desktopTab === "analysis"   && <div className="flex-1 overflow-hidden flex flex-col"><AnalysisPage loans={loans} metrics={metrics} theme={t} /></div>}
         </div>
       </div>
 
@@ -372,7 +375,7 @@ function AppInner() {
           </>
         )}
 
-        {mobileTab === "analytics"  && <div className="px-4 pb-28 pt-4 space-y-3"><PortfolioDonut metrics={metrics} compact /><MonthlyCollections loans={loans} compact /><RepaymentProgress loans={loans} compact /><FinancialStackedBar loans={loans} compact /><GrowthCharts loans={loans} theme={t} /></div>}
+        {mobileTab === "analysis"   && <MobileAnalysisView loans={loans} metrics={metrics} theme={t} />}
         {mobileTab === "clients"    && <div className="pb-28"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
         {mobileTab === "waitlist"   && <div className="pb-28"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
         {mobileTab === "agreements" && <div className="pb-28"><AgreementsPage theme={t} /></div>}
