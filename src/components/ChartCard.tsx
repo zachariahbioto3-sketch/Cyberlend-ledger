@@ -3,7 +3,7 @@ import { FONT, MUTED } from "./chartTheme"
 
 export function ChartCard({ title, right, children }: { title: string; right?: ReactNode; children: ReactNode }) {
   return (
-    <div className="card-surface p-5">
+    <div className="card-surface p-5 min-w-0">
       <div className="flex items-center justify-between mb-4">
         <p style={{ fontFamily: FONT, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: MUTED, textTransform: "uppercase" }}>{title}</p>
         {right}
@@ -25,3 +25,4 @@ export function Legend({ items }: { items: { label: string; color: string }[] })
     </div>
   )
 }
+

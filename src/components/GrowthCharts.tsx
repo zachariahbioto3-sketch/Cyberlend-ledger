@@ -2,6 +2,16 @@ import React from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from "recharts";
 import { Loan } from "../types";
 
+function GrowthTooltip({ active, payload, label, tooltipStyle, render }: any) {
+  if (!active || !payload?.length || payload[0]?.value == null) return null
+  return (
+    <div style={tooltipStyle}>
+      <p style={{ fontWeight: 700, marginBottom: 4 }}>{label}</p>
+      {render(payload[0].value)}
+    </div>
+  )
+}
+
 interface GrowthChartsProps {
   loans: Loan[];
   theme: any;
@@ -94,14 +104,14 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
     <div className="space-y-4">
       <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: FONT, color: "#5F6472" }}>Growth and projections</p>
 
-      <div className="card-surface p-5">
+      <div className="card-surface p-5 min-w-0">
         <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ fontFamily: FONT, color: "#5F6472" }}>Asset growth + 6-month trajectory</p>
         <ResponsiveContainer width="100%" height={200} minWidth={0}>
           <LineChart data={combinedAsset} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(17,18,20,0.06)" />
             <XAxis dataKey="month" tick={axisStyle} />
             <YAxis tick={axisStyle} tickFormatter={(v) => v >= 1000 ? (v / 1000).toFixed(0) + "k" : v} />
-            <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => ["KES " + Number(v).toLocaleString(), ""]} />
+            <Tooltip content={(p: any) => <GrowthTooltip {...p} tooltipStyle={tooltipStyle} render={(v: number) => <p>{"KES " + Number(v).toLocaleString()}</p>} />} />
             <Line type="monotone" dataKey="assets" stroke="#111214" strokeWidth={2} dot={false} name="Actual" connectNulls={false} />
             <Line type="monotone" dataKey="projected" stroke="#5F6472" strokeWidth={2} strokeDasharray="5 4" dot={false} name="Projected" connectNulls={false} />
           </LineChart>
@@ -117,27 +127,27 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card-surface p-5">
+        <div className="card-surface p-5 min-w-0">
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ fontFamily: FONT, color: "#5F6472" }}>New client formation</p>
           <ResponsiveContainer width="100%" height={160} minWidth={0}>
             <BarChart data={clientData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(17,18,20,0.06)" />
               <XAxis dataKey="month" tick={axisStyle} />
               <YAxis tick={axisStyle} allowDecimals={false} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [v, "New Clients"]} />
+              <Tooltip content={(p: any) => <GrowthTooltip {...p} tooltipStyle={tooltipStyle} render={(v: number) => <p>{v} New Clients</p>} />} />
               <Bar dataKey="newClients" fill="#111214" radius={[4, 4, 0, 0]} name="New Clients" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="card-surface p-5">
+        <div className="card-surface p-5 min-w-0">
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ fontFamily: FONT, color: "#5F6472" }}>Rate of return (%)</p>
           <ResponsiveContainer width="100%" height={160} minWidth={0}>
             <LineChart data={returnData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(17,18,20,0.06)" />
               <XAxis dataKey="month" tick={axisStyle} />
               <YAxis tick={axisStyle} tickFormatter={(v) => v + "%"} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [v + "%", "Return Rate"]} />
+              <Tooltip content={(p: any) => <GrowthTooltip {...p} tooltipStyle={tooltipStyle} render={(v: number) => <p>{v}% Return Rate</p>} />} />
               <ReferenceLine y={20} stroke="#E3A008" strokeDasharray="4 3" label={{ value: "Target 20%", position: "insideTopRight", fontSize: 10, fill: "#8A5B00", fontFamily: FONT }} />
               <Line type="monotone" dataKey="returnRate" stroke="#111214" strokeWidth={2} dot={{ r: 3, fill: "#111214" }} name="Return %" />
             </LineChart>
@@ -147,6 +157,9 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
     </div>
   );
 };
+
+
+
 
 
 
