@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils"
+﻿import { cn } from "@/lib/utils"
 import { LayoutDashboard, Users, TrendingUp, ScrollText, Clock } from "lucide-react"
 import { motion } from "framer-motion"
 
-type Tab = "loans" | "analytics" | "clients" | "waitlist" | "agreements"
+type Tab = "loans" | "analysis" | "clients" | "waitlist" | "agreements"
 
 interface BottomTabBarProps {
   active: Tab
@@ -11,7 +11,7 @@ interface BottomTabBarProps {
 
 const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "loans",      label: "Loans",     icon: <LayoutDashboard className="h-5 w-5" /> },
-  { id: "analytics",  label: "Analytics", icon: <TrendingUp className="h-5 w-5" /> },
+  { id: "analysis",   label: "Analysis",  icon: <TrendingUp className="h-5 w-5" /> },
   { id: "clients",    label: "Clients",   icon: <Users className="h-5 w-5" /> },
   { id: "waitlist",   label: "Waitlist",  icon: <Clock className="h-5 w-5" /> },
   { id: "agreements", label: "Docs",      icon: <ScrollText className="h-5 w-5" /> },
@@ -67,5 +67,6 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
     </nav>
   )
 }
+
 
 

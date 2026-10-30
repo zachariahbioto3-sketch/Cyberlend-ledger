@@ -1,8 +1,8 @@
-import { useState } from "react"
+﻿import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, Users, TrendingUp, ScrollText, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 
-type Tab = "dashboard" | "clients" | "waitlist" | "agreements"
+type Tab = "dashboard" | "analysis" | "clients" | "waitlist" | "agreements"
 
 interface SidebarProps {
   active: Tab
@@ -11,6 +11,7 @@ interface SidebarProps {
 
 const nav: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard",  label: "Dashboard",  icon: <LayoutDashboard className="h-5 w-5" /> },
+  { id: "analysis",   label: "Analysis",   icon: <TrendingUp className="h-5 w-5" /> },
   { id: "clients",    label: "Clients",    icon: <Users className="h-5 w-5" /> },
   { id: "waitlist",   label: "Waitlist",   icon: <Clock className="h-5 w-5" /> },
   { id: "agreements", label: "Agreements", icon: <ScrollText className="h-5 w-5" /> },
@@ -73,6 +74,7 @@ export function Sidebar({ active, onChange }: SidebarProps) {
     </aside>
   )
 }
+
 
 
 
