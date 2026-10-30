@@ -31,9 +31,9 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
   const statusStyle = (status: string) => {
     const map: Record<string, { bg: string; color: string; border: string }> = {
       Active:    { bg: t.bgActive,            color: t.text,      border: t.borderMid },
-      Overdue:   { bg: 'rgba(220,50,50,0.1)', color: '#f87171',   border: 'rgba(220,50,50,0.2)' },
+      Overdue:   { bg: '#F9DADA', color: '#A82F2F', border: 'transparent' },
       Completed: { bg: t.bgCard,              color: t.textMuted, border: t.border },
-      Defaulted: { bg: 'rgba(180,20,20,0.1)', color: '#fca5a5',   border: 'rgba(180,20,20,0.2)' },
+      Defaulted: { bg: '#EBC9C9', color: '#7A1F1F', border: 'transparent' },
     };
     return map[status] || map.Completed;
   };
@@ -41,7 +41,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
   const ss = statusStyle(loan.status);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(20px)' }}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto" style={{ background: 'rgba(17,18,20,0.45)', backdropFilter: 'blur(8px)' }}>
       <div className="rounded-2xl border overflow-hidden shadow-2xl" style={{ background: t.bgModal, borderColor: t.borderMid, width: "88vw", maxWidth: "640px", maxHeight: "88vh", display: "flex", flexDirection: "column" }}>
         <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: t.border }}>
           <div>
@@ -142,7 +142,7 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
 
           <button onClick={() => { if (confirm(`Delete ${loan.borrowerName}? This cannot be undone.`)) { onDeleteLoan(loan.id); onClose(); } }}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-bold transition-all border"
-            style={{ fontFamily: mono, borderColor: 'rgba(239,68,68,0.25)', color: '#f87171', background: 'rgba(239,68,68,0.05)' }}>
+            style={{ fontFamily: mono, borderColor: 'transparent', color: '#A82F2F', background: '#F9DADA' }}>
             <Trash2 className="w-3 h-3" />
             DELETE RECORD
           </button>
@@ -151,6 +151,11 @@ export const LoanDetailModal: React.FC<LoanDetailModalProps> = ({ loan, onClose,
     </div>
   );
 };
+
+
+
+
+
 
 
 

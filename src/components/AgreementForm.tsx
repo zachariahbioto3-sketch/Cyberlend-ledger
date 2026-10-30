@@ -190,7 +190,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
   const cardSx   = { background: t.bgCard, borderColor: t.border };
   const modalSx  = { background: t.bgModal, borderColor: t.borderMid };
   const headSx   = { borderColor: t.border };
-  const shSx     = { color: "#c49a2f", borderColor: t.border };
+  const shSx     = { color: "#111214", borderColor: t.border };
 
   const stepTitles = ["Lender Details","Borrower Details","Guarantor Details","Loan Facility","Interest & Fees","Disbursement","Review & Confirm"];
 
@@ -210,7 +210,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}>
       <div className="cl-form-modal rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl border" style={modalSx}>
 
@@ -380,7 +380,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
                 <div className="flex justify-between font-semibold border-t pt-2 mt-2" style={{ color: t.text, borderColor: t.border }}>
                   <span>Net Disbursed</span><span>{formatCurrency(netDisbursed)}</span>
                 </div>
-                <div className="flex justify-between" style={{ color: "#4ade80" }}>
+                <div className="flex justify-between" style={{ color: "#1E9E5A" }}>
                   <span>Total Interest ({interest.basis})</span><span>{formatCurrency(totalInterest)}</span>
                 </div>
               </div>
@@ -477,7 +477,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
                             <td className="px-2 py-1.5" style={{ color: t.textMuted }}>{row.dueDate}</td>
                             <td className="px-2 py-1.5" style={{ color: t.text }}>{formatCurrency(row.principal)}</td>
                             <td className="px-2 py-1.5" style={{ color: t.text }}>{formatCurrency(row.interest)}</td>
-                            <td className="px-2 py-1.5 font-medium" style={{ color: "#c49a2f" }}>{formatCurrency(row.totalDue)}</td>
+                            <td className="px-2 py-1.5 font-medium" style={{ color: "#111214" }}>{formatCurrency(row.totalDue)}</td>
                             <td className="px-2 py-1.5" style={{ color: t.textMuted }}>{formatCurrency(row.balance)}</td>
                           </tr>
                         ))}
@@ -500,13 +500,13 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
           {step < TOTAL_STEPS ? (
             <button onClick={next}
               className="px-5 py-2 text-sm rounded-lg font-medium transition"
-              style={{ background: "#c49a2f", color: "#ffffff" }}>
+              style={{ background: "#111214", color: "#ffffff" }}>
               Next →
             </button>
           ) : (
             <button onClick={handleSubmit}
               className="px-5 py-2 text-sm rounded-lg font-medium transition"
-              style={{ background: "#16a34a", color: "#ffffff" }}>
+              style={{ background: "#1E9E5A", color: "#ffffff" }}>
               ✓ Save Agreement & Create Loan
             </button>
           )}
@@ -515,6 +515,8 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
     </div>
   );
 }
+
+
 
 
 
