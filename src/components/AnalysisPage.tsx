@@ -6,6 +6,7 @@ import { calculateRateOfReturn, currentMonthAcquisitionRate, rankBorrowersByExpo
 import { GrowthCharts } from "./GrowthCharts";
 import { PortfolioDonut } from "./PortfolioDonut";
 import { AnalysisModal } from "./AnalysisModal";
+import { AssetBanner } from "./AssetBanner";
 
 interface AnalysisPageProps {
   loans: Loan[];
@@ -56,7 +57,7 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ loans, metrics, them
       id: "loan-distribution",
       icon: <PieChart className="w-4 h-4" />,
       title: "Loan Distribution",
-      intro: "How outstanding loans are spread across active, overdue, completed and defaulted status — the health of the platform.",
+      intro: "How outstanding loans are spread across active, overdue, completed and defaulted status \u2014 the health of the platform.",
       modalSummary: "Portfolio health across loan statuses",
       modalBody: `${metrics.activeLoansCount} active, ${metrics.overdueCount} overdue, ${metrics.completedLoansCount} completed and ${metrics.defaultedCount} defaulted loans make up the current book. A healthy platform keeps overdue and defaulted shares low relative to active and completed.`,
       chart: <PortfolioDonut metrics={metrics} />,
@@ -66,31 +67,25 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ loans, metrics, them
   const activeCard = cards.find((c) => c.id === openCard) || null;
 
   return (
-    <div className="px-6 py-6 space-y-6 overflow-y-auto flex-1">
-      {/* Top banner: asset growth chart */}
-      <div
-        className="rounded-[var(--radius-lg)] border p-5"
-        style={{ borderColor: "var(--border)", background: "var(--bg-raised)" }}
-      >
-        <h2 className="cl-mono text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--muted-foreground)" }}>
-          Asset Growth
-        </h2>
-        <GrowthCharts loans={loans} theme={t} />
-      </div>
+    <div className="overflow-y-auto flex-1" style={{ background: "var(--background)" }}>
+      <AssetBanner loans={loans} metrics={metrics} />
 
-      {/* Magazine-style article grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {cards.map((card) => (
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {cards.map((card, i) => (
           <button
             key={card.id}
             onClick={() => setOpenCard(card.id)}
-            className="text-left rounded-[var(--radius-md)] border p-5 transition-colors hover:border-[var(--gold-500)]"
-            style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
+            className="text-left p-6 transition-colors hover:bg-[var(--bg-raised)]"
+            style={{
+              borderColor: "var(--border)",
+              borderBottomWidth: i < 2 ? 1 : 0,
+              borderBottomStyle: "solid",
+              borderRightWidth: i % 2 === 0 ? 1 : 0,
+              borderRightStyle: "solid",
+            }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 rounded-lg" style={{ background: "var(--bg-raised)", color: "var(--gold-500)" }}>
-                {card.icon}
-              </div>
+              <span style={{ color: "var(--gold-500)" }}>{card.icon}</span>
               <h3 className="cl-mono text-xs font-bold uppercase tracking-widest" style={{ color: "var(--foreground)" }}>
                 {card.title}
               </h3>
@@ -99,15 +94,15 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ loans, metrics, them
               {card.intro}
             </p>
             <span className="inline-block mt-3 text-xs font-semibold" style={{ color: "var(--gold-500)" }}>
-              View analysis →
+              View analysis &rarr;
             </span>
           </button>
         ))}
       </div>
 
       {top && bottom && (
-        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-          Highest exposure: <span style={{ color: "var(--foreground)" }}>{top.borrowerName}</span> ({formatCurrency(top.outstanding)}) ·
+        <p className="px-6 py-4 text-xs border-t" style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}>
+          Highest exposure: <span style={{ color: "var(--foreground)" }}>{top.borrowerName}</span> ({formatCurrency(top.outstanding)}) &middot;
           {" "}Lowest: <span style={{ color: "var(--foreground)" }}>{bottom.borrowerName}</span> ({formatCurrency(bottom.outstanding)})
         </p>
       )}

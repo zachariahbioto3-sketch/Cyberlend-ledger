@@ -4,9 +4,9 @@ import { PortfolioMetrics } from "../types"
 import { ChartCard, Legend } from "./ChartCard"
 import { FONT, INK, MUTED, STATUS_COLORS, tooltipBox } from "./chartTheme"
 
-interface Props { metrics: PortfolioMetrics; compact?: boolean }
+interface Props { metrics: PortfolioMetrics; compact?: boolean; bare?: boolean }
 
-export const PortfolioDonut: React.FC<Props> = ({ metrics, compact = false }) => {
+export const PortfolioDonut: React.FC<Props> = ({ metrics, compact = false, bare = false }) => {
   const data = [
     { name: "Active",    value: metrics.activeLoansCount },
     { name: "Overdue",   value: metrics.overdueCount },
@@ -29,8 +29,8 @@ export const PortfolioDonut: React.FC<Props> = ({ metrics, compact = false }) =>
     )
   }
 
-  return (
-    <ChartCard title="Portfolio health">
+  const body = (
+    <>
       <div style={{ position: "relative", height: chartH, width: "100%", minWidth: 0 }}>
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <PieChart>
@@ -46,6 +46,10 @@ export const PortfolioDonut: React.FC<Props> = ({ metrics, compact = false }) =>
         </div>
       </div>
       <Legend items={data.map((d) => ({ label: `${d.name} ${d.value}`, color: STATUS_COLORS[d.name] }))} />
-    </ChartCard>
+    </>
   )
+
+  if (bare) return body
+
+  return <ChartCard title="Portfolio health">{body}</ChartCard>
 }

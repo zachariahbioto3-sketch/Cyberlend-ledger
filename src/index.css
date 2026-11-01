@@ -324,3 +324,60 @@ select option { background-color: #FFFFFF; color: var(--text-primary); }
   color-scheme: dark;
 }
 
+
+/* ---- Analysis banner (change --banner-bg to recolor the banner and top bar) ---- */
+:root { --banner-bg: #0E6B7A; }
+
+.analysis-merge > header {
+  background: var(--banner-bg) !important;
+  border-color: transparent !important;
+  backdrop-filter: none !important;
+}
+.analysis-merge > header button {
+  background: rgba(255,255,255,0.16) !important;
+  color: #fff !important;
+}
+.analysis-merge > div:nth-child(2) {
+  background: var(--banner-bg);
+  border-color: transparent !important;
+}
+.analysis-merge > div:nth-child(2) button { color: #fff !important; }
+
+.analysis-mobile-top {
+  background: var(--banner-bg);
+  border-color: transparent !important;
+}
+.analysis-mobile-top .font-brand,
+.analysis-mobile-top svg { color: #fff !important; }
+.analysis-mobile-top button {
+  background: rgba(255,255,255,0.16) !important;
+  border-color: transparent !important;
+}
+/* ---- Analysis banner (change --banner-bg to recolor the banner and top bar) ---- */
+:root { --banner-bg: #0E6B7A; }
+
+.analysis-merge > header {
+  background: var(--banner-bg) !important;
+  border-color: transparent !important;
+  backdrop-filter: none !important;
+}
+.analysis-merge > header button {
+  background: rgba(255,255,255,0.16) !important;
+  color: #fff !important;
+}
+.analysis-merge > div:nth-child(2) {
+  background: var(--banner-bg);
+  border-color: transparent !important;
+}
+.analysis-merge > div:nth-child(2) button { color: #fff !important; }
+
+.analysis-mobile-top {
+  background: var(--banner-bg);
+  border-color: transparent !important;
+}
+.analysis-mobile-top .font-brand,
+.analysis-mobile-top svg { color: #fff !important; }
+.analysis-mobile-top button {
+  background: rgba(255,255,255,0.16) !important;
+  border-color: transparent !important;
+}

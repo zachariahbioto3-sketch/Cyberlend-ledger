@@ -5,6 +5,7 @@ import { calculateRateOfReturn, currentMonthAcquisitionRate, rankBorrowersByExpo
 import { GrowthCharts } from "./GrowthCharts";
 import { PortfolioDonut } from "./PortfolioDonut";
 import { AnalysisModal } from "./AnalysisModal";
+import { AssetBanner } from "./AssetBanner";
 
 interface MobileAnalysisViewProps {
   loans: Loan[];
@@ -34,47 +35,37 @@ export const MobileAnalysisView: React.FC<MobileAnalysisViewProps> = ({ loans, m
   } ${bottom && ranked.length > 1 ? `${bottom.borrowerName} holds the smallest, at ${bottom.shareOfPortfolio.toFixed(1)}%.` : ""} Return on principal lent stands at ${rateOfReturn.toFixed(1)}%, with ${acquisitionThisMonth} new client${acquisitionThisMonth === 1 ? "" : "s"} added this month.`;
 
   return (
-    <div className="px-4 pb-28 pt-4 space-y-4">
-      {/* Ranked text summary */}
-      <button
-        onClick={() => setOpen("distribution")}
-        className="w-full text-left rounded-[var(--radius-md)] border p-4"
-        style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
-      >
-        <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
-          Asset Distribution
-        </h3>
-        <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-          {distributionSummary}
-        </p>
-        <span className="inline-block mt-2 text-xs font-semibold" style={{ color: "var(--gold-500)" }}>
-          View full breakdown →
-        </span>
-      </button>
+    <div className="pb-28" style={{ background: "var(--background)" }}>
+      <AssetBanner loans={loans} metrics={metrics} onClick={() => setOpen("projection")} />
 
-      {/* Asset projection chart */}
-      <button
-        onClick={() => setOpen("projection")}
-        className="w-full text-left rounded-[var(--radius-md)] border p-4"
-        style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
-      >
-        <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
-          Asset Projection
-        </h3>
-        <GrowthCharts loans={loans} theme={t} />
-      </button>
+      <div>
+        <button
+          onClick={() => setOpen("distribution")}
+          className="w-full text-left p-4 border-b"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
+            Asset Distribution
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
+            {distributionSummary}
+          </p>
+          <span className="inline-block mt-2 text-xs font-semibold" style={{ color: "var(--gold-500)" }}>
+            View full breakdown &rarr;
+          </span>
+        </button>
 
-      {/* Portfolio health chart */}
-      <button
-        onClick={() => setOpen("health")}
-        className="w-full text-left rounded-[var(--radius-md)] border p-4"
-        style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
-      >
-        <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
-          Portfolio Health
-        </h3>
-        <PortfolioDonut metrics={metrics} compact />
-      </button>
+        <button
+          onClick={() => setOpen("health")}
+          className="w-full text-left p-4 border-b"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
+            Portfolio Health
+          </h3>
+          <PortfolioDonut metrics={metrics} compact bare />
+        </button>
+      </div>
 
       <AnalysisModal
         open={open === "distribution"}

@@ -136,7 +136,7 @@ function AppInner() {
       {/* -- DESKTOP -- */}
       <div className="hidden lg:flex min-h-screen" style={{ background:"var(--background)" }}>
         <Sidebar active={desktopTab} onChange={setDesktopTab} />
-        <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+        <div className={"flex-1 flex flex-col min-w-0 overflow-x-hidden" + (desktopTab === "analysis" ? " analysis-merge" : "")}>
           <Header onSearch={() => {}} />
 
           <div className="flex items-center justify-end gap-2 px-6 py-2 border-b" style={{ borderColor:"var(--border)" }}>
@@ -225,7 +225,7 @@ function AppInner() {
 
       {/* -- MOBILE -- */}
       <div className="lg:hidden min-h-screen" style={{ background:"var(--background)" }}>
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b" style={{ borderColor:"var(--border)", paddingTop:"max(1rem, env(safe-area-inset-top))" }}>
+        <div className={"flex items-center justify-between px-4 pt-4 pb-3 border-b" + (mobileTab === "analysis" ? " analysis-mobile-top" : "")} style={{ borderColor:"var(--border)", paddingTop:"max(1rem, env(safe-area-inset-top))" }}>
           <span className="font-brand text-xl" style={{ color:"var(--foreground)" }}>Cyberlend</span>
           <div className="flex gap-2">
             <ExportMenu loans={loans} />
