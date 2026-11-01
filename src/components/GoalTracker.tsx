@@ -14,7 +14,7 @@ interface GoalTrackerProps {
 
 export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans, theme: t, onEdit }) => {
   const mono = "var(--font-mono)";
-  const isDark = t.text !== "#0a0a0a";
+  
 
   const activeLoans     = loans.filter((l) => l.status === "Active" || l.status === "Overdue");
   const uniqueClients   = new Set(activeLoans.map((l) => l.borrowerPhone)).size;
@@ -55,24 +55,24 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
   ];
 
   const pct      = (c: number, tgt: number) => Math.min(100, tgt > 0 ? (c / tgt) * 100 : 0);
-  const fillColor = (p: number) => p >= 90 ? "#4ade80" : p >= 60 ? "#f59e0b" : "#f87171";
+  const fillColor = (p: number) => p >= 90 ? "#1E9E5A" : p >= 60 ? "#E3A008" : "#D64545"; const textColor = (p: number) => p >= 90 ? "#14703F" : p >= 60 ? "#8A5B00" : "#A82F2F";
   const label     = (p: number) => p >= 90 ? "ON TRACK" : p >= 60 ? "CLOSE" : "BEHIND";
-  const rimColor  = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
+  const rimColor  = "#E4E7F2";
 
   const noGoalsSet = goals.targetPortfolioSize === 0 && goals.targetClientCount === 0;
 
   return (
-    <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
+    <div className="card-surface p-5">
 
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <Target className="w-4 h-4" style={{ color: "#c49a2f" }} />
-          <p className="text-[10px] font-bold uppercase tracking-widest"
+          <Target className="w-4 h-4" style={{ color: "#111214" }} />
+          <p className="text-xs font-bold uppercase tracking-widest"
             style={{ fontFamily: mono, color: t.textFaint }}>GOAL TRACKER</p>
         </div>
         <button onClick={onEdit}
-          className="text-[9px] font-bold px-3 py-1 rounded-lg border"
-          style={{ fontFamily: mono, borderColor: "rgba(196,154,47,0.30)", color: "#c49a2f", background: "rgba(196,154,47,0.10)" }}>
+          className="text-xs font-bold px-4 py-1.5 rounded-full"
+          style={{ fontFamily: mono, color: "#111214", background: "#E9ECFB" }}>
           EDIT GOALS
         </button>
       </div>
@@ -89,7 +89,7 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {trackers.map((tr) => {
             const p    = pct(tr.current, tr.target);
-            const fill = fillColor(p);
+            const fill = fillColor(p); const ink = textColor(p);
             const rim  = rimColor;
             const data = [
               { value: p },
@@ -100,7 +100,7 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
               <div key={tr.label} className="rounded-2xl border p-4 flex flex-col items-center"
                 style={{ background: t.bgCard, borderColor: t.border }}>
 
-                <p className="text-[9px] font-bold uppercase tracking-widest mb-3 text-center"
+                <p className="text-xs font-bold uppercase tracking-widest mb-3 text-center"
                   style={{ fontFamily: mono, color: t.textFaint }}>{tr.label}</p>
 
                 <div className="relative w-full" style={{ height: 130 }}>
@@ -130,18 +130,18 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
                     alignItems: "center", justifyContent: "center",
                     pointerEvents: "none",
                   }}>
-                    <p style={{ fontFamily: mono, fontSize: 18, fontWeight: 700, color: fill, lineHeight: 1 }}>
+                    <p style={{ fontFamily: mono, fontSize: 18, fontWeight: 700, color: ink, lineHeight: 1 }}>
                       {p.toFixed(0)}%
                     </p>
-                    <p style={{ fontFamily: mono, fontSize: 8, color: t.textFaint, letterSpacing: 1.5, marginTop: 4, textTransform: "uppercase" }}>
+                    <p style={{ fontFamily: mono, fontSize: 10, color: t.textFaint, letterSpacing: 1.5, marginTop: 4, textTransform: "uppercase" }}>
                       {label(p)}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-3 text-center">
-                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: fill }}>{tr.display}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: t.textFaint, fontFamily: mono }}>
+                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: ink }}>{tr.display}</p>
+                  <p className="text-xs mt-0.5" style={{ color: t.textFaint, fontFamily: mono }}>
                     / {tr.goal}
                   </p>
                 </div>
@@ -153,3 +153,17 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({ goals, metrics, loans,
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+

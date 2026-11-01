@@ -1,14 +1,10 @@
 import React from "react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { Loan } from "../types"
+import { ChartCard, Legend } from "./ChartCard"
+import { INK, INACTIVE, MUTED, FONT, STATUS_COLORS, axisTick, tooltipBox } from "./chartTheme"
 
-const MONO = "'JetBrains Mono', monospace"
-const STATUS_COLORS: Record<string, string> = {
-  Active:    "#c49a2f",
-  Overdue:   "#e07070",
-  Completed: "#7fc98f",
-  Defaulted: "#7d2a2a",
-}
+const fillFor = (status: string) => (status === "Active" ? INK : STATUS_COLORS[status] || INK)
 
 interface Props { loans: Loan[]; compact?: boolean }
 
@@ -30,12 +26,12 @@ export const RepaymentProgress: React.FC<Props> = ({ loans, compact = false }) =
     const d = payload[0]?.payload
     const pct = Math.round((d.completed / d.term) * 100)
     return (
-      <div style={{ background: "#141414", border: "1px solid rgba(243,234,216,0.12)", borderRadius: 8, padding: "10px 14px", fontFamily: MONO }}>
-        <p style={{ fontSize: 9, fontWeight: 700, color: "#f3ead8", letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>{d.fullName}</p>
-        {[["MONTHS DONE", `${d.completed} / ${d.term}`], ["PROGRESS", `${pct}%`], ["STATUS", d.status.toUpperCase()]].map(([label, val]) => (
+      <div style={tooltipBox}>
+        <p style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>{d.fullName}</p>
+        {[["Months done", `${d.completed} / ${d.term}`], ["Progress", `${pct}%`], ["Status", d.status]].map(([label, val]) => (
           <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
-            <span style={{ fontSize: 9, color: "rgba(243,234,216,0.4)" }}>{label}</span>
-            <span style={{ fontSize: 10, fontWeight: 700, color: label === "STATUS" ? STATUS_COLORS[d.status] : "#f3ead8" }}>{val}</span>
+            <span style={{ fontSize: 12, opacity: 0.75 }}>{label}</span>
+            <span style={{ fontSize: 12, fontWeight: 700 }}>{val}</span>
           </div>
         ))}
       </div>
@@ -43,32 +39,30 @@ export const RepaymentProgress: React.FC<Props> = ({ loans, compact = false }) =
   }
 
   return (
-    <div style={{ background: "#141414", border: "1px solid rgba(243,234,216,0.08)", borderRadius: 12, padding: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: 3, color: "rgba(243,234,216,0.4)", textTransform: "uppercase" }}>REPAYMENT PROGRESS</p>
-        {compact && loans.length > 5 && <span style={{ fontFamily: MONO, fontSize: 9, color: "rgba(243,234,216,0.4)" }}>{loans.length - 5} MORE</span>}
-      </div>
+    <ChartCard
+      title="Repayment progress"
+      right={compact && loans.length > 5 ? <span style={{ fontFamily: FONT, fontSize: 12, color: MUTED }}>{loans.length - 5} more</span> : undefined}
+    >
       <div style={{ height: chartHeight, width: "100%", minWidth: 0 }}>
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart layout="vertical" data={data} barCategoryGap="25%">
-            <XAxis type="number" tick={{ fontSize: 9, fill: "rgba(243,234,216,0.4)", fontFamily: MONO }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}mo`} />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#f3ead8", fontFamily: MONO, fontWeight: 600 }} axisLine={false} tickLine={false} width={58} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(243,234,216,0.03)" }} />
-            <Bar dataKey="completed" stackId="a" radius={[0,0,0,0]}>
-              {data.map((entry, i) => <Cell key={i} fill={STATUS_COLORS[entry.status]} />)}
+            <XAxis type="number" tick={axisTick} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}mo`} />
+            <YAxis type="category" dataKey="name" tick={{ ...axisTick, fill: INK, fontWeight: 600 }} axisLine={false} tickLine={false} width={64} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(17,18,20,0.04)" }} />
+            <Bar dataKey="completed" stackId="a" radius={[6, 0, 0, 6]}>
+              {data.map((entry, i) => <Cell key={i} fill={fillFor(entry.status)} />)}
             </Bar>
-            <Bar dataKey="remaining" stackId="a" fill="rgba(243,234,216,0.08)" radius={[4,4,4,4]} />
+            <Bar dataKey="remaining" stackId="a" fill={INACTIVE} radius={[0, 6, 6, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginTop: 14 }}>
-        {Object.entries(STATUS_COLORS).map(([status, color]) => (
-          <div key={status} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0 }} />
-            <span style={{ fontFamily: MONO, fontSize: 9, color: "rgba(243,234,216,0.4)", letterSpacing: 1 }}>{status.toUpperCase()}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+      <Legend items={[
+        { label: "Active", color: INK },
+        { label: "Overdue", color: STATUS_COLORS.Overdue },
+        { label: "Completed", color: STATUS_COLORS.Completed },
+        { label: "Defaulted", color: STATUS_COLORS.Defaulted },
+        { label: "Remaining", color: INACTIVE },
+      ]} />
+    </ChartCard>
   )
 }

@@ -46,13 +46,13 @@ export async function generatePortfolioSummaryPdf(
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
 
-  const DARK      = [15, 17, 23] as [number, number, number];
-  const CARD      = [26, 29, 39] as [number, number, number];
-  const BLUE      = [91, 124, 250] as [number, number, number];
-  const WHITE     = [232, 234, 240] as [number, number, number];
-  const MUTED     = [120, 125, 150] as [number, number, number];
-  const RED       = [248, 113, 113] as [number, number, number];
-  const GREEN     = [74, 222, 128] as [number, number, number];
+  const DARK      = [17, 18, 20] as [number, number, number];
+  const CARD      = [32, 34, 38] as [number, number, number];
+  const BLUE      = [59, 111, 224] as [number, number, number];
+  const WHITE     = [245, 246, 250] as [number, number, number];
+  const MUTED     = [154, 160, 173] as [number, number, number];
+  const RED       = [214, 69, 69] as [number, number, number];
+  const GREEN     = [46, 184, 106] as [number, number, number];
   const BORDER    = [40, 44, 60] as [number, number, number];
 
   const filteredLoans = options.includePaidOff
@@ -220,14 +220,14 @@ export async function generateLoanNoteStatement(loan: Loan, orgName: string, pre
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
 
-  const DARK  = [15, 17, 23]   as [number, number, number];
-  const CARD  = [26, 29, 39]   as [number, number, number];
-  const BLUE  = [91, 124, 250] as [number, number, number];
-  const WHITE = [232, 234, 240] as [number, number, number];
-  const MUTED = [120, 125, 150] as [number, number, number];
-  const RED   = [248, 113, 113] as [number, number, number];
-  const GREEN = [74, 222, 128]  as [number, number, number];
-  const AMBER = [245, 158, 11]  as [number, number, number];
+  const DARK  = [17, 18, 20]   as [number, number, number];
+  const CARD  = [32, 34, 38]   as [number, number, number];
+  const BLUE  = [59, 111, 224] as [number, number, number];
+  const WHITE = [245, 246, 250] as [number, number, number];
+  const MUTED = [154, 160, 173] as [number, number, number];
+  const RED   = [214, 69, 69] as [number, number, number];
+  const GREEN = [46, 184, 106]  as [number, number, number];
+  const AMBER = [227, 160, 8]  as [number, number, number];
 
   const fmt = (n: number) => `KES ${n.toLocaleString("en-KE", { minimumFractionDigits: 2 })}`;
   const now = new Date().toLocaleDateString("en-KE", { day: "2-digit", month: "long", year: "numeric" });
@@ -379,14 +379,14 @@ export async function generateDebtServiceReport(loans: Loan[], orgName: string, 
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
 
-  const DARK  = [15, 17, 23]   as [number, number, number];
-  const CARD  = [26, 29, 39]   as [number, number, number];
-  const BLUE  = [91, 124, 250] as [number, number, number];
-  const WHITE = [232, 234, 240] as [number, number, number];
-  const MUTED = [120, 125, 150] as [number, number, number];
-  const RED   = [248, 113, 113] as [number, number, number];
-  const GREEN = [74, 222, 128]  as [number, number, number];
-  const AMBER = [245, 158, 11]  as [number, number, number];
+  const DARK  = [17, 18, 20]   as [number, number, number];
+  const CARD  = [32, 34, 38]   as [number, number, number];
+  const BLUE  = [59, 111, 224] as [number, number, number];
+  const WHITE = [245, 246, 250] as [number, number, number];
+  const MUTED = [154, 160, 173] as [number, number, number];
+  const RED   = [214, 69, 69] as [number, number, number];
+  const GREEN = [46, 184, 106]  as [number, number, number];
+  const AMBER = [227, 160, 8]  as [number, number, number];
 
   const fmt = (n: number) => `KES ${n.toLocaleString("en-KE", { minimumFractionDigits: 2 })}`;
   const now = new Date().toLocaleDateString("en-KE", { day: "2-digit", month: "long", year: "numeric" });
@@ -495,14 +495,14 @@ export async function generateStandingReport(loans: Loan[], metrics: PortfolioMe
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
 
-  const DARK  = [15, 17, 23]   as [number, number, number];
-  const CARD  = [26, 29, 39]   as [number, number, number];
-  const BLUE  = [91, 124, 250] as [number, number, number];
-  const WHITE = [232, 234, 240] as [number, number, number];
-  const MUTED = [120, 125, 150] as [number, number, number];
-  const RED   = [248, 113, 113] as [number, number, number];
-  const GREEN = [74, 222, 128]  as [number, number, number];
-  const AMBER = [245, 158, 11]  as [number, number, number];
+  const DARK  = [17, 18, 20]   as [number, number, number];
+  const CARD  = [32, 34, 38]   as [number, number, number];
+  const BLUE  = [59, 111, 224] as [number, number, number];
+  const WHITE = [245, 246, 250] as [number, number, number];
+  const MUTED = [154, 160, 173] as [number, number, number];
+  const RED   = [214, 69, 69] as [number, number, number];
+  const GREEN = [46, 184, 106]  as [number, number, number];
+  const AMBER = [227, 160, 8]  as [number, number, number];
 
   const fmt = (n: number) => `KES ${n.toLocaleString("en-KE", { minimumFractionDigits: 2 })}`;
   const now = new Date().toLocaleDateString("en-KE", { day: "2-digit", month: "long", year: "numeric" });
@@ -630,14 +630,14 @@ export async function generateAgreementPdf(agreement: import("../types").LoanAgr
   const W   = doc.internal.pageSize.getWidth();
 
   // ── Colour palette ──
-  const DARK   = [15,  17,  23]  as [number,number,number];
-  const CARD   = [26,  29,  39]  as [number,number,number];
-  const BLUE   = [91,  124, 250] as [number,number,number];
-  const WHITE  = [232, 234, 240] as [number,number,number];
-  const MUTED  = [120, 125, 150] as [number,number,number];
-  const GREEN  = [74,  222, 128] as [number,number,number];
+  const DARK   = [17, 18, 20]  as [number,number,number];
+  const CARD   = [32, 34, 38]  as [number,number,number];
+  const BLUE   = [59, 111, 224] as [number,number,number];
+  const WHITE  = [245, 246, 250] as [number,number,number];
+  const MUTED  = [154, 160, 173] as [number,number,number];
+  const GREEN  = [46, 184, 106] as [number,number,number];
   const BORDER = [40,  44,  60]  as [number,number,number];
-  const RED    = [248, 113, 113] as [number,number,number];
+  const RED    = [214, 69, 69] as [number,number,number];
 
   let y = 0;
 
@@ -867,18 +867,18 @@ export async function generateAgreementPdf(agreement: import("../types").LoanAgr
       theme: "plain",
       styles: {
         fontSize: 7,
-        textColor: [232, 234, 240],
+        textColor: [245, 246, 250],
         cellPadding: 2.5,
         lineColor: [40, 44, 60],
         lineWidth: 0.1,
       },
       headStyles: {
-        fillColor: [26, 29, 39],
-        textColor: [120, 125, 150],
+        fillColor: [32, 34, 38],
+        textColor: [154, 160, 173],
         fontStyle: "bold",
       },
       alternateRowStyles: { fillColor: [20, 22, 32] },
-      bodyStyles:         { fillColor: [15, 17, 23] },
+      bodyStyles:         { fillColor: [17, 18, 20] },
       margin: { left: 14, right: 14 },
     });
     y = (doc as any).lastAutoTable.finalY + 8;
@@ -937,3 +937,4 @@ export async function generateAgreementPdf(agreement: import("../types").LoanAgr
 
   await savePdf(doc, `Agreement_${agreement.agreementNumber}.pdf`);
 }
+

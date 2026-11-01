@@ -1,0 +1,708 @@
+diff --git a/package-lock.json b/package-lock.json
+index 31239bb..b65e012 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1285,9 +1285,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1305,9 +1302,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1325,9 +1319,6 @@
+                 "ppc64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1345,9 +1336,6 @@
+                 "riscv64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1365,9 +1353,6 @@
+                 "riscv64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1385,9 +1370,6 @@
+                 "s390x"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1405,9 +1387,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1425,9 +1404,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1958,9 +1934,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1978,9 +1951,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -1998,9 +1968,6 @@
+                 "ppc64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2018,9 +1985,6 @@
+                 "s390x"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2038,9 +2002,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2058,9 +2019,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2363,9 +2321,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -2387,9 +2342,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -2411,9 +2363,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -2435,9 +2384,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -2610,9 +2556,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2630,9 +2573,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2650,9 +2590,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -2670,9 +2607,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MIT",
+             "optional": true,
+             "os": [
+@@ -5864,9 +5798,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -5888,9 +5819,6 @@
+                 "arm64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -5912,9 +5840,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "glibc"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+@@ -5936,9 +5861,6 @@
+                 "x64"
+             ],
+             "dev": true,
+-            "libc": [
+-                "musl"
+-            ],
+             "license": "MPL-2.0",
+             "optional": true,
+             "os": [
+diff --git a/src/App.tsx b/src/App.tsx
+index 4418b28..350875c 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -12,6 +12,8 @@ import { RepaymentProgress }   from "./components/RepaymentProgress";
+ import { FinancialStackedBar } from "./components/FinancialStackedBar";
+ import { ClientsPage }         from "./components/ClientsPage";
+ import { GrowthCharts }        from "./components/GrowthCharts";
++import { AnalysisPage }        from "./components/AnalysisPage";
++import { MobileAnalysisView }  from "./components/MobileAnalysisView";
+ import { GoalsModal }          from "./components/GoalsModal";
+ import { ClientEditModal }     from "./components/ClientEditModal";
+ import { GoalTracker }         from "./components/GoalTracker";
+@@ -217,6 +219,7 @@ function AppInner() {
+           {desktopTab === "clients"    && <div className="flex-1 overflow-hidden"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
+           {desktopTab === "waitlist"   && <div className="flex-1 overflow-hidden"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
+           {desktopTab === "agreements" && <div className="flex-1 overflow-auto"><AgreementsPage theme={t} /></div>}
++          {desktopTab === "analysis"   && <div className="flex-1 overflow-hidden flex flex-col"><AnalysisPage loans={loans} metrics={metrics} theme={t} /></div>}
+         </div>
+       </div>
+ 
+@@ -372,7 +375,7 @@ function AppInner() {
+           </>
+         )}
+ 
+-        {mobileTab === "analytics"  && <div className="px-4 pb-28 pt-4 space-y-3"><PortfolioDonut metrics={metrics} compact /><MonthlyCollections loans={loans} compact /><RepaymentProgress loans={loans} compact /><FinancialStackedBar loans={loans} compact /><GrowthCharts loans={loans} theme={t} /></div>}
++        {mobileTab === "analysis"   && <MobileAnalysisView loans={loans} metrics={metrics} theme={t} />}
+         {mobileTab === "clients"    && <div className="pb-28"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
+         {mobileTab === "waitlist"   && <div className="pb-28"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
+         {mobileTab === "agreements" && <div className="pb-28"><AgreementsPage theme={t} /></div>}
+diff --git a/src/components/AnalysisModal.tsx b/src/components/AnalysisModal.tsx
+new file mode 100644
+index 0000000..dcfc61f
+--- /dev/null
++++ b/src/components/AnalysisModal.tsx
+@@ -0,0 +1,68 @@
++import React from "react";
++import { X } from "lucide-react";
++import { cn } from "@/lib/utils";
++
++interface AnalysisModalProps {
++  open: boolean;
++  onClose: () => void;
++  title: string;
++  summary: string;
++  body: string;
++  chart?: React.ReactNode;
++}
++
++export const AnalysisModal: React.FC<AnalysisModalProps> = ({ open, onClose, title, summary, body, chart }) => {
++  React.useEffect(() => {
++    if (!open) return;
++    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
++    document.addEventListener("keydown", handler);
++    return () => document.removeEventListener("keydown", handler);
++  }, [open, onClose]);
++
++  if (!open) return null;
++
++  return (
++    <div
++      className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto"
++      style={{ background: "rgba(17,18,20,0.45)", backdropFilter: "blur(8px)" }}
++      onClick={onClose}
++    >
++      <div
++        onClick={(e) => e.stopPropagation()}
++        className="rounded-[var(--radius-lg)] border overflow-hidden shadow-2xl flex flex-col"
++        style={{
++          background: "var(--background)",
++          borderColor: "var(--border)",
++          width: "92vw",
++          maxWidth: "640px",
++          maxHeight: "88vh",
++        }}
++      >
++        <div className="p-5 border-b flex items-start justify-between gap-4" style={{ borderColor: "var(--border)" }}>
++          <div>
++            <h3 className="cl-mono text-sm font-bold tracking-widest" style={{ color: "var(--foreground)" }}>
++              {title.toUpperCase()}
++            </h3>
++            <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>{summary}</p>
++          </div>
++          <button
++            onClick={onClose}
++            className={cn("p-1.5 rounded-lg shrink-0")}
++            style={{ color: "var(--muted-foreground)" }}
++          >
++            <X className="w-4 h-4" />
++          </button>
++        </div>
++
++        <div className="p-5 space-y-5 overflow-y-auto flex-1">
++          {chart && (
++            <div className="rounded-[var(--radius-md)] border p-3" style={{ borderColor: "var(--border)", background: "var(--bg-raised)" }}>
++              {chart}
++            </div>
++          )}
++          <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>{body}</p>
++        </div>
++      </div>
++    </div>
++  );
++};
+diff --git a/src/components/AnalysisPage.tsx b/src/components/AnalysisPage.tsx
+new file mode 100644
+index 0000000..08babf6
+--- /dev/null
++++ b/src/components/AnalysisPage.tsx
+@@ -0,0 +1,125 @@
++import React, { useState } from "react";
++import { TrendingUp, Users, PieChart, LineChart } from "lucide-react";
++import { Loan, PortfolioMetrics } from "../types";
++import { formatCurrency } from "../utils/loanCalculations";
++import { calculateRateOfReturn, currentMonthAcquisitionRate, rankBorrowersByExposure } from "../utils/analysisMetrics";
++import { GrowthCharts } from "./GrowthCharts";
++import { PortfolioDonut } from "./PortfolioDonut";
++import { AnalysisModal } from "./AnalysisModal";
++
++interface AnalysisPageProps {
++  loans: Loan[];
++  metrics: PortfolioMetrics;
++  theme: any;
++}
++
++type CardId = "rate-of-return" | "client-acquisition" | "loan-distribution" | "asset-projection";
++
++export const AnalysisPage: React.FC<AnalysisPageProps> = ({ loans, metrics, theme: t }) => {
++  const [openCard, setOpenCard] = useState<CardId | null>(null);
++
++  const rateOfReturn = calculateRateOfReturn(metrics);
++  const acquisitionThisMonth = currentMonthAcquisitionRate(loans);
++  const ranked = rankBorrowersByExposure(loans);
++  const top = ranked[0];
++  const bottom = ranked[ranked.length - 1];
++
++  const cards: { id: CardId; icon: React.ReactNode; title: string; intro: string; modalSummary: string; modalBody: string; chart: React.ReactNode }[] = [
++    {
++      id: "asset-projection",
++      icon: <LineChart className="w-4 h-4" />,
++      title: "Asset Projection",
++      intro: "How your lent capital is expected to grow over the coming months, based on current loan terms.",
++      modalSummary: "Projected growth of total assets under management",
++      modalBody: `Your portfolio currently stands at ${formatCurrency(metrics.totalPrincipalLent)} in principal lent, with ${formatCurrency(metrics.totalOutstanding)} still outstanding. At the current pace of lending and collection, this chart shows how your asset base is expected to move month over month.`,
++      chart: <GrowthCharts loans={loans} theme={t} />,
++    },
++    {
++      id: "rate-of-return",
++      icon: <TrendingUp className="w-4 h-4" />,
++      title: "Rate of Return",
++      intro: `Currently earning ${rateOfReturn.toFixed(1)}% return on principal lent, from interest collected.`,
++      modalSummary: `${rateOfReturn.toFixed(1)}% return on principal lent so far`,
++      modalBody: `Net profit of ${formatCurrency(metrics.totalProfit)} against ${formatCurrency(metrics.totalPrincipalLent)} lent gives a return of ${rateOfReturn.toFixed(1)}%. This reflects interest collected across all loans, active and completed, and will shift as more loans mature or default.`,
++      chart: <GrowthCharts loans={loans} theme={t} />,
++    },
++    {
++      id: "client-acquisition",
++      icon: <Users className="w-4 h-4" />,
++      title: "Client Acquisition",
++      intro: `${acquisitionThisMonth} new client${acquisitionThisMonth === 1 ? "" : "s"} added this month.`,
++      modalSummary: "New clients acquired over time",
++      modalBody: `You added ${acquisitionThisMonth} new client${acquisitionThisMonth === 1 ? "" : "s"} this month, out of ${ranked.length} total unique borrowers on the platform. Steady client growth keeps the lending pipeline healthy alongside repayments from existing borrowers.`,
++      chart: null,
++    },
++    {
++      id: "loan-distribution",
++      icon: <PieChart className="w-4 h-4" />,
++      title: "Loan Distribution",
++      intro: "How outstanding loans are spread across active, overdue, completed and defaulted status — the health of the platform.",
++      modalSummary: "Portfolio health across loan statuses",
++      modalBody: `${metrics.activeLoansCount} active, ${metrics.overdueCount} overdue, ${metrics.completedLoansCount} completed and ${metrics.defaultedCount} defaulted loans make up the current book. A healthy platform keeps overdue and defaulted shares low relative to active and completed.`,
++      chart: <PortfolioDonut metrics={metrics} />,
++    },
++  ];
++
++  const activeCard = cards.find((c) => c.id === openCard) || null;
++
++  return (
++    <div className="px-6 py-6 space-y-6 overflow-y-auto flex-1">
++      {/* Top banner: asset growth chart */}
++      <div
++        className="rounded-[var(--radius-lg)] border p-5"
++        style={{ borderColor: "var(--border)", background: "var(--bg-raised)" }}
++      >
++        <h2 className="cl-mono text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--muted-foreground)" }}>
++          Asset Growth
++        </h2>
++        <GrowthCharts loans={loans} theme={t} />
++      </div>
++
++      {/* Magazine-style article grid */}
++      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
++        {cards.map((card) => (
++          <button
++            key={card.id}
++            onClick={() => setOpenCard(card.id)}
++            className="text-left rounded-[var(--radius-md)] border p-5 transition-colors hover:border-[var(--gold-500)]"
++            style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
++          >
++            <div className="flex items-center gap-2 mb-3">
++              <div className="p-1.5 rounded-lg" style={{ background: "var(--bg-raised)", color: "var(--gold-500)" }}>
++                {card.icon}
++              </div>
++              <h3 className="cl-mono text-xs font-bold uppercase tracking-widest" style={{ color: "var(--foreground)" }}>
++                {card.title}
++              </h3>
++            </div>
++            <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
++              {card.intro}
++            </p>
++            <span className="inline-block mt-3 text-xs font-semibold" style={{ color: "var(--gold-500)" }}>
++              View analysis →
++            </span>
++          </button>
++        ))}
++      </div>
++
++      {top && bottom && (
++        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
++          Highest exposure: <span style={{ color: "var(--foreground)" }}>{top.borrowerName}</span> ({formatCurrency(top.outstanding)}) ·
++          {" "}Lowest: <span style={{ color: "var(--foreground)" }}>{bottom.borrowerName}</span> ({formatCurrency(bottom.outstanding)})
++        </p>
++      )}
++
++      <AnalysisModal
++        open={!!activeCard}
++        onClose={() => setOpenCard(null)}
++        title={activeCard?.title || ""}
++        summary={activeCard?.modalSummary || ""}
++        body={activeCard?.modalBody || ""}
++        chart={activeCard?.chart}
++      />
++    </div>
++  );
++};
+diff --git a/src/components/MobileAnalysisView.tsx b/src/components/MobileAnalysisView.tsx
+new file mode 100644
+index 0000000..4133c2f
+--- /dev/null
++++ b/src/components/MobileAnalysisView.tsx
+@@ -0,0 +1,104 @@
++import React, { useState } from "react";
++import { Loan, PortfolioMetrics } from "../types";
++import { formatCurrency } from "../utils/loanCalculations";
++import { calculateRateOfReturn, currentMonthAcquisitionRate, rankBorrowersByExposure } from "../utils/analysisMetrics";
++import { GrowthCharts } from "./GrowthCharts";
++import { PortfolioDonut } from "./PortfolioDonut";
++import { AnalysisModal } from "./AnalysisModal";
++
++interface MobileAnalysisViewProps {
++  loans: Loan[];
++  metrics: PortfolioMetrics;
++  theme: any;
++}
++
++type ModalId = "distribution" | "projection" | "health" | null;
++
++export const MobileAnalysisView: React.FC<MobileAnalysisViewProps> = ({ loans, metrics, theme: t }) => {
++  const [open, setOpen] = useState<ModalId>(null);
++
++  const ranked = rankBorrowersByExposure(loans);
++  const top3 = ranked.slice(0, 3);
++  const bottom = ranked[ranked.length - 1];
++  const rateOfReturn = calculateRateOfReturn(metrics);
++  const acquisitionThisMonth = currentMonthAcquisitionRate(loans);
++
++  const distributionSummary = ranked.length === 0
++    ? "No borrowers yet."
++    : `${top3.map((b) => `${b.borrowerName} (${formatCurrency(b.outstanding)})`).join(", ")}${
++        ranked.length > 3 ? `, down to ${bottom.borrowerName} (${formatCurrency(bottom.outstanding)})` : ""
++      }.`;
++
++  const distributionBody = `Assets are spread across ${ranked.length} unique borrower${ranked.length === 1 ? "" : "s"}. ${
++    ranked[0] ? `${ranked[0].borrowerName} holds the largest share at ${ranked[0].shareOfPortfolio.toFixed(1)}% of outstanding exposure.` : ""
++  } ${bottom && ranked.length > 1 ? `${bottom.borrowerName} holds the smallest, at ${bottom.shareOfPortfolio.toFixed(1)}%.` : ""} Return on principal lent stands at ${rateOfReturn.toFixed(1)}%, with ${acquisitionThisMonth} new client${acquisitionThisMonth === 1 ? "" : "s"} added this month.`;
++
++  return (
++    <div className="px-4 pb-28 pt-4 space-y-4">
++      {/* Ranked text summary */}
++      <button
++        onClick={() => setOpen("distribution")}
++        className="w-full text-left rounded-[var(--radius-md)] border p-4"
++        style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
++      >
++        <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
++          Asset Distribution
++        </h3>
++        <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
++          {distributionSummary}
++        </p>
++        <span className="inline-block mt-2 text-xs font-semibold" style={{ color: "var(--gold-500)" }}>
++          View full breakdown →
++        </span>
++      </button>
++
++      {/* Asset projection chart */}
++      <button
++        onClick={() => setOpen("projection")}
++        className="w-full text-left rounded-[var(--radius-md)] border p-4"
++        style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
++      >
++        <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
++          Asset Projection
++        </h3>
++        <GrowthCharts loans={loans} theme={t} />
++      </button>
++
++      {/* Portfolio health chart */}
++      <button
++        onClick={() => setOpen("health")}
++        className="w-full text-left rounded-[var(--radius-md)] border p-4"
++        style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
++      >
++        <h3 className="cl-mono text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
++          Portfolio Health
++        </h3>
++        <PortfolioDonut metrics={metrics} compact />
++      </button>
++
++      <AnalysisModal
++        open={open === "distribution"}
++        onClose={() => setOpen(null)}
++        title="Asset Distribution"
++        summary="Borrowers ranked by outstanding exposure, highest to lowest"
++        body={distributionBody}
++      />
++      <AnalysisModal
++        open={open === "projection"}
++        onClose={() => setOpen(null)}
++        title="Asset Projection"
++        summary="Projected growth of total assets under management"
++        body={`Principal lent: ${formatCurrency(metrics.totalPrincipalLent)}. Outstanding: ${formatCurrency(metrics.totalOutstanding)}. This chart tracks how your lent capital moves month over month.`}
++        chart={<GrowthCharts loans={loans} theme={t} />}
++      />
++      <AnalysisModal
++        open={open === "health"}
++        onClose={() => setOpen(null)}
++        title="Portfolio Health"
++        summary="Loan distribution across statuses"
++        body={`${metrics.activeLoansCount} active, ${metrics.overdueCount} overdue, ${metrics.completedLoansCount} completed, ${metrics.defaultedCount} defaulted.`}
++        chart={<PortfolioDonut metrics={metrics} />}
++      />
++    </div>
++  );
++};
+diff --git a/src/utils/analysisMetrics.ts b/src/utils/analysisMetrics.ts
+new file mode 100644
+index 0000000..b54ec5b
+--- /dev/null
++++ b/src/utils/analysisMetrics.ts
+@@ -0,0 +1,93 @@
++import { Loan, PortfolioMetrics } from "../types";
++
++// ─── RATE OF RETURN ──────────────────────────────────────────────────────────
++// Profit earned so far as a percentage of total principal lent out.
++
++export function calculateRateOfReturn(metrics: PortfolioMetrics): number {
++  if (metrics.totalPrincipalLent <= 0) return 0;
++  return (metrics.totalProfit / metrics.totalPrincipalLent) * 100;
++}
++
++// ─── CLIENT ACQUISITION RATE ─────────────────────────────────────────────────
++// New unique borrowers added per calendar month, based on originationDate
++// of their first loan (falls back to dateJoined when present).
++
++export interface MonthlyAcquisition {
++  month: string;      // "2026-10"
++  label: string;       // "Oct 2026"
++  newClients: number;
++}
++
++function monthKey(dateStr: string): string {
++  return dateStr ? dateStr.slice(0, 7) : "";
++}
++
++function monthLabel(key: string): string {
++  const [y, m] = key.split("-");
++  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
++  const idx = parseInt(m, 10) - 1;
++  return `${months[idx] ?? m} ${y}`;
++}
++
++export function calculateClientAcquisition(loans: Loan[]): MonthlyAcquisition[] {
++  const firstSeenByBorrower = new Map<string, string>();
++
++  for (const loan of loans) {
++    const joinDate = loan.dateJoined || loan.originationDate;
++    const key = loan.borrowerName;
++    const existing = firstSeenByBorrower.get(key);
++    if (!existing || joinDate < existing) {
++      firstSeenByBorrower.set(key, joinDate);
++    }
++  }
++
++  const countsByMonth = new Map<string, number>();
++  for (const joinDate of firstSeenByBorrower.values()) {
++    const key = monthKey(joinDate);
++    if (!key) continue;
++    countsByMonth.set(key, (countsByMonth.get(key) || 0) + 1);
++  }
++
++  return Array.from(countsByMonth.entries())
++    .sort(([a], [b]) => a.localeCompare(b))
++    .map(([month, newClients]) => ({ month, label: monthLabel(month), newClients }));
++}
++
++export function currentMonthAcquisitionRate(loans: Loan[]): number {
++  const series = calculateClientAcquisition(loans);
++  if (series.length === 0) return 0;
++  return series[series.length - 1].newClients;
++}
++
++// ─── BORROWER RANKING ────────────────────────────────────────────────────────
++// Ranks unique borrowers by total outstanding exposure, highest to lowest,
++// for the "asset distribution" text summary.
++
++export interface BorrowerExposure {
++  borrowerName: string;
++  outstanding: number;
++  loanAmount: number;
++  shareOfPortfolio: number; // percentage
++}
++
++export function rankBorrowersByExposure(loans: Loan[]): BorrowerExposure[] {
++  const byBorrower = new Map<string, { outstanding: number; loanAmount: number }>();
++
++  for (const loan of loans) {
++    const existing = byBorrower.get(loan.borrowerName) || { outstanding: 0, loanAmount: 0 };
++    existing.outstanding += loan.remainingBalance || 0;
++    existing.loanAmount += loan.loanAmount || 0;
++    byBorrower.set(loan.borrowerName, existing);
++  }
++
++  const totalOutstanding = Array.from(byBorrower.values()).reduce((sum, b) => sum + b.outstanding, 0);
++
++  return Array.from(byBorrower.entries())
++    .map(([borrowerName, v]) => ({
++      borrowerName,
++      outstanding: v.outstanding,
++      loanAmount: v.loanAmount,
++      shareOfPortfolio: totalOutstanding > 0 ? (v.outstanding / totalOutstanding) * 100 : 0,
++    }))
++    .sort((a, b) => b.outstanding - a.outstanding);
++}
