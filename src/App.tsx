@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
@@ -26,11 +26,14 @@ import { FaqGrid }             from "./components/FaqGrid";
 import { Sidebar }             from "./components/Sidebar";
 import { BottomTabBar }        from "./components/BottomTabBar";
 import { Header }              from "./components/Header";
+import { SettingsPanel }       from "./components/SettingsPanel";
+import { AppLockScreen }       from "./components/AppLockScreen";
+import { isSecurityEnabled, getAutoLockMinutes } from "./utils/security";
 import { StatTile }            from "./components/StatTile";
 import { AnimatedAmount }      from "./components/AnimatedAmount";
 import { ConfirmDialog }       from "./components/ConfirmDialog";
 import { Button }              from "./components/ui/button";
-import { Download, PlusCircle, Bell, FileText, Trash2, Sun, Moon } from "lucide-react";
+import { Download, PlusCircle, Bell, FileText, Trash2, Sun, Moon, User } from "lucide-react";
 import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
@@ -83,6 +86,8 @@ function AppInner() {
   const toggleTheme = () => { const d = !isDark; setIsDark(d); document.documentElement.classList.toggle("dark", d); localStorage.setItem("cyberlend-theme", d ? "dark" : "light"); };
   const [confirmReset,     setConfirmReset]     = useState(false);
   const [pdfOpen,          setPdfOpen]          = useState(false);
+  const [settingsOpen,     setSettingsOpen]     = useState(false);
+  const [locked,           setLocked]            = useState(() => isSecurityEnabled());
   const [mSearch,          setMSearch]          = useState("");
   const [mStatus,          setMStatus]          = useState("ALL");
   const [mobileTab,  setMobileTab]  = useState<"loans"|"analysis"|"clients"|"waitlist"|"agreements">("loans");
@@ -131,19 +136,38 @@ function AppInner() {
     Defaulted: { bg: "rgba(180,20,20,0.12)",  color: "#fca5a5",                border: "rgba(180,20,20,0.25)" },
   } as Record<string,{bg:string;color:string;border:string}>)[status] ?? { bg:"rgba(255,255,255,0.06)", color:"var(--muted-foreground)", border:"var(--border)" };
 
+  useEffect(() => {
+    if (!isSecurityEnabled() || locked) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const resetTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => setLocked(true), getAutoLockMinutes() * 60 * 1000);
+    };
+    const events = ["mousemove", "keydown", "touchstart", "click"];
+    events.forEach((ev) => window.addEventListener(ev, resetTimer));
+    resetTimer();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+    };
+  }, [locked]);
+
+  if (locked) {
+    return <AppLockScreen onUnlock={() => setLocked(false)} />;
+  }
+
   return (
     <>
       {/* -- DESKTOP -- */}
       <div className="hidden lg:flex min-h-screen" style={{ background:"var(--background)" }}>
         <Sidebar active={desktopTab} onChange={setDesktopTab} />
         <div className={"flex-1 flex flex-col min-w-0 overflow-x-hidden" + (desktopTab === "analysis" ? " analysis-merge" : "")}>
-          <Header onSearch={() => {}} />
+          <Header onSearch={() => {}} onOpenSettings={() => setSettingsOpen(true)} />
 
           <div className="flex items-center justify-end gap-2 px-6 py-2 border-b" style={{ borderColor:"var(--border)" }}>
             <ExportMenu loans={loans} />
             <Button variant="ghost" size="sm" onClick={() => setPdfOpen(true)}><FileText className="w-3 h-3 mr-1"/>PDF</Button>
             
-            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}>{isDark ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}</Button>
             <Button size="sm" onClick={() => setNewLoanOpen(true)}><PlusCircle className="w-3.5 h-3.5 mr-1"/>NEW LOAN</Button>
           </div>
 
@@ -229,11 +253,11 @@ function AppInner() {
           <span className="font-brand text-xl" style={{ color:"var(--foreground)" }}>Cyberlend</span>
           <div className="flex gap-2">
             <ExportMenu loans={loans} />
-            <button onClick={toggleTheme} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
-              {isDark ? <Sun className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} /> : <Moon className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />}
-            </button>
             <button className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
               <Bell className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />
+            </button>
+            <button aria-label="Profile" onClick={() => setSettingsOpen(true)} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
+              <User className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />
             </button>
             <button onClick={() => setNewLoanOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background:"var(--primary)" }}>
               <PlusCircle className="w-4 h-4" style={{ color:"var(--primary-foreground)" }} />
@@ -410,6 +434,7 @@ function AppInner() {
       )}
 
       <ConfirmDialog open={confirmReset} title="Clear all data?" description="This permanently deletes all loans, clients and transactions. Cannot be undone." confirmLabel="Clear everything" destructive onConfirm={handleResetData} onCancel={() => setConfirmReset(false)} />
+      <SettingsPanel open={settingsOpen} onOpenChange={setSettingsOpen} isDark={isDark} onToggleTheme={toggleTheme} />
       <ClientEditModal isOpen={clientEditTarget !== null} onClose={() => setClientEditTarget(null)} loan={clientEditTarget} onSave={handleSaveClientEdit} theme={t} />
       <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
       <GoalsModal isOpen={goalsModalOpen} onClose={() => setGoalsModalOpen(false)} goals={goals} onSave={setGoals} theme={t} />
@@ -422,6 +447,9 @@ function AppInner() {
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
+
+
 
 
 

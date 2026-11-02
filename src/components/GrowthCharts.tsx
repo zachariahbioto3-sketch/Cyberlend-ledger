@@ -1,6 +1,7 @@
 import React from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from "recharts";
 import { Loan } from "../types";
+import { loadSettings } from "../utils/settings";
 
 function GrowthTooltip({ active, payload, label, tooltipStyle, render }: any) {
   if (!active || !payload?.length || payload[0]?.value == null) return null
@@ -33,6 +34,7 @@ function formatMonthLabel(key: string) {
 
 export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) => {
   const FONT = "var(--font-mono)";
+  const targetRate = loadSettings().targetReturnRate;
 
   const allMonths = [...new Set(loans.map(l => getMonthKey(l.originationDate)))].filter(Boolean).sort();
 
@@ -148,7 +150,7 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
               <XAxis dataKey="month" tick={axisStyle} />
               <YAxis tick={axisStyle} tickFormatter={(v) => v + "%"} />
               <Tooltip content={(p: any) => <GrowthTooltip {...p} tooltipStyle={tooltipStyle} render={(v: number) => <p>{v}% Return Rate</p>} />} />
-              <ReferenceLine y={20} stroke="#E3A008" strokeDasharray="4 3" label={{ value: "Target 20%", position: "insideTopRight", fontSize: 10, fill: "#8A5B00", fontFamily: FONT }} />
+              <ReferenceLine y={targetRate} stroke="#E3A008" strokeDasharray="4 3" label={{ value: "Target " + targetRate + "%", position: "insideTopRight", fontSize: 10, fill: "#8A5B00", fontFamily: FONT }} />
               <Line type="monotone" dataKey="returnRate" stroke="#111214" strokeWidth={2} dot={{ r: 3, fill: "#111214" }} name="Return %" />
             </LineChart>
           </ResponsiveContainer>
@@ -157,6 +159,7 @@ export const GrowthCharts: React.FC<GrowthChartsProps> = ({ loans, theme: t }) =
     </div>
   );
 };
+
 
 
 

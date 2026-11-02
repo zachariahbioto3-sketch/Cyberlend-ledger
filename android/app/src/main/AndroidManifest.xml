@@ -49,5 +49,6 @@
 
     <!-- Required to show files in Downloads so user can find them -->
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
 </manifest>

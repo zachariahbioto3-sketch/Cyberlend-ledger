@@ -3,10 +3,11 @@ import { Search, Bell, User } from "lucide-react"
 
 interface HeaderProps {
   onSearch?: (q: string) => void
+  onOpenSettings?: () => void
   className?: string
 }
 
-export function Header({ onSearch, className }: HeaderProps) {
+export function Header({ onSearch, onOpenSettings, className }: HeaderProps) {
   return (
     <header className={cn(
       "flex items-center justify-between gap-4",
@@ -35,13 +36,14 @@ export function Header({ onSearch, className }: HeaderProps) {
         <button aria-label="Notifications" className="h-11 w-11 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--bg-raised)] transition-colors duration-150">
           <Bell className="h-5 w-5" />
         </button>
-        <button aria-label="Profile" className="h-11 w-11 flex items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] transition-colors duration-150">
+        <button aria-label="Profile" onClick={onOpenSettings} className="h-11 w-11 flex items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] transition-colors duration-150">
           <User className="h-4 w-4" />
         </button>
       </div>
     </header>
   )
 }
+
 
 
 

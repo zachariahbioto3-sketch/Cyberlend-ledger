@@ -48,6 +48,8 @@ const LOAN_PURPOSES: LoanPurpose[] = [
   "Agriculture","Home Improvement","Debt Consolidation","Electronics/Assets","Personal Use","Other",
 ];
 
+import { loadSettings } from "../utils/settings";
+
 const LENDER_KEY = "cyberlend_lender_default";
 function loadLender(): LenderDetails {
   try { const raw = localStorage.getItem(LENDER_KEY); return raw ? { ...EMPTY_LENDER, ...JSON.parse(raw) } : EMPTY_LENDER; } catch { return EMPTY_LENDER; }
@@ -68,10 +70,10 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
   const [borrower,     setBorrower]     = useState(prefill ? { ...EMPTY_BORROWER, fullName: prefill.fullName, phone: prefill.phone, email: prefill.email || "", idNumber: prefill.idNumber || "", address: prefill.address || "", occupation: prefill.occupation || "" } : EMPTY_BORROWER);
   const [guarantor,    setGuarantor]    = useState<Guarantor>(EMPTY_GUARANTOR);
   const [facility,     setFacility]     = useState<AgreementFacility>(prefill ? { ...EMPTY_FACILITY, approvedAmount: prefill.approvedAmount ?? EMPTY_FACILITY.approvedAmount, term: prefill.term ?? EMPTY_FACILITY.term, disbursementDate: prefill.disbursementDate ?? EMPTY_FACILITY.disbursementDate } : EMPTY_FACILITY);
-  const [interest,     setInterest]     = useState<AgreementInterest>(EMPTY_INTEREST);
-  const [fees,         setFees]         = useState<AgreementFees>(EMPTY_FEES);
+  const [interest,     setInterest]     = useState<AgreementInterest>(() => ({ ...EMPTY_INTEREST, rate: loadSettings().defaultInterestRate }));
+  const [fees,         setFees]         = useState<AgreementFees>(() => ({ ...EMPTY_FEES, processingFeeType: loadSettings().defaultProcessingFeeType, processingFeeValue: loadSettings().defaultProcessingFeeValue }));
   const [disbursement, setDisbursement] = useState<AgreementDisbursement>(EMPTY_DISBURSEMENT);
-  const [repayment,    setRepayment]    = useState<AgreementRepayment>(EMPTY_REPAYMENT);
+  const [repayment,    setRepayment]    = useState<AgreementRepayment>(() => ({ ...EMPTY_REPAYMENT, frequency: loadSettings().defaultRepaymentFrequency }));
   const [clientQuery, setClientQuery] = useState("");
 
   // Everyone we already know: loans + waitlist/registered clients, merged by phone number
@@ -515,6 +517,7 @@ export function AgreementForm({ onClose, theme: t, prefill, onCreated }: Agreeme
     </div>
   );
 }
+
 
 
 
