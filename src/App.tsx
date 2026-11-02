@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect } from "react";
+﻿import React, { useState, useMemo, useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
 import { AnimatedSplash } from "./components/AnimatedSplash";
 import { useLoanStore } from "./store/loanStore";
 import { Loan } from "./types";
-import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, LoanDetailModal, PdfExportModal, WaitlistPage } from "./components";
+import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, PdfExportModal, WaitlistPage } from "./components";
 import { PortfolioDonut }      from "./components/PortfolioDonut";
 import { MonthlyCollections }  from "./components/MonthlyCollections";
 import { RepaymentProgress }   from "./components/RepaymentProgress";
@@ -82,6 +82,7 @@ function AppInner() {
   const [paymentLoan,      setPaymentLoan]      = useState<Loan | null>(null);
   const [detailLoan,       setDetailLoan]       = useState<Loan | null>(null);
   const [mobileBorrowerLoans, setMobileBorrowerLoans] = useState<Loan[] | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Loan | null>(null);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
   const toggleTheme = () => { const d = !isDark; setIsDark(d); document.documentElement.classList.toggle("dark", d); localStorage.setItem("cyberlend-theme", d ? "dark" : "light"); };
   const [confirmReset,     setConfirmReset]     = useState(false);
@@ -92,6 +93,11 @@ function AppInner() {
   const [mStatus,          setMStatus]          = useState("ALL");
   const [mobileTab,  setMobileTab]  = useState<"loans"|"analysis"|"clients"|"waitlist"|"agreements">("loans");
   const [desktopTab, setDesktopTab] = useState<"dashboard"|"analysis"|"clients"|"waitlist"|"agreements">("dashboard");
+  const openNewAgreement = () => { setDetailLoan(null); setDesktopTab("agreements"); setMobileTab("agreements"); };
+  // Clear the shared selected client whenever the user leaves the Clients tab,
+  // so the Dashboard doesn't show a stale profile panel
+  useEffect(() => { if (desktopTab !== "clients") setSelectedClient(null); }, [desktopTab]);
+  useEffect(() => { if (mobileTab !== "clients") setSelectedClient(null); }, [mobileTab]);
 
   const handleUpdateLoan    = (id: string, updates: Partial<any>) => useLoanStore.getState().updateLoan(id, updates);
   const handleSaveClientEdit = (id: string, updates: Partial<Loan>) => {
@@ -182,7 +188,7 @@ function AppInner() {
               {selectedClient && <TrackerBar metrics={metrics} theme={t} selectedClient={selectedClient} onClose={() => setSelectedClient(null)} />}
               {selectedClient && (
                 <div className="px-6 py-4 overflow-y-auto">
-                  <ClientProfilePanel client={selectedClient} metrics={metrics} theme={t} allLoans={loans} />
+                  <ClientProfilePanel client={selectedClient} metrics={metrics} theme={t} allLoans={loans} onRecordPayment={(loan) => setPaymentLoan(loan)} onNewAgreement={openNewAgreement} />
                 </div>
               )}
 
@@ -240,7 +246,7 @@ function AppInner() {
             </main>
           )}
 
-          {desktopTab === "clients"    && <div className="flex-1 overflow-hidden"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
+          {desktopTab === "clients"    && <div className="flex-1 overflow-hidden"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRecordPayment={(l) => setPaymentLoan(l)} onNewAgreement={openNewAgreement} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
           {desktopTab === "waitlist"   && <div className="flex-1 overflow-hidden"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
           {desktopTab === "agreements" && <div className="flex-1 overflow-auto"><AgreementsPage theme={t} /></div>}
           {desktopTab === "analysis"   && <div className="flex-1 overflow-hidden flex flex-col"><AnalysisPage loans={loans} metrics={metrics} theme={t} /></div>}
@@ -400,7 +406,7 @@ function AppInner() {
         )}
 
         {mobileTab === "analysis"   && <MobileAnalysisView loans={loans} metrics={metrics} theme={t} />}
-        {mobileTab === "clients"    && <div className="pb-28"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
+        {mobileTab === "clients"    && <div className="pb-28"><ClientsPage loans={loans} theme={t} onUpdateLoan={handleUpdateLoan} onEditClient={(l) => setClientEditTarget(l)} onRecordPayment={(l) => setPaymentLoan(l)} onNewAgreement={openNewAgreement} onRegisterSuccess={() => showToast("Client registered & added to waitlist","success")} /></div>}
         {mobileTab === "waitlist"   && <div className="pb-28"><WaitlistPage theme={t} onPromoteToLoan={(e) => { setPromotedEntry(e); setNewLoanOpen(true); }} /></div>}
         {mobileTab === "agreements" && <div className="pb-28"><AgreementsPage theme={t} /></div>}
 
@@ -434,6 +440,7 @@ function AppInner() {
       )}
 
       <ConfirmDialog open={confirmReset} title="Clear all data?" description="This permanently deletes all loans, clients and transactions. Cannot be undone." confirmLabel="Clear everything" destructive onConfirm={handleResetData} onCancel={() => setConfirmReset(false)} />
+      <ConfirmDialog open={!!deleteTarget} title="Delete this loan?" description="This permanently deletes the loan and its payment history. Cannot be undone." confirmLabel="Delete" destructive onConfirm={() => { if (deleteTarget) deleteLoan(deleteTarget.id); setDeleteTarget(null); setDetailLoan(null); }} onCancel={() => setDeleteTarget(null)} />
       <SettingsPanel open={settingsOpen} onOpenChange={setSettingsOpen} isDark={isDark} onToggleTheme={toggleTheme} />
       <ClientEditModal isOpen={clientEditTarget !== null} onClose={() => setClientEditTarget(null)} loan={clientEditTarget} onSave={handleSaveClientEdit} theme={t} />
       <GoalDrawer goals={goals} metrics={metrics} loans={loans} theme={t} onEdit={() => setGoalsModalOpen(true)} />
@@ -441,12 +448,44 @@ function AppInner() {
       <PdfExportModal isOpen={pdfOpen} onClose={() => setPdfOpen(false)} loans={loans} metrics={metrics} theme={t} />
       <NewLoanModal isOpen={newLoanOpen} onClose={() => { setNewLoanOpen(false); setPromotedEntry(null); }} onAddLoan={(data) => { addLoan(data); if(promotedEntry?.id){removeFromWaitlist(promotedEntry.id);showToast("Client promoted to active borrower","success");}else{showToast("Loan created successfully","success");} setNewLoanOpen(false); setPromotedEntry(null); }} theme={t} prefillClient={promotedEntry ? { borrowerName:promotedEntry.name, borrowerPhone:promotedEntry.phone, borrowerEmail:promotedEntry.email||"", borrowerPhoto:promotedEntry.borrowerPhoto||"", occupation:promotedEntry.occupation, loanPurpose:promotedEntry.purpose, borrowerIdNumber:promotedEntry.idNumber||"", borrowerAddress:promotedEntry.address||"", kraPin:promotedEntry.kraPin||"", referralSource:promotedEntry.referralSource||"", clientNotes:promotedEntry.notes||"", clientFlags:["New"] } as any : null} />
       <RecordPaymentModal isOpen={!!paymentLoan} loan={paymentLoan} onClose={() => setPaymentLoan(null)} onSavePayment={handleSavePayment} theme={t} />
-      <LoanDetailModal loan={detailLoan} onClose={() => setDetailLoan(null)} onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }} onDeleteLoan={deleteLoan} onDeleteTransaction={deleteTransaction} theme={t} />
+      {detailLoan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setDetailLoan(null)}>
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border p-4 sm:p-5"
+            style={{ background: t.bgCard, borderColor: t.border }}
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-end gap-2 mb-2">
+              <button onClick={() => setDeleteTarget(detailLoan)}
+                className="px-3 py-1.5 rounded-xl border text-[10px] font-bold"
+                style={{ background: "rgba(248,113,113,0.1)", borderColor: "rgba(248,113,113,0.3)", color: "#f87171" }}>
+                DELETE LOAN
+              </button>
+              <button onClick={() => setDetailLoan(null)}
+                className="px-3 py-1.5 rounded-xl border text-[10px] font-bold"
+                style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
+                CLOSE
+              </button>
+            </div>
+            <ClientProfilePanel
+              client={detailLoan}
+              allLoans={loans}
+              theme={t}
+              onRecordPayment={(loan) => { setDetailLoan(null); setPaymentLoan(loan); }}
+              onNewAgreement={openNewAgreement}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-import { ExportMenu } from "./ExportMenu";
+﻿import { ExportMenu } from "./ExportMenu";
 import React, { useState, useMemo } from "react";
 import { Loan } from "../types";
 import { formatCurrency, formatDate } from "../utils/loanCalculations";
@@ -21,6 +21,8 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedBorrower, setSelectedBorrower] = useState<Loan[] | null>(null);
+  const [confirmDeleteGroup, setConfirmDeleteGroup] = useState<Loan[] | null>(null);
+  const [confirmDeleteGroup, setConfirmDeleteGroup] = useState<Loan[] | null>(null);
   const mono = "var(--font-mono)";
 
   const filtered = useMemo(() => loans.filter((l) => {
@@ -228,6 +230,9 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
     </div>
   );
 };
+
+
+
 
 
 

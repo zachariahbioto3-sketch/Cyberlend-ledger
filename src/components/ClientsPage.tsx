@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+﻿import React, { useState, useMemo, useRef } from "react";
 import {
   Users, Search, Star, AlertTriangle, UserX,
   Mail, MapPin, CreditCard, TrendingUp, FileText, Calendar,
@@ -6,9 +6,9 @@ import {
   DollarSign, Activity, CheckCircle, Clock, ShieldAlert,
   BarChart2, Upload, Camera, UserPlus, Phone
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useLoanStore } from "../store/loanStore";
 import { ClientInfoCard } from "./ClientInfoCard";
+import { ClientProfilePanel } from "./ClientProfilePanel";
 import { Loan, ClientFlag, LoanPurpose } from "../types";
 import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
 import { compressImage } from "../utils/imageUtils";
@@ -19,6 +19,8 @@ interface ClientsPageProps {
   theme: any;
   onUpdateLoan?: (id: string, updates: Partial<Loan>) => void;
   onEditClient?: (loan: Loan) => void;
+  onRecordPayment?: (loan: Loan) => void;
+  onNewAgreement?: (client: Loan) => void;
 }
 
 const FLAG_META: Record<ClientFlag, { color: string; bg: string; border: string; icon: React.ReactNode }> = {
@@ -380,235 +382,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
 };
 
 // -- PORTFOLIO SUMMARY PANEL ---------------------------------------------------
-interface PortfolioSummaryPanelProps { loans: Loan[]; theme: any; grouped: Record<string, Loan[]>; }
-
-const PortfolioSummaryPanel: React.FC<PortfolioSummaryPanelProps> = ({ loans, theme: t, grouped }) => {
-  const mono    = "var(--font-mono)";
-  const metrics = calculatePortfolioMetrics(loans);
-  const totalClients = Object.keys(grouped).length;
-
-  const topBorrowers = useMemo(() => {
-    return Object.entries(grouped)
-      .map(([, clientLoans]) => {
-        const latest    = clientLoans[0];
-        const totalLent = clientLoans.reduce((s, l) => s + l.loanAmount, 0);
-        const hasOverdue = clientLoans.some(l => l.status === "Overdue");
-        return { name: latest.borrowerName, phone: latest.borrowerPhone, totalLent, hasOverdue, flags: latest.clientFlags || [] };
-      })
-      .sort((a, b) => b.totalLent - a.totalLent)
-      .slice(0, 5);
-  }, [grouped]);
-
-  const flagSummary = useMemo(() => {
-    return (Object.keys(FLAG_META) as ClientFlag[]).map(f => ({
-      flag: f, count: loans.filter(l => (l.clientFlags || []).includes(f)).length,
-    })).filter(x => x.count > 0);
-  }, [loans]);
-
-  const collectionRate = useMemo(() => {
-    const totalExpected = loans.reduce((s, l) => s + (l.monthlyInterest * l.monthsCompleted), 0);
-    if (totalExpected === 0) return 0;
-    return Math.min(100, Math.round((metrics.totalCollected / totalExpected) * 100));
-  }, [loans, metrics]);
-
-  const monthlyCollections = useMemo(() => {
-    const map: Record<string, { collected: number; outstanding: number }> = {};
-    loans.forEach(loan => {
-      loan.transactions
-        .filter(tx => tx.status === "Completed" && tx.paymentType === "Interest")
-        .forEach(tx => {
-          const month = tx.date.slice(0, 7);
-          if (!map[month]) map[month] = { collected: 0, outstanding: 0 };
-          map[month].collected += tx.amount;
-        });
-      if (loan.status !== "Completed") {
-        const month = loan.nextDueDate?.slice(0, 7) || new Date().toISOString().slice(0, 7);
-        if (!map[month]) map[month] = { collected: 0, outstanding: 0 };
-        map[month].outstanding += loan.monthlyInterest;
-      }
-    });
-    return Object.entries(map).sort(([a], [b]) => a.localeCompare(b)).slice(-6)
-      .map(([month, data]) => ({ month: month.slice(5), ...data }));
-  }, [loans]);
-
-  const agingBuckets = useMemo(() => {
-    const today = new Date();
-    const buckets = [
-      { label: "1-30 days",  count: 0, amount: 0 },
-      { label: "31-60 days", count: 0, amount: 0 },
-      { label: "60+ days",   count: 0, amount: 0 },
-    ];
-    loans.filter(l => l.status === "Overdue").forEach(l => {
-      const days = Math.floor((today.getTime() - new Date(l.nextDueDate).getTime()) / 86400000);
-      if (days <= 30)      { buckets[0].count++; buckets[0].amount += l.loanAmount; }
-      else if (days <= 60) { buckets[1].count++; buckets[1].amount += l.loanAmount; }
-      else                 { buckets[2].count++; buckets[2].amount += l.loanAmount; }
-    });
-    return buckets;
-  }, [loans]);
-
-  const portfolioStats = [
-    { label: "TOTAL CLIENTS",   value: String(totalClients),                              icon: <Users className="w-4 h-4" />,       color: "var(--foreground)" },
-    { label: "TOTAL LENT",      value: formatCompactCurrency(metrics.totalPrincipalLent), icon: <DollarSign className="w-4 h-4" />,  color: "var(--success-fg)" },
-    { label: "INTEREST EARNED", value: formatCompactCurrency(metrics.totalCollected),     icon: <TrendingUp className="w-4 h-4" />,  color: "var(--warning-fg)" },
-    { label: "ACTIVE LOANS",    value: String(metrics.activeLoansCount),                  icon: <Activity className="w-4 h-4" />,    color: "var(--foreground)" },
-    { label: "OVERDUE",         value: String(metrics.overdueCount),                      icon: <Clock className="w-4 h-4" />,       color: metrics.overdueCount > 0 ? "#A82F2F" : "#1E9E5A" },
-    { label: "COMPLETED",       value: String(metrics.completedLoansCount),               icon: <CheckCircle className="w-4 h-4" />, color: "var(--success-fg)" },
-  ];
-
-  return (
-    <div className="flex flex-col lg:flex-row flex-1 min-w-0 overflow-y-auto" style={{ background: t.bgCard }}>
-      {/* Left column */}
-      <div className="flex flex-col px-4 py-4 gap-4 flex-1 min-w-0 lg:border-r" style={{ borderColor: t.border }}>
-        <div>
-          <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>PORTFOLIO OVERVIEW</h2>
-          <p className="text-xs mt-1" style={{ color: t.textFaint, fontFamily: mono }}>SELECT A CLIENT TO VIEW THEIR PROFILE</p>
-        </div>
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">
-          {portfolioStats.map(s => (
-            <div key={s.label} className="rounded-2xl border p-4 flex flex-col gap-2"
-              style={{ background: t.bg, borderColor: t.border }}>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs uppercase tracking-widest truncate min-w-0" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
-                <span className="shrink-0" style={{ color: s.color }}>{s.icon}</span>
-              </div>
-              <p className="text-lg font-bold" style={{ fontFamily: mono, color: s.color }}>{s.value}</p>
-            </div>
-          ))}
-        </div>
-
-        {flagSummary.length > 0 && (
-          <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>CLIENT SEGMENTS</p>
-            <div className="flex gap-2 flex-wrap">
-              {flagSummary.map(({ flag, count }) => (
-                <div key={flag}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-bold"
-                  style={{ fontFamily: mono, background: FLAG_META[flag].bg, borderColor: FLAG_META[flag].border, color: FLAG_META[flag].color }}>
-                  {FLAG_META[flag].icon}{flag} <span className="opacity-70">({count})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>TOP BORROWERS</p>
-          <div className="space-y-2">
-            {topBorrowers.map((b, i) => (
-              <div key={b.phone} className="flex items-center gap-3 p-3 rounded-xl border"
-                style={{ background: t.bgActive, borderColor: t.border }}>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 border"
-                  style={{
-                    background:  b.hasOverdue ? "rgba(248,113,113,0.15)" : "rgba(196,154,47,0.12)",
-                    borderColor: b.hasOverdue ? "rgba(248,113,113,0.4)"  : "rgba(196,154,47,0.3)",
-                  }}>
-                  <span className="text-xs font-bold" style={{ fontFamily: mono, color: b.hasOverdue ? "#A82F2F" : "#111214" }}>{i + 1}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold truncate" style={{ color: t.text }}>{b.name}</p>
-                  <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>{b.phone}</p>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-xs font-bold" style={{ fontFamily: mono, color: "var(--foreground)" }}>{formatCompactCurrency(b.totalLent)}</p>
-                  {b.hasOverdue && <p className="text-xs" style={{ color: "var(--danger-fg)", fontFamily: mono }}>OVERDUE</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right column */}
-      <div className="flex flex-col px-4 py-4 gap-4 w-full lg:w-[320px] xl:w-[360px] lg:shrink-0">
-        <div>
-          <h2 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>FINANCIAL HEALTH</h2>
-          <p className="text-xs mt-1" style={{ color: t.textFaint, fontFamily: mono }}>COLLECTION METRICS & RISK</p>
-        </div>
-
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>REPAYMENT RATE</p>
-            <BarChart2 className="w-3.5 h-3.5" style={{ color: "var(--foreground)" }} />
-          </div>
-          <div className="flex items-end gap-3 mb-3">
-            <p className="text-3xl font-bold" style={{ fontFamily: mono, color: collectionRate >= 80 ? "#1E9E5A" : collectionRate >= 50 ? "#8A5B00" : "#A82F2F" }}>
-              {collectionRate}%
-            </p>
-          </div>
-          <div className="h-2 rounded-full overflow-hidden" style={{ background: t.bgActive }}>
-            <div className="h-full rounded-full transition-all"
-              style={{ width: `${collectionRate}%`, background: collectionRate >= 80 ? "#1E9E5A" : collectionRate >= 50 ? "#8A5B00" : "#A82F2F" }} />
-          </div>
-        </div>
-
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>MONTHLY COLLECTIONS</p>
-            <div className="flex gap-3 text-xs" style={{ fontFamily: mono }}>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#111214" }} />COL</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: "#A82F2F" }} />DUE</span>
-            </div>
-          </div>
-          {monthlyCollections.length === 0 ? (
-            <p className="text-xs text-center py-4" style={{ color: t.textFaint, fontFamily: mono }}>NO DATA YET</p>
-          ) : (
-            <div style={{ width: "100%", minWidth: 1, height: 120, display: "block" }}>
-              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={120}>
-                <BarChart data={monthlyCollections} barGap={3} barCategoryGap="30%">
-                  <XAxis dataKey="month" tick={{ fontSize: 9, fill: "rgba(243,234,216,0.35)", fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} />
-                  <YAxis hide />
-                  <Tooltip cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                    contentStyle={{ background: "var(--card)", border: "1px solid rgba(243,234,216,0.14)", borderRadius: 10, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--foreground)" }}
-                    formatter={(v: number) => [`KES ${v.toLocaleString()}`, undefined]} />
-                  <Bar dataKey="collected"   name="Collected" fill="var(--gold-500)" radius={[3,3,0,0]} />
-                  <Bar dataKey="outstanding" name="Due"       fill="var(--danger-fg)" opacity={0.5} radius={[3,3,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>AGING DEBT</p>
-            <ShieldAlert className="w-3.5 h-3.5" style={{ color: metrics.overdueCount > 0 ? "#A82F2F" : t.textFaint }} />
-          </div>
-          {metrics.overdueCount === 0 ? (
-            <div className="flex flex-col items-center py-3 gap-1.5">
-              <CheckCircle className="w-6 h-6" style={{ color: "var(--success-fg)" }} />
-              <p className="text-xs font-bold" style={{ fontFamily: mono, color: "var(--success-fg)" }}>ALL CLEAR</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {agingBuckets.map((bucket, i) => {
-                const colors = ["#8A5B00", "#A82F2F", "#7A1F1F"];
-                return (
-                  <div key={bucket.label} className="flex items-center justify-between p-2.5 rounded-xl border"
-                    style={{ background: t.bgActive, borderColor: t.border }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-6 rounded-full" style={{ background: colors[i] }} />
-                      <div>
-                        <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{bucket.label}</p>
-                        <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>{bucket.count} LOANS</p>
-                      </div>
-                    </div>
-                    <p className="text-xs font-bold" style={{ fontFamily: mono, color: colors[i] }}>
-                      {bucket.amount > 0 ? formatCompactCurrency(bucket.amount) : ""}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// -- MAIN CLIENTS PAGE ---------------------------------------------------------
-export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpdateLoan, onEditClient }) => {
+export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpdateLoan, onEditClient, onRecordPayment, onNewAgreement }) => {
   const { setSelectedClient } = useLoanStore();
   const [search, setSearch]           = useState("");
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -640,7 +414,6 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
 
   const selected       = selectedKey ? grouped[selectedKey] : null;
   const selectedLatest = selected ? selected[0] : null;
-  const selectedStats  = selected ? getBorrowerStats(selected) : null;
 
   const handleEdit = () => {
     if (!selectedLatest) return;
@@ -800,60 +573,29 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
         </div>
       </div>
 
-      {/* RIGHT  PORTFOLIO SUMMARY (no client selected) */}
+      {/* RIGHT  EMPTY STATE (no client selected) */}
       {!selected && (
-        <div className="flex-1 overflow-hidden w-full">
-          <PortfolioSummaryPanel loans={loans} theme={t} grouped={grouped} />
+        <div className="hidden lg:flex flex-1 items-center justify-center" style={{ background: t.bgCard }}>
+          <p className="text-xs uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>
+            Select a client to view their profile
+          </p>
         </div>
       )}
 
-      {/* RIGHT  CLIENT DETAIL (client selected)  FIXED: no longer absolute */}
-      {selected && selectedLatest && selectedStats && (
+      {/* RIGHT  CLIENT PROFILE (client selected) */}
+      {selected && selectedLatest && (
         <div className="flex flex-col flex-1 w-full lg:overflow-hidden" style={{ background: t.bgCard }}>
 
-          {/* Detail header */}
-          <div className="flex flex-col px-3 py-3 border-b shrink-0 gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 sm:gap-3"
-            style={{ borderColor: t.border }}>
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <button onClick={() => { setSelectedKey(null); setEditMode(false); }}
-                className="flex lg:hidden items-center justify-center w-8 h-8 rounded-xl border shrink-0"
-                style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
-                <ArrowLeft className="w-4 h-4" />
-              </button>
-
-              {/* Avatar with photo support */}
-              <div className="w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 overflow-hidden"
-                style={{ background: t.bgActive, borderColor: t.borderMid }}>
-                {selectedLatest.borrowerPhoto ? (
-                  <img src={selectedLatest.borrowerPhoto} alt={selectedLatest.borrowerName}
-                    className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-lg font-bold" style={{ fontFamily: mono, color: t.text }}>
-                    {selectedLatest.borrowerName.charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-
-              <div className="min-w-0">
-                <h3 className="text-sm font-bold truncate" style={{ fontFamily: mono, color: t.text }}>
-                  {selectedLatest.borrowerName}
-                </h3>
-                <p className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
-                  {selectedLatest.borrowerPhone}
-                  {selectedLatest.borrowerUsername && `  @${selectedLatest.borrowerUsername}`}
-                </p>
-                <div className="flex gap-1.5 mt-1 flex-wrap">
-                  {(selectedLatest.clientFlags || []).map(f => (
-                    <span key={f}
-                      className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold"
-                      style={{ fontFamily: mono, background: FLAG_META[f].bg, borderColor: FLAG_META[f].border, color: FLAG_META[f].color }}>
-                      {FLAG_META[f].icon}{f.toUpperCase()}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
+          {/* Toolbar */}
+          <div className="flex items-center justify-between px-3 py-3 border-b shrink-0 gap-2" style={{ borderColor: t.border }}>
+            <button onClick={() => { setSelectedKey(null); setEditMode(false); }}
+              className="flex lg:hidden items-center justify-center w-8 h-8 rounded-xl border shrink-0"
+              style={{ background: t.bgBtn, borderColor: t.border, color: t.textFaint }}>
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <p className="text-[10px] uppercase tracking-widest" style={{ fontFamily: mono, color: t.textFaint }}>
+              {editMode ? "Editing client" : "Profile"}
+            </p>
             <div className="flex items-center gap-1.5 shrink-0">
               {!editMode ? (
                 <button onClick={handleEdit}
@@ -883,77 +625,29 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({ loans, theme: t, onUpd
             </div>
           </div>
 
-          {/* Detail body */}
-          <div className="flex-1 px-3 py-3 space-y-3 sm:px-5 sm:py-5 sm:space-y-4 lg:overflow-y-auto">
-
-            {/* Stats row */}
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: "TOTAL LENT",    value: formatCompactCurrency(selectedStats.totalLent) },
-                { label: "INTEREST PAID", value: formatCompactCurrency(selectedStats.totalCollected) },
-                { label: "REPAY RATE",    value: `${selectedStats.repayRate}%` },
-                { label: "TRANSACTIONS",  value: String(selectedStats.totalTx) },
-              ].map(s => (
-                <div key={s.label} className="rounded-2xl p-4 border"
-                  style={{ background: t.bgActive, borderColor: t.border }}>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ fontFamily: mono, color: t.textFaint }}>{s.label}</p>
-                  <p className="text-sm font-bold" style={{ fontFamily: mono, color: "var(--foreground)" }}>{s.value}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* ID photo if available */}
-            {selectedLatest.borrowerIdPhoto && (
-              <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>ID DOCUMENT</p>
-                <img src={selectedLatest.borrowerIdPhoto} alt="ID" className="w-full max-h-48 object-contain rounded-xl" />
-              </div>
+          {/* Body */}
+          <div className="flex-1 px-3 py-3 sm:px-5 sm:py-5 lg:overflow-y-auto">
+            {editMode ? (
+              <ClientInfoCard
+                client={selectedLatest}
+                editMode={editMode}
+                editData={editData}
+                onChange={(k, v) => setEditData((p) => ({ ...p, [k]: v } as Partial<Loan>))}
+                onToggleFlag={toggleFlag}
+                onEdit={handleEdit}
+                onCancel={() => setEditMode(false)}
+                onSave={handleSave}
+                flagMeta={FLAG_META}
+              />
+            ) : (
+              <ClientProfilePanel
+                client={selectedLatest}
+                allLoans={loans}
+                theme={t}
+                onRecordPayment={onRecordPayment}
+                onNewAgreement={onNewAgreement}
+              />
             )}
-
-            {/* Contact & Profile */}
-            <ClientInfoCard
-              client={selectedLatest}
-              editMode={editMode}
-              editData={editData}
-              onChange={(k, v) => setEditData((p) => ({ ...p, [k]: v } as Partial<Loan>))}
-              onToggleFlag={toggleFlag}
-              onEdit={handleEdit}
-              onCancel={() => setEditMode(false)}
-              onSave={handleSave}
-              flagMeta={FLAG_META}
-            />
-
-            {/* Loan history */}
-            <div className="rounded-2xl border p-4" style={{ background: t.bg, borderColor: t.border }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ fontFamily: mono, color: t.textFaint }}>
-                LOAN HISTORY ({selected.length})
-              </p>
-              <div className="space-y-2">
-                {selected.map(l => (
-                  <div key={l.id} className="flex items-center justify-between p-3 rounded-xl border"
-                    style={{ background: t.bgActive, borderColor: t.border }}>
-                    <div>
-                      <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{l.loanNumber}</p>
-                      <p className="text-xs" style={{ color: t.textFaint }}>{l.category}  {l.originationDate}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>
-                        {formatCompactCurrency(l.loanAmount)}
-                      </p>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full border"
-                        style={{
-                          fontFamily: mono,
-                          color:       l.status === "Active" ? "#111214" : l.status === "Overdue" ? "#A82F2F" : "#1E9E5A",
-                          background:  l.status === "Active" ? "rgba(196,154,47,0.1)" : l.status === "Overdue" ? "rgba(248,113,113,0.1)" : "rgba(74,222,128,0.1)",
-                          borderColor: l.status === "Active" ? "rgba(196,154,47,0.3)" : l.status === "Overdue" ? "rgba(248,113,113,0.3)" : "rgba(74,222,128,0.3)",
-                        }}>
-                        {l.status.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       )}
