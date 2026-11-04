@@ -1,6 +1,6 @@
-﻿import React from "react";
+import React from "react";
 import { Loan, PortfolioMetrics, RepaymentTransaction } from "../types";
-import { formatCurrency, formatDate } from "../utils/loanCalculations";
+import { formatCurrency, formatCompactCurrency, formatDate } from "../utils/loanCalculations";
 import { ArrowUpRight, MapPin, Plus, Wallet } from "lucide-react";
 
 interface ClientProfilePanelProps {
@@ -186,7 +186,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
 
       {/* Header */}
       <div className="rounded-2xl border p-5" style={{ background: t.bgCard, borderColor: t.border }}>
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
           <div
             className="w-28 h-28 shrink-0 rounded-xl overflow-hidden border flex items-center justify-center"
             style={{ background: t.bgActive, borderColor: t.borderMid }}
@@ -204,7 +204,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
               </span>
             )}
           </div>
-          <div className="text-right min-w-0">
+          <div className="text-left sm:text-right min-w-0">
             <p className="text-4xl font-bold leading-none" style={{ color: t.text }}>
               {formatCurrency(outstanding)}
             </p>
