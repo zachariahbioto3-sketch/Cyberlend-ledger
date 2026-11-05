@@ -1,13 +1,15 @@
-import { cn } from "@/lib/utils"
-import { Search, Bell, User } from "lucide-react"
+﻿import { cn } from "@/lib/utils"
+import { Search, User } from "lucide-react"
+import { NotificationBell } from "./NotificationBell"
 
 interface HeaderProps {
   onSearch?: (q: string) => void
   onOpenSettings?: () => void
+  onOpenNotifications?: () => void
   className?: string
 }
 
-export function Header({ onSearch, onOpenSettings, className }: HeaderProps) {
+export function Header({ onSearch, onOpenSettings, onOpenNotifications, className }: HeaderProps) {
   return (
     <header className={cn(
       "flex items-center justify-between gap-4",
@@ -17,7 +19,7 @@ export function Header({ onSearch, onOpenSettings, className }: HeaderProps) {
       "pt-[calc(env(safe-area-inset-top,0px)+12px)]",
       className
     )}>
-      {/* Logo — mobile only */}
+      {/* Logo â€” mobile only */}
       <span className="font-brand text-[var(--foreground)] text-xl md:hidden">Cyberlend</span>
 
       {/* Search */}
@@ -25,7 +27,7 @@ export function Header({ onSearch, onOpenSettings, className }: HeaderProps) {
         <Search className="h-4 w-4 text-[var(--text-muted)] shrink-0" />
         <input
           type="text"
-          placeholder="Search loans, clients…"
+          placeholder="Search loans, clientsâ€¦"
           onChange={(e) => onSearch?.(e.target.value)}
           className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
         />
@@ -33,9 +35,7 @@ export function Header({ onSearch, onOpenSettings, className }: HeaderProps) {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        <button aria-label="Notifications" className="h-11 w-11 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--bg-raised)] transition-colors duration-150">
-          <Bell className="h-5 w-5" />
-        </button>
+        <NotificationBell onClick={() => onOpenNotifications?.()} />
         <button aria-label="Profile" onClick={onOpenSettings} className="h-11 w-11 flex items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] transition-colors duration-150">
           <User className="h-4 w-4" />
         </button>
@@ -43,6 +43,7 @@ export function Header({ onSearch, onOpenSettings, className }: HeaderProps) {
     </header>
   )
 }
+
 
 
 

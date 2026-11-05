@@ -4,8 +4,9 @@ import { Filesystem, Directory } from "@capacitor/filesystem";
 import { ToastProvider, useToast } from "./components/Toast";
 import { AnimatedSplash } from "./components/AnimatedSplash";
 import { useLoanStore } from "./store/loanStore";
+import { useNotificationStore } from "./store/notificationStore";
 import { Loan } from "./types";
-import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, PdfExportModal, WaitlistPage } from "./components";
+import { LoanLedgerTable, NewLoanModal, RecordPaymentModal, PdfExportModal, WaitlistPage, NotificationBell, NotificationPanel } from "./components";
 import { PortfolioDonut }      from "./components/PortfolioDonut";
 import { MonthlyCollections }  from "./components/MonthlyCollections";
 import { RepaymentProgress }   from "./components/RepaymentProgress";
@@ -88,6 +89,9 @@ function AppInner() {
   const [confirmReset,     setConfirmReset]     = useState(false);
   const [pdfOpen,          setPdfOpen]          = useState(false);
   const [settingsOpen,     setSettingsOpen]     = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const generateNotifications = useNotificationStore((s) => s.generate);
+  useEffect(() => { generateNotifications(loans); }, [loans]);
   const [locked,           setLocked]            = useState(() => isSecurityEnabled());
   const [mSearch,          setMSearch]          = useState("");
   const [mStatus,          setMStatus]          = useState("ALL");
@@ -168,7 +172,7 @@ function AppInner() {
       <div className="hidden lg:flex min-h-screen" style={{ background:"var(--background)" }}>
         <Sidebar active={desktopTab} onChange={setDesktopTab} />
         <div className={"flex-1 flex flex-col min-w-0 overflow-x-hidden" + (desktopTab === "analysis" ? " analysis-merge" : "")}>
-          <Header onSearch={() => {}} onOpenSettings={() => setSettingsOpen(true)} />
+          <Header onSearch={() => {}} onOpenSettings={() => setSettingsOpen(true)} onOpenNotifications={() => setNotificationsOpen(true)} />
 
           <div className="flex items-center justify-end gap-2 px-6 py-2 border-b" style={{ borderColor:"var(--border)" }}>
             <ExportMenu loans={loans} />
@@ -259,9 +263,7 @@ function AppInner() {
           <span className="font-brand text-xl" style={{ color:"var(--foreground)" }}>Cyberlend</span>
           <div className="flex gap-2">
             <ExportMenu loans={loans} />
-            <button className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
-              <Bell className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />
-            </button>
+            <NotificationBell variant="mobile" onClick={() => setNotificationsOpen(true)} />
             <button aria-label="Profile" onClick={() => setSettingsOpen(true)} className="w-9 h-9 rounded-full border flex items-center justify-center" style={{ borderColor:"var(--border)", background:"var(--bg-raised)" }}>
               <User className="w-4 h-4" style={{ color:"var(--muted-foreground)" }} />
             </button>
@@ -475,11 +477,14 @@ function AppInner() {
           </div>
         </div>
       )}
+
+      <NotificationPanel open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
     </>
   );
 }
 
 export default function App() { return <ToastProvider><AppInner /></ToastProvider>; }
+
 
 
 

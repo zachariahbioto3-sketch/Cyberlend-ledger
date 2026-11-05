@@ -1,4 +1,4 @@
-export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
+﻿export type LoanCategory = "Personal" | "Business" | "Emergency" | "Agriculture" | "Education" | "Medical" | "Other";
 
 export type LoanStatus = "Active" | "Overdue" | "Completed" | "Defaulted";
 
@@ -236,3 +236,25 @@ export interface LoanAgreement {
   linkedLoanId?: string;
   createdAt: string;
 }
+
+export type NotificationType = "upcoming" | "overdue";
+export type NotificationSeverity = "upcoming" | "dueToday" | "overdue" | "defaulter";
+
+export interface LoanNotification {
+  id: string;
+  loanId: string;
+  loanNumber: string;
+  borrowerName: string;
+  type: NotificationType;
+  severity: NotificationSeverity;
+  dueDate: string;
+  daysOverdue?: number;
+  daysLeft?: number;
+  amountDue: number;
+  remainingBalance: number;
+  message: string;
+  detail: string;
+  read: boolean;
+  createdAt: string;
+}
+

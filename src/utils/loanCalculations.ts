@@ -1,8 +1,8 @@
-import { Loan, PortfolioMetrics, RepaymentRow, InterestBasis } from "../types";
+﻿import { Loan, PortfolioMetrics, RepaymentRow, InterestBasis } from "../types";
 
 const DEFAULT_INTEREST_RATE = 0.20;
 
-// ─── EXISTING CYBERLEND LOAN MODEL ───────────────────────────────────────────
+// â”€â”€â”€ EXISTING CYBERLEND LOAN MODEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Recurring interest-only loan model:
 // Borrower pays interest each month, principal stays unchanged.
 // Loan closes only when borrower pays principal + interest together.
@@ -14,7 +14,7 @@ export function calculateCyberlendLoan(principal: number, term: number = 5) {
   return { monthlyInterest, totalRepayable, monthlyPayment };
 }
 
-// ─── AGREEMENT REPAYMENT SCHEDULE ────────────────────────────────────────────
+// â”€â”€â”€ AGREEMENT REPAYMENT SCHEDULE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Generates full repayment schedule table for the loan agreement PDF.
 // Supports Flat Rate and Reducing Balance interest basis.
 
@@ -79,7 +79,7 @@ export function generateRepaymentSchedule(
   return rows;
 }
 
-// ─── SCHEDULE SUMMARY HELPERS ─────────────────────────────────────────────────
+// â”€â”€â”€ SCHEDULE SUMMARY HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function scheduleTotalInterest(rows: RepaymentRow[]): number {
   return rows.reduce((sum, r) => sum + r.interest, 0);
@@ -89,7 +89,7 @@ export function scheduleTotalDue(rows: RepaymentRow[]): number {
   return rows.reduce((sum, r) => sum + r.totalDue, 0);
 }
 
-// ─── DATE HELPER ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ DATE HELPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function addMonths(dateStr: string, months: number): string {
   try {
@@ -101,7 +101,7 @@ function addMonths(dateStr: string, months: number): string {
   }
 }
 
-// ─── PORTFOLIO METRICS ────────────────────────────────────────────────────────
+// â”€â”€â”€ PORTFOLIO METRICS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function calculatePortfolioMetrics(loans: Loan[], totalCapital: number = 0): PortfolioMetrics {
   let totalPrincipalLent       = 0;
@@ -157,7 +157,7 @@ export function calculatePortfolioMetrics(loans: Loan[], totalCapital: number = 
   };
 }
 
-// ─── LOAN LIFECYCLE ───────────────────────────────────────────────────────────
+// â”€â”€â”€ LOAN LIFECYCLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function toLocalISO(d: Date): string {
   const y = d.getFullYear();
@@ -190,6 +190,21 @@ export function updateLoanAfterInterest(loan: Loan, amount: number = loan.monthl
   };
 }
 
+// Replays a loan's interest transactions in order to derive the correct
+// carryForward balance from scratch. Used after deleting a transaction, since
+// the carry is a running total that can't just be left as-is once history changes.
+export function recomputeCarryForward(monthlyInterest: number, interestTxs: { date: string; id: string; amount: number }[]): number {
+  const sorted = [...interestTxs].sort((a, b) => (a.date === b.date ? a.id.localeCompare(b.id) : a.date.localeCompare(b.date)));
+  let carry = 0;
+  for (const tx of sorted) {
+    const amountDue = carry + monthlyInterest;
+    const paid = Math.max(0, Math.min(tx.amount, amountDue));
+    const fullyPaid = paid >= amountDue;
+    carry = fullyPaid ? 0 : amountDue - paid;
+  }
+  return carry;
+}
+
 export function closeLoanWithPrincipal(loan: Loan): Loan {
   return {
     ...loan,
@@ -199,7 +214,7 @@ export function closeLoanWithPrincipal(loan: Loan): Loan {
   };
 }
 
-// ─── FORMATTING ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ FORMATTING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-KE", {
@@ -243,3 +258,4 @@ export function numberToWords(amount: number): string {
   const rounded = Math.round(amount);
   return convert(rounded) + " Shillings Only";
 }
+
