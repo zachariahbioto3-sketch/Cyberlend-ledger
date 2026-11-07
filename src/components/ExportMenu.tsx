@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Download, FileText, FileSpreadsheet, FileType, Loader2 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
@@ -44,7 +44,7 @@ export function ExportMenu({ loans }: { loans: Loan[] }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56 border border-[rgba(243,234,216,0.1)] bg-[var(--bg-surface)] text-[var(--text-primary)]"
+        className="w-56 border border-[var(--border)] bg-[var(--popover)] backdrop-blur-xl text-[var(--popover-foreground)] shadow-xl"
       >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="px-3 py-2 text-sm font-semibold text-[var(--text-primary)]">

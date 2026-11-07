@@ -43,13 +43,13 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ metrics, l
           </div>
           <div>
             <h4 className="text-sm font-bold text-white" style={{ fontFamily: "var(--font-mono)" }}>
-              {overdueLoans.length} OVERDUE Ã¢â‚¬â€ COLLECT NOW
+              {overdueLoans.length} OVERDUE — COLLECT NOW
             </h4>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/40">
               {overdueLoans.map((l) => (
                 <span key={l.id}>
                   <span className="font-semibold text-white/70">{l.borrowerName}</span>
-                  {' Ã‚· '}
+                  {' · '}
                   <span>{formatCurrency(l.monthlyPayment)} overdue</span>
                 </span>
               ))}

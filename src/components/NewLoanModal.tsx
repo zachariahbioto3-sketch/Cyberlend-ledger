@@ -188,7 +188,7 @@ if (!isOpen) return null;
                       style={{ background: t.bgCard, borderColor: t.border }}>
                       <div>
                         <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>{l.loanNumber}</p>
-                        <p className="text-[9px]" style={{ color: t.textFaint }}>{l.originationDate} Â· {l.category}</p>
+                        <p className="text-[9px]" style={{ color: t.textFaint }}>{l.originationDate} · {l.category}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-bold" style={{ fontFamily: mono, color: t.text }}>

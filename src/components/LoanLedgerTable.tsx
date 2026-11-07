@@ -56,7 +56,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: t.text }}>MASTER LEDGER</h2>
-            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{borrowerGroups.length} BORROWERS Â· {loans.length} LOANS - {formatCurrency(loans.reduce((s, l) => s + (l.status === "Active" || l.status === "Overdue" ? l.remainingBalance : 0), 0))} OUTSTANDING</p>
+            <p className="text-[10px] mt-0.5" style={{ fontFamily: mono, color: t.textFaint }}>{borrowerGroups.length} BORROWERS · {loans.length} LOANS - {formatCurrency(loans.reduce((s, l) => s + (l.status === "Active" || l.status === "Overdue" ? l.remainingBalance : 0), 0))} OUTSTANDING</p>
           </div>
           <div className="flex items-center gap-2">
             <ExportMenu loans={loans} />
@@ -137,7 +137,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
                       <ProfileAvatar name={loan.borrowerName} photo={loan.borrowerPhoto} className="h-7 w-7" textClassName="text-[10px]" />
                       <div>
                       <p className="font-semibold" style={{ color: t.text }}>{loan.borrowerName}</p>
-                        <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerPhone} Â· {group.length} LOAN{group.length === 1 ? "" : "S"}</p>
+                        <p className="text-[10px]" style={{ color: t.textFaint }}>{loan.borrowerPhone} · {group.length} LOAN{group.length === 1 ? "" : "S"}</p>
                       </div>
                     </div>
                   </td>
@@ -210,7 +210,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold uppercase tracking-widest" style={{ fontFamily: mono, color: t.text }}>{selectedBorrower[0].borrowerName}</h3>
-                <p className="text-[10px]" style={{ color: t.textFaint }}>{selectedBorrower[0].borrowerPhone} Â· {selectedBorrower.length} LOANS</p>
+                <p className="text-[10px]" style={{ color: t.textFaint }}>{selectedBorrower[0].borrowerPhone} · {selectedBorrower.length} LOANS</p>
               </div>
               <button onClick={() => setSelectedBorrower(null)} className="rounded-lg px-2 py-1 text-xs" style={{ color: t.textFaint }}>CLOSE</button>
             </div>
@@ -218,7 +218,7 @@ export const LoanLedgerTable: React.FC<LoanLedgerTableProps> = ({ loans, onSelec
               {selectedBorrower.map((loan) => {
                 const ss = statusStyle(loan.status);
                 return <button key={loan.id} onClick={() => { setSelectedBorrower(null); onSelectLoan(loan); }} className="flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors hover:bg-[var(--bg-active)]" style={{ borderColor: t.border }}>
-                  <div><p className="text-xs font-bold" style={{ color: t.text }}>{loan.loanNumber}</p><p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} Â· {formatDate(loan.originationDate)}</p></div>
+                  <div><p className="text-xs font-bold" style={{ color: t.text }}>{loan.loanNumber}</p><p className="text-[10px]" style={{ color: t.textFaint }}>{loan.category} · {formatDate(loan.originationDate)}</p></div>
                   <div className="text-right"><p className="text-xs font-bold" style={{ fontFamily: mono, color: t.text }}>{formatCurrency(loan.remainingBalance)}</p><span className="text-[9px] font-bold" style={{ color: ss.color }}>{loan.status.toUpperCase()}</span></div>
                 </button>;
               })}

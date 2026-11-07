@@ -121,7 +121,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
         <div
           onClick={(e) => e.stopPropagation()}
           className="absolute top-16 right-6 w-[380px] max-h-[520px] rounded-[16px] border shadow-xl flex flex-col"
-          style={{ background: "var(--card)", borderColor: "var(--border)" }}
+          style={{ background: "var(--popover)", borderColor: "var(--border)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
         >
           <div className="flex items-center justify-between px-4 pt-4 pb-1">
             <h3 className="text-sm font-bold" style={{ color: "var(--foreground)" }}>Notifications</h3>
@@ -148,3 +148,4 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
     </>
   );
 }
+

@@ -39,7 +39,7 @@ import { formatCompactCurrency } from "./utils/loanCalculations";
 
 export type Theme = "dark" | "light";
 
-// CSS-variable shim Ã¢â‚¬â€ keeps old child components working without modifying them
+// CSS-variable shim — keeps old child components working without modifying them
 const t = {
   bg:           "var(--background)",
   bgCard:       "var(--card)",
@@ -111,7 +111,7 @@ function AppInner() {
   const handleSavePayment = (loanId: string, txs: any[]) => {
     txs.forEach((tx) => tx.paymentType === "Principal" ? closeLoan(loanId, tx) : recordPayment(loanId, tx));
     setPaymentLoan(null);
-    showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded Ã¢â‚¬â€œ loan rolled over", "success");
+    showToast(txs.some((x) => x.paymentType === "Principal") ? "Loan settled and closed" : "Interest recorded – loan rolled over", "success");
   };
   const handleExportCSV = async () => {
     if (!loans.length) { showToast("No loans to export", "error"); return; }
@@ -235,10 +235,10 @@ function AppInner() {
                     <Bell className="w-4 h-4 text-red-400" />
                   </div>
                   <div>
-                    <h4 className="cl-mono text-sm font-bold" style={{ color:"var(--foreground)" }}>{overdueLoans.length} OVERDUE Ã¢â‚¬â€ COLLECT NOW</h4>
+                    <h4 className="cl-mono text-sm font-bold" style={{ color:"var(--foreground)" }}>{overdueLoans.length} OVERDUE — COLLECT NOW</h4>
                     <div className="mt-1 flex flex-wrap gap-x-4 text-xs" style={{ color:"var(--muted-foreground)" }}>
                       {overdueLoans.map((l) => (
-                        <span key={l.id}><span className="font-semibold" style={{ color:"var(--foreground)" }}>{l.borrowerName}</span> Ã¢â‚¬â€ {formatCompactCurrency(l.monthlyPayment)} overdue</span>
+                        <span key={l.id}><span className="font-semibold" style={{ color:"var(--foreground)" }}>{l.borrowerName}</span> — {formatCompactCurrency(l.monthlyPayment)} overdue</span>
                       ))}
                     </div>
                   </div>
@@ -322,10 +322,10 @@ function AppInner() {
               <div className="mx-4 mt-3 rounded-[10px] p-3 border flex items-start gap-2" style={{ background:"rgba(239,68,68,0.07)", borderColor:"rgba(239,68,68,0.20)" }}>
                 <Bell className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="cl-mono text-xs font-bold" style={{ color:"#f87171" }}>{overdueLoans.length} OVERDUE Ã¢â‚¬â€ COLLECT NOW</p>
+                  <p className="cl-mono text-xs font-bold" style={{ color:"#f87171" }}>{overdueLoans.length} OVERDUE — COLLECT NOW</p>
                   {overdueLoans.map((l) => (
                     <p key={l.id} className="cl-mono text-[10px] mt-0.5" style={{ color:"var(--muted-foreground)" }}>
-                      <span style={{ color:"var(--foreground)", fontWeight:700 }}>{l.borrowerName}</span> Ã¢â‚¬â€ {formatCompactCurrency(l.monthlyInterest)} due
+                      <span style={{ color:"var(--foreground)", fontWeight:700 }}>{l.borrowerName}</span> — {formatCompactCurrency(l.monthlyInterest)} due
                     </p>
                   ))}
                 </div>
@@ -385,7 +385,7 @@ function AppInner() {
                           </div>
                           <div>
                             <p className="text-xs font-bold" style={{ color:"var(--foreground)" }}>{loan.borrowerName}</p>
-                            <p className="cl-mono text-[10px]" style={{ color:"var(--text-faint)" }}>{group.length} LOAN{group.length === 1 ? "" : "S"} Ã‚Â· {loan.category}</p>
+                            <p className="cl-mono text-[10px]" style={{ color:"var(--text-faint)" }}>{group.length} LOAN{group.length === 1 ? "" : "S"} · {loan.category}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
