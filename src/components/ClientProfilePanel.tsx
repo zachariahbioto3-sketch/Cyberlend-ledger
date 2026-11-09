@@ -313,6 +313,25 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
         {client.borrowerPhone && <InfoRow theme={t} icon={Phone} label="Phone number" value={client.borrowerPhone} />}
         <InfoRow theme={t} icon={Briefcase} label="Occupation" value={occupation || "—"} />
         {address && <InfoRow theme={t} icon={MapPin} label="Address" value={address} />}
+        <InfoRow theme={t} icon={CreditCard} label="ID number" value={client.borrowerIdNumber || "—"} />
+        <div className="px-5 py-3 border-b" style={{ borderColor: t.border }}>
+          <p className="text-[9px] uppercase tracking-wide mb-2" style={{ color: t.textFaint }}>ID photo</p>
+          {client.borrowerIdPhoto ? (
+            <img
+              src={client.borrowerIdPhoto}
+              alt="ID document"
+              className="w-full h-28 object-cover rounded-xl border"
+              style={{ borderColor: t.border }}
+            />
+          ) : (
+            <div
+              className="w-full h-28 rounded-xl border-2 border-dashed flex items-center justify-center"
+              style={{ borderColor: t.border, background: t.bgActive }}
+            >
+              <span className="text-xs" style={{ color: t.textFaint }}>No ID image</span>
+            </div>
+          )}
+        </div>
         <InfoRow theme={t} icon={Clock} label="Next due" value={dueLine} last />
       </GroupCard>
 

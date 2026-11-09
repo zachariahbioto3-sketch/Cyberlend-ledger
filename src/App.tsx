@@ -47,7 +47,7 @@ const t = {
   bgSidebar:    "var(--card)",
   bgNav:        "var(--card)",
   bgInput:      "var(--input)",
-  bgModal:      "var(--card)",
+  bgModal:      "var(--popover)",
   bgBtn:        "var(--bg-raised)",
   bgActive:     "var(--bg-raised)",
   border:       "var(--border)",
@@ -414,7 +414,7 @@ function AppInner() {
 
         {mobileBorrowerLoans && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setMobileBorrowerLoans(null)}>
-            <div className="w-full max-w-sm rounded-2xl border p-5" style={{ background: "var(--card)", borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-sm rounded-2xl border p-5" style={{ background: "var(--popover)", borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
               <div className="mb-4 flex items-center justify-between"><div><p className="cl-mono text-sm font-bold" style={{ color: "var(--foreground)" }}>{mobileBorrowerLoans[0].borrowerName}</p><p className="cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{mobileBorrowerLoans.length} LOANS</p></div><button onClick={() => setMobileBorrowerLoans(null)} style={{ color: "var(--text-faint)" }}>CLOSE</button></div>
               <div className="space-y-2">{mobileBorrowerLoans.map((loan) => <button key={loan.id} onClick={() => { setMobileBorrowerLoans(null); setDetailLoan(loan); }} className="flex w-full items-center justify-between rounded-xl border p-3 text-left" style={{ borderColor: "var(--border)" }}><span><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{loan.loanNumber}</span><span className="block cl-mono text-[10px]" style={{ color: "var(--text-faint)" }}>{loan.category}</span></span><span className="text-right"><span className="block cl-mono text-xs font-bold" style={{ color: "var(--foreground)" }}>{formatCompactCurrency(loan.remainingBalance)}</span><span className="block cl-mono text-[9px]" style={{ color: "var(--muted-foreground)" }}>{loan.status}</span></span></button>)}</div>
             </div>
@@ -427,7 +427,7 @@ function AppInner() {
       {/* -- MODALS -- */}
       {capitalModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)" }}>
-          <div className="rounded-[12px] p-6 border w-full max-w-sm" style={{ background:"var(--card)", borderColor:"var(--border)" }}>
+          <div className="rounded-[12px] p-6 border w-full max-w-sm" style={{ background:"var(--popover)", borderColor:"var(--border)" }}>
             <p className="cl-mono text-sm font-bold tracking-widest mb-1" style={{ color:"var(--foreground)" }}>SET TOTAL CAPITAL</p>
             <p className="cl-mono text-[10px] mb-4" style={{ color:"#5F6472" }}>Total pool of money available to the lending business.</p>
             <input type="number" value={capitalInput} onChange={(e) => setCapitalInput(e.target.value)} placeholder="e.g. 500000"
@@ -453,7 +453,7 @@ function AppInner() {
       {detailLoan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setDetailLoan(null)}>
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border p-4 sm:p-5"
-            style={{ background: t.bgCard, borderColor: t.border }}
+            style={{ background: t.bgModal, borderColor: t.border }}
             onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-end gap-2 mb-2">
               <button onClick={() => setDeleteTarget(detailLoan)}

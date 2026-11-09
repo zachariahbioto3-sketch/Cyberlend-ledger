@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Edit3, Camera } from "lucide-react";
 import { Loan, ClientFlag } from "../types";
 import { compressImage } from "../utils/imageUtils";
+import { PhotoCapture } from "./PhotoCapture";
 
 interface ClientEditModalProps {
   isOpen:  boolean;
@@ -103,19 +104,15 @@ export const ClientEditModal: React.FC<ClientEditModalProps> = ({ isOpen, onClos
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-2" style={labelStyle}>
                   {key === "borrowerPhoto" ? "PROFILE PHOTO" : "ID PHOTO"}
                 </label>
-                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border cursor-pointer"
-                  style={{ height: 80, borderColor: t.border, background: t.bgActive, borderStyle: "dashed" }}>
-                  {form[key] ? (
-                    <img src={form[key] as string} alt="" className="w-full h-full object-cover rounded-xl" />
-                  ) : (
-                    <>
-                      <Camera className="w-5 h-5" style={{ color: t.textFaint }} />
-                      <span className="text-[9px]" style={{ fontFamily: mono, color: t.textFaint }}>UPLOAD</span>
-                    </>
-                  )}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhoto(key, e)} />
-                </label>
-                {key === "borrowerPhoto" && form[key] && <button type="button" onClick={() => set(key, "")} className="mt-1 text-[9px] text-red-400">REMOVE PHOTO</button>}
+                <PhotoCapture
+                  value={(form[key] as string) || ""}
+                  onChange={(img) => set(key, img)}
+                  label={key === "borrowerPhoto" ? "Profile Photo" : "ID Photo"}
+                  theme={t}
+                  facingMode={key === "borrowerPhoto" ? "user" : "environment"}
+                  height={80}
+                />
+                {form[key] && <button type="button" onClick={() => set(key, "")} className="mt-1 text-[9px] text-red-400">REMOVE PHOTO</button>}
               </div>
             ))}
           </div>

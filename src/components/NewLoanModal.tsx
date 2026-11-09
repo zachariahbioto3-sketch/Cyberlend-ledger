@@ -3,6 +3,7 @@ import { X, PlusCircle, Check, ChevronDown, User, AlertTriangle, Clock, FileText
 import { LoanCategory, LoanPurpose, Loan } from "../types";
 import { calculateCyberlendLoan, formatCurrency, formatCompactCurrency } from "../utils/loanCalculations";
 import { AgreementForm } from "./AgreementForm";
+import { PhotoCapture } from "./PhotoCapture";
 
 const LOAN_PURPOSES: LoanPurpose[] = [
   "Business Capital","School Fees","Medical Emergency","Land/Property",
@@ -38,6 +39,8 @@ if (!isOpen) return null;
   const [borrowerPhone,  setBorrowerPhone]  = useState(prefillClient?.borrowerPhone  || "");
   const [borrowerName,   setBorrowerName]   = useState(prefillClient?.borrowerName   || "");
   const [borrowerEmail,  setBorrowerEmail]  = useState(prefillClient?.borrowerEmail  || "");
+  const [borrowerPhoto,   setBorrowerPhoto]   = useState(prefillClient?.borrowerPhoto   || "");
+  const [borrowerIdPhoto, setBorrowerIdPhoto] = useState(prefillClient?.borrowerIdPhoto || "");
   const [loanAmount,     setLoanAmount]     = useState<number>(5000);
   const [term,           setTerm]           = useState<number>(5);
   const [category,       setCategory]       = useState<LoanCategory>("Personal");
@@ -69,6 +72,8 @@ if (!isOpen) return null;
     if (isReturning && latestLoan && !prefillClient) {
       setBorrowerName(latestLoan.borrowerName);
       setBorrowerEmail(latestLoan.borrowerEmail || "");
+      setBorrowerPhoto(latestLoan.borrowerPhoto || "");
+      setBorrowerIdPhoto(latestLoan.borrowerIdPhoto || "");
     }
   }, [isReturning, latestLoan]);
 
@@ -85,8 +90,8 @@ if (!isOpen) return null;
       borrowerName:    borrowerName.trim(),
       borrowerPhone:   borrowerPhone.trim(),
       borrowerEmail:   borrowerEmail.trim(),
-      borrowerPhoto:   latestLoan?.borrowerPhoto    || prefillClient?.borrowerPhoto    || "",
-      borrowerIdPhoto: latestLoan?.borrowerIdPhoto  || prefillClient?.borrowerIdPhoto  || "",
+      borrowerPhoto,
+      borrowerIdPhoto,
       borrowerAddress: latestLoan?.borrowerAddress  || prefillClient?.borrowerAddress  || "",
       borrowerIdNumber:latestLoan?.borrowerIdNumber || prefillClient?.borrowerIdNumber || "",
       borrowerUsername:latestLoan?.borrowerUsername || prefillClient?.borrowerUsername || "",
@@ -127,7 +132,7 @@ if (!isOpen) return null;
             </div>
             <div>
               <h3 className="text-sm font-bold tracking-widest" style={{ fontFamily: mono, color: t.text }}>
-                {isReturning ? "NEW LOAN â€” RETURNING CLIENT" : "NEW LOAN"}
+                {isReturning ? "NEW LOAN — RETURNING CLIENT" : "NEW LOAN"}
               </h3>
               <p className="text-[10px]" style={{ color: t.textFaint }}>
                 {isReturning ? `${returningClientLoans.length} previous loan(s) on file` : "Add borrower to ledger"}
@@ -166,7 +171,7 @@ if (!isOpen) return null;
                     {outstandingBalance > 0 && (
                       <span className="flex items-center gap-1 text-xs" style={{ fontFamily: mono, color: "#8A5B00" }}>
                         <AlertTriangle className="w-3 h-3" />
-                        {formatCompactCurrency(outstandingBalance)} outstanding â€” rolled into new loan
+                        {formatCompactCurrency(outstandingBalance)} outstanding — rolled into new loan
                       </span>
                     )}
                   </div>
@@ -209,7 +214,23 @@ if (!isOpen) return null;
               </div>
             )}
 
-            {/* Phone â€” triggers returning client lookup */}
+            {/* Photo documents */}
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-3"
+                style={{ fontFamily: mono, color: t.textFaint }}>PHOTO DOCUMENTS</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs mb-2 font-bold uppercase" style={labelStyle}>Passport Photo</p>
+                  <PhotoCapture value={borrowerPhoto} onChange={setBorrowerPhoto} label="Passport Photo" theme={t} facingMode="user" />
+                </div>
+                <div>
+                  <p className="text-xs mb-2 font-bold uppercase" style={labelStyle}>ID Card Photo</p>
+                  <PhotoCapture value={borrowerIdPhoto} onChange={setBorrowerIdPhoto} label="ID Card Photo" theme={t} facingMode="environment" />
+                </div>
+              </div>
+            </div>
+
+            {/* Phone — triggers returning client lookup */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[9px] font-bold uppercase tracking-widest mb-1" style={labelStyle}>

@@ -9,6 +9,7 @@ import {
 import { useLoanStore } from "../store/loanStore";
 import { ClientInfoCard } from "./ClientInfoCard";
 import { ClientProfilePanel } from "./ClientProfilePanel";
+import { PhotoCapture } from "./PhotoCapture";
 import { Loan, ClientFlag, LoanPurpose } from "../types";
 import { formatCompactCurrency, calculatePortfolioMetrics } from "../utils/loanCalculations";
 import { compressImage } from "../utils/imageUtils";
@@ -168,45 +169,25 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ theme: t, onClose, onSa
               {/* Passport photo */}
               <div>
                 <p className="text-xs mb-2 font-bold uppercase" style={labelStyle}>Passport Photo</p>
-                <input ref={passportRef} type="file" accept="image/*" className="hidden"
-                  onChange={e => handleImage("borrowerPhoto", e.target.files?.[0])} />
-                <button onClick={() => passportRef.current?.click()}
-                  className="w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                  style={{ borderColor: form.borrowerPhoto ? "#111214" : t.border, background: t.bgActive }}>
-                  {form.borrowerPhoto ? (
-                    <img src={form.borrowerPhoto} alt="passport"
-                      className="w-full h-full object-cover rounded-2xl" />
-                  ) : (
-                    <>
-                      <Camera className="w-6 h-6" style={{ color: t.textFaint }} />
-                      <span className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
-                        UPLOAD PHOTO
-                      </span>
-                    </>
-                  )}
-                </button>
+                <PhotoCapture
+                  value={form.borrowerPhoto}
+                  onChange={(img) => set("borrowerPhoto", img)}
+                  label="Passport Photo"
+                  theme={t}
+                  facingMode="user"
+                />
               </div>
 
               {/* ID card */}
               <div>
                 <p className="text-xs mb-2 font-bold uppercase" style={labelStyle}>ID Card Photo</p>
-                <input ref={idRef} type="file" accept="image/*" className="hidden"
-                  onChange={e => handleImage("borrowerIdPhoto", e.target.files?.[0])} />
-                <button onClick={() => idRef.current?.click()}
-                  className="w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                  style={{ borderColor: form.borrowerIdPhoto ? "#111214" : t.border, background: t.bgActive }}>
-                  {form.borrowerIdPhoto ? (
-                    <img src={form.borrowerIdPhoto} alt="id"
-                      className="w-full h-full object-cover rounded-2xl" />
-                  ) : (
-                    <>
-                      <Upload className="w-6 h-6" style={{ color: t.textFaint }} />
-                      <span className="text-xs" style={{ color: t.textFaint, fontFamily: mono }}>
-                        UPLOAD ID
-                      </span>
-                    </>
-                  )}
-                </button>
+                <PhotoCapture
+                  value={form.borrowerIdPhoto}
+                  onChange={(img) => set("borrowerIdPhoto", img)}
+                  label="ID Card Photo"
+                  theme={t}
+                  facingMode="environment"
+                />
               </div>
             </div>
           </div>

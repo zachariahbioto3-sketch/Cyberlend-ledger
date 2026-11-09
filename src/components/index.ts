@@ -14,6 +14,7 @@ export { ClientEditModal } from "./ClientEditModal";
 export { GoalDrawer } from "./GoalDrawer";
 export { NotificationBell } from "./NotificationBell";
 export { NotificationPanel } from "./NotificationPanel";
+export { PhotoCapture } from "./PhotoCapture";
 export { AgreementsPage } from './AgreementsPage';
 export { AgreementForm } from './AgreementForm';
 
