@@ -124,6 +124,31 @@ export const ClientInfoCard: React.FC<ClientInfoCardProps> = ({
           </label>
         </Group>
 
+        <Group title="ID photo">
+          <label className={cn(
+            "flex min-h-24 cursor-pointer items-center gap-4 rounded-xl border border-dashed p-3",
+            editMode ? "border-foreground/20" : "cursor-default border-foreground/10"
+          )}>
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-foreground/15 bg-muted">
+              {source.borrowerIdPhoto ? (
+                <img src={String(source.borrowerIdPhoto)} alt="ID document" className="h-full w-full object-cover" />
+              ) : <Camera className="h-5 w-5 text-muted-fg" />}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium">{editMode ? (source.borrowerIdPhoto ? "Change ID photo" : "Add ID photo") : "Client ID photo"}</p>
+              <p className="mt-1 text-xs text-muted-fg">
+                {editMode ? "Upload or update if the client didn't have it at registration." : "Shown alongside the ID number on the client profile."}
+              </p>
+              {editMode && source.borrowerIdPhoto && <button type="button" onClick={(e) => { e.preventDefault(); onChange("borrowerIdPhoto", ""); }} className="mt-2 text-xs text-red-400">Remove photo</button>}
+            </div>
+            {editMode && <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              compressImage(file).then((image) => onChange("borrowerIdPhoto", image));
+            }} />}
+          </label>
+        </Group>
+
         <Group title="Identity">
           <FieldGrid defs={IDENTITY} source={source} editMode={editMode} onChange={onChange} />
         </Group>

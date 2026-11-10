@@ -3,7 +3,7 @@ import { Loan, PortfolioMetrics, RepaymentTransaction } from "../types";
 import { formatCurrency, formatCompactCurrency, formatDate } from "../utils/loanCalculations";
 import {
   ArrowUpRight, MapPin, Plus, Wallet, Phone, Briefcase, Clock,
-  ChevronRight, CreditCard, FileText,
+  ChevronRight, CreditCard, FileText, X,
 } from "lucide-react";
 
 interface ClientProfilePanelProps {
@@ -191,6 +191,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
 }) => {
   const mono = "var(--font-mono)";
   const today = startOfToday();
+  const [lightbox, setLightbox] = React.useState<string | null>(null);
 
   const clientLoans = allLoans
     .filter((l) => l.borrowerName === client.borrowerName)
@@ -320,7 +321,8 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
             <img
               src={client.borrowerIdPhoto}
               alt="ID document"
-              className="w-full h-28 object-cover rounded-xl border"
+              onClick={() => setLightbox(client.borrowerIdPhoto!)}
+              className="w-full h-28 object-cover rounded-xl border cursor-zoom-in"
               style={{ borderColor: t.border }}
             />
           ) : (
@@ -464,6 +466,29 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
           )}
         </div>
       </GroupCard>
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center p-6"
+          style={{ background: "rgba(10,10,12,0.92)" }}
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            onClick={() => setLightbox(null)}
+            aria-label="Close"
+            className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(255,255,255,0.1)" }}
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+          <img
+            src={lightbox}
+            alt="ID document — full view"
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-full max-w-full rounded-2xl object-contain"
+          />
+        </div>
+      )}
     </div>
   );
 };
