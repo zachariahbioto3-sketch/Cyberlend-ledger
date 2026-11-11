@@ -146,19 +146,24 @@ function InfoRow({
 }
 
 function StatRow({
-  theme: t, label, value, last,
-}: { theme: any; label: string; value: number; last?: boolean }) {
+  theme: t, label, value, last, open, onClick,
+}: { theme: any; label: string; value: number; last?: boolean; open?: boolean; onClick?: () => void }) {
   return (
-    <div
-      className={`flex items-center justify-between px-5 py-3.5 ${last ? "" : "border-b"}`}
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full flex items-center justify-between px-5 py-3.5 ${last ? "" : "border-b"}`}
       style={{ borderColor: t.border }}
     >
       <p className="text-sm" style={{ color: t.text }}>{label}</p>
       <div className="flex items-center gap-1">
         <span className="text-sm font-bold" style={{ color: t.text }}>{value}</span>
-        <ChevronRight className="w-3.5 h-3.5" style={{ color: t.textFaint }} />
+        <ChevronRight
+          className="w-3.5 h-3.5 transition-transform"
+          style={{ color: t.textFaint, transform: open ? "rotate(90deg)" : "rotate(0deg)" }}
+        />
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -192,6 +197,8 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
   const mono = "var(--font-mono)";
   const today = startOfToday();
   const [lightbox, setLightbox] = React.useState<string | null>(null);
+  const [loansOpen, setLoansOpen] = React.useState(false);
+  const [txOpen, setTxOpen] = React.useState(false);
 
   const clientLoans = allLoans
     .filter((l) => l.borrowerName === client.borrowerName)
@@ -232,17 +239,24 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
 
   const duesByLoan = clientLoans.map((l) => ({ loan: l, rows: buildDues(l, today) }));
 
-  // Maps each payment to the month it was applied to, with that month's totals
+  // A frozen, chronological ledger: each payment's "remaining" is computed once,
+  // from only the payments before it (same running-carry logic as the loan's real
+  // carryForward tracking) — so recording a later payment never rewrites what an
+  // earlier payment's row already showed.
   const cycleByTx = new Map<string, { cycle: number; due: number; paid: number; remaining: number }>();
-  duesByLoan.forEach(({ rows }) =>
-    rows.forEach((r) =>
-      r.txIds.forEach((id) => {
-        if (!cycleByTx.has(id)) {
-          cycleByTx.set(id, { cycle: r.cycle, due: r.due, paid: r.paid, remaining: r.carryOut });
-        }
-      })
-    )
-  );
+  clientLoans.forEach((l) => {
+    const sorted = (l.transactions || [])
+      .filter((tx) => tx.status === "Completed" && tx.paymentType === "Interest")
+      .sort((a, b) => (a.date === b.date ? a.id.localeCompare(b.id) : Date.parse(a.date) - Date.parse(b.date)));
+    let carry = 0;
+    sorted.forEach((tx, i) => {
+      const due = carry + l.monthlyInterest;
+      const paid = tx.amount;
+      const remaining = Math.max(0, due - paid);
+      cycleByTx.set(tx.id, { cycle: i + 1, due, paid, remaining });
+      carry = remaining;
+    });
+  });
 
   const payments = clientLoans
     .flatMap((l) => (l.transactions || []).map((tx: RepaymentTransaction) => ({ tx, loanNumber: l.loanNumber })))
@@ -365,11 +379,12 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
       {/* Stats group */}
       <GroupCard theme={t}>
         <GroupLabel theme={t}>Overview</GroupLabel>
-        <StatRow theme={t} label="Loans" value={clientLoans.length} />
-        <StatRow theme={t} label="Transactions" value={totalTransactions} last />
+        <StatRow theme={t} label="Loans" value={clientLoans.length} open={loansOpen} onClick={() => setLoansOpen((v) => !v)} />
+        <StatRow theme={t} label="Transactions" value={totalTransactions} last open={txOpen} onClick={() => setTxOpen((v) => !v)} />
       </GroupCard>
 
-      {/* Payment history group */}
+      {/* Payment history group — collapsed by default, opened from the Transactions row above */}
+      {txOpen && (
       <GroupCard theme={t}>
         <GroupLabel theme={t}>Payment history</GroupLabel>
         <div className="max-h-72 overflow-y-auto pb-1">
@@ -398,13 +413,18 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
                         <p className="text-[9px]" style={{ color: tx.status === "Completed" ? "#4ade80" : "#f87171" }}>
                           {tx.status}
                         </p>
+                        {cyc && (
+                          <p className="text-[9px] font-bold" style={{ color: cyc.remaining > 0 ? "#f87171" : "#4ade80" }}>
+                            Remaining {formatCurrency(cyc.remaining)}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
                   {short && cyc && (
                     <div className="mt-2 ml-11 rounded-lg px-2 py-1.5 border" style={{ borderColor: "rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.08)" }}>
                       <p className="text-[9px] font-bold" style={{ color: "#f87171" }}>
-                        PAID LESS THAN EXPECTED · MONTH {cyc.cycle}
+                        PAID LESS THAN EXPECTED · PAYMENT #{cyc.cycle}
                       </p>
                       <p className="text-[9px] mt-0.5" style={{ color: t.textMuted }}>
                         Expected {formatCurrency(cyc.due)} · Paid {formatCurrency(cyc.paid)} · Remaining{" "}
@@ -418,8 +438,10 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
           )}
         </div>
       </GroupCard>
+      )}
 
-      {/* Dues history group */}
+      {/* Dues history group — collapsed by default, opened from the Loans row above */}
+      {loansOpen && (
       <GroupCard theme={t}>
         <GroupLabel theme={t}>Dues history</GroupLabel>
         <div className="max-h-72 overflow-y-auto pb-2">
@@ -466,6 +488,7 @@ export const ClientProfilePanel: React.FC<ClientProfilePanelProps> = ({
           )}
         </div>
       </GroupCard>
+      )}
 
       {lightbox && (
         <div

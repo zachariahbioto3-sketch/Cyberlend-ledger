@@ -34,11 +34,17 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
 
   useEffect(() => {
     if (!isOpen || !loan) return;
-    setMode('interest');
+    const aheadOnOpen = (loan.carryForward || 0) === 0 && (() => {
+      const [y, m, d] = loan.nextDueDate.split('-').map(Number);
+      const due = new Date(y, (m || 1) - 1, d || 1);
+      const n = new Date(); const today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+      return due > today;
+    })();
+    setMode(aheadOnOpen ? 'settle' : 'interest');
     setDate(toLocalISO(new Date()));
     setPaymentMethod('M-Pesa');
     setReferenceNumber('REF-' + Date.now().toString().slice(-6));
-    setNotes(NOTE_INTEREST);
+    setNotes(aheadOnOpen ? NOTE_SETTLE : NOTE_INTEREST);
     setPaymentAmount(loan ? loan.monthlyInterest + (loan.carryForward || 0) : 0);
   }, [isOpen, loan?.id]);
 
@@ -53,7 +59,15 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
   const isCompleted = loan.status === 'Completed';
   const inputStyle = { background: t.bgInput, borderColor: t.border, color: t.text };
 
+  // Already paid this cycle in full (no shortfall) and the next due date hasn't
+  // arrived yet — block another interest-only payment until then. A full payoff
+  // (settle) stays available regardless, since closing the loan early is always fine.
+  const todayStart = (() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); })();
+  const nextDueDateObj = (() => { const [y, m, d] = loan.nextDueDate.split('-').map(Number); return new Date(y, (m || 1) - 1, d || 1); })();
+  const paidAhead = !isCompleted && (loan.carryForward || 0) === 0 && nextDueDateObj > todayStart;
+
   const pickMode = (m: PayMode) => {
+    if (m === 'interest' && paidAhead) return; // locked until nextDueDate
     setMode(m);
     setNotes(m === 'interest' ? NOTE_INTEREST : NOTE_SETTLE);
   };
@@ -61,6 +75,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isCompleted) return;
+    if (mode === 'interest' && paidAhead) return;
     const ref = referenceNumber.trim() || ('REF-' + Date.now().toString().slice(-6));
     const txs: Omit<RepaymentTransaction, 'id'>[] = [
       { loanId: loan.id, date, amount: paymentAmount, paymentMethod, referenceNumber: ref, status: 'Completed', paymentType: 'Interest', notes: notes || undefined },
@@ -112,23 +127,31 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
               {([
                 { key: 'interest', label: 'PAY INTEREST', sub: 'Loan rolls over' },
                 { key: 'settle', label: 'SETTLE LOAN', sub: 'Principal + interest' },
-              ] as const).map((o) => (
-                <button key={o.key} type="button" onClick={() => pickMode(o.key)}
-                  className="flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-left"
-                  style={{
-                    fontFamily: mono,
-                    borderColor: mode === o.key ? t.borderStrong : t.border,
-                    background: mode === o.key ? t.bgActive : t.bgCard,
-                    color: mode === o.key ? t.text : t.textMuted,
-                  }}>
-                  {o.key === 'interest' ? <RefreshCw className="w-4 h-4" /> : <Check className="w-4 h-4" />}
-                  <span>
-                    <span className="block text-xs font-bold">{o.label}</span>
-                    <span className="block text-[9px]">{o.sub}</span>
-                  </span>
-                </button>
-              ))}
+              ] as const).map((o) => {
+                const locked = o.key === 'interest' && paidAhead;
+                return (
+                  <button key={o.key} type="button" onClick={() => pickMode(o.key)} disabled={locked}
+                    className="flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-left disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{
+                      fontFamily: mono,
+                      borderColor: mode === o.key ? t.borderStrong : t.border,
+                      background: mode === o.key ? t.bgActive : t.bgCard,
+                      color: mode === o.key ? t.text : t.textMuted,
+                    }}>
+                    {o.key === 'interest' ? <RefreshCw className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+                    <span>
+                      <span className="block text-xs font-bold">{o.label}</span>
+                      <span className="block text-[9px]">{o.sub}</span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            {paidAhead && (
+              <p className="text-[10px] mt-2" style={{ fontFamily: mono, color: t.textFaint }}>
+                Already paid in full for this cycle — next interest payment opens {formatDate(loan.nextDueDate)}. You can still settle the loan early.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -199,7 +222,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, 
 
           <div className="flex items-center justify-end gap-2">
             <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ color: t.textMuted }}>Cancel</button>
-            <button type="submit" disabled={isCompleted} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-lg"
+            <button type="submit" disabled={isCompleted || (mode === 'interest' && paidAhead)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-lg"
               style={{ fontFamily: mono, background: t.btnPrimary, color: t.btnPrimaryTx, opacity: isCompleted ? 0.4 : 1 }}>
               <Check className="w-3.5 h-3.5" /> RECORD {formatCurrency(amount)}
             </button>
