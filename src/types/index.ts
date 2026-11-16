@@ -258,3 +258,60 @@ export interface LoanNotification {
   createdAt: string;
 }
 
+
+export type ContributionStatus = "Pending" | "Approved" | "Rejected";
+
+export interface Investor {
+  id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  idNumber?: string;
+  address?: string;
+  dateJoined: string;
+  notes?: string;
+}
+
+export interface CapitalContribution {
+  id: string;
+  investorId: string;
+  amount: number;
+  date: string;
+  status: ContributionStatus;
+  notes?: string;
+}
+
+export interface CapitalAllocation {
+  id: string;
+  contributionId: string;
+  investorId: string;
+  loanId: string;
+  amountAllocated: number;
+  share: number;
+  date: string;
+}
+
+export interface ProfitShareConfig {
+  investorId?: string;
+  profitSharePercent: number;
+  effectiveDate: string;
+}
+
+export interface CapitalReclaim {
+  id: string;
+  investorId: string;
+  amount: number;
+  date: string;
+  notes?: string;
+}
+
+export interface InvestorMetrics {
+  investorId: string;
+  totalContributed: number;
+  totalAllocated: number;
+  totalUnallocated: number;
+  totalReturned: number;
+  totalProfitShare: number;
+  totalReclaimed: number;
+  totalUnreclaimed: number;
+}
